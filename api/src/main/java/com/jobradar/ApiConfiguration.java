@@ -7,8 +7,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.SqsClientBuilder;
 
@@ -46,6 +48,28 @@ class ApiConfiguration {
             // LocalStack serves buckets under the path, not as a sub-domain.
             builder.endpointOverride(URI.create(endpoint))
                     .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build());
+        }
+        return builder.build();
+    }
+
+    /** Reads generated CVs when the user approves an application email. */
+    @Bean
+    S3Client s3Client(
+            @Value("${jobradar.aws.region}") String region, @Value("${jobradar.aws.endpoint:}") String endpoint) {
+        var builder = S3Client.builder().region(Region.of(region));
+        if (!endpoint.isBlank()) {
+            builder.endpointOverride(URI.create(endpoint)).forcePathStyle(true);
+        }
+        return builder.build();
+    }
+
+    /** Reads the users' Gmail refresh tokens. */
+    @Bean
+    SecretsManagerClient secretsManagerClient(
+            @Value("${jobradar.aws.region}") String region, @Value("${jobradar.aws.endpoint:}") String endpoint) {
+        var builder = SecretsManagerClient.builder().region(Region.of(region));
+        if (!endpoint.isBlank()) {
+            builder.endpointOverride(URI.create(endpoint));
         }
         return builder.build();
     }

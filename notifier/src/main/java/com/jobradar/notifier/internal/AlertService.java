@@ -80,16 +80,33 @@ public class AlertService {
                 .filter(posting -> posting.fitScore() != null && posting.fitScore() >= APPLY_NOW_MIN_FIT)
                 .filter(posting -> Duration.between(posting.freshSince(), now).compareTo(APPLY_NOW_MAX_AGE) < 0)
                 .flatMap(posting -> notifications.findCvKey(userId, cvVersionId).map(key -> {
-                    boolean hasLink = AlertFormatter.isUrl(posting.applyTarget());
-                    telegram.sendMessage(
+                    telegram.sendWithButtons(
                             posting.chatId(),
                             AlertFormatter.applyNowWithCv(posting, atsScore, cvLinks.presign(key)),
-                            hasLink ? "Open posting" : null,
-                            hasLink ? posting.applyTarget() : null);
+                            applyButtons(posting, cvVersionId));
                     notifications.recordSent(userId, postingId, NotificationType.APPLY_NOW, now);
                     return true;
                 }))
                 .orElse(false);
+    }
+
+    /**
+     * Buttons of the Apply-now alert. Approve sends the email, and exists only for postings that
+     * take applications by email; for every other channel the user applies on the posting itself
+     * and taps "I applied" so the tracker knows. Nothing is sent until the user taps.
+     */
+    static List<List<TelegramClient.Button>> applyButtons(AlertPosting posting, long cvVersionId) {
+        List<List<TelegramClient.Button>> rows = new java.util.ArrayList<>();
+        if (AlertFormatter.isUrl(posting.applyTarget())) {
+            rows.add(List.of(TelegramClient.Button.link("Open posting", posting.applyTarget())));
+        }
+        rows.add(List.of(
+                "email".equals(posting.applyChannel())
+                        ? TelegramClient.Button.action("Approve & send", TapData.approve(posting.postingId(), cvVersionId))
+                        : TelegramClient.Button.action("I applied", TapData.markApplied(posting.postingId(), cvVersionId)),
+                TelegramClient.Button.action("Skip", TapData.skip(posting.postingId())),
+                TelegramClient.Button.action("Later", TapData.later(posting.postingId()))));
+        return rows;
     }
 
     /** Warm band: every 3 hours, one message per user with everything aged 2 to 24 hours. */

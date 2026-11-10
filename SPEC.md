@@ -59,6 +59,13 @@ the rest"). All of them are configuration, so any can be changed later without a
 ### M3 Apply
 - Gmail push on one label; parsers for Wuzzuf, Bayt and LinkedIn alert emails.
 - Email apply on Approve (sent from the user's Gmail); tracker; follow-up reminders (7–10 days).
+- Implemented in the api: the Apply-now alert carries Approve / "I applied" / Skip / Later
+  buttons; taps are fetched by long polling (no public endpoint). Only the Approve tap of the
+  linked user (private chat id = Telegram user id) calls `ApplyService.approve`, which sends the
+  tailored CV from the user's Gmail (`gmail.send`, refresh token in Secrets Manager under
+  `app_user.gmail_token_ref`), once per posting, within `daily_apply_cap`. Postings that take no
+  email are applied to by the user, who taps "I applied". Follow-up reminders with a drafted
+  message come after 8 days. Parsing the user's Gmail label for alert emails is a separate step.
 - **Verify:** one real application sent end to end from a Telegram tap, with an `application` row
   and `follow_up_at` set.
 
