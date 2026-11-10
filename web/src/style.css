@@ -1,0 +1,9 @@
+body { font: 14px/1.4 system-ui, sans-serif; margin: 0; color: #1a1a1a; background: #fafafa; }
+main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+h1 small { font-size: 14px; font-weight: 400; color: #666; margin-left: 8px; }
+.stats { display: flex; flex-wrap: wrap; gap: 12px; }
+.stat { border: 1px solid #ddd; background: #fff; padding: 8px 14px; min-width: 120px; }
+.stat b { display: block; font-size: 22px; }
+table { width: 100%; border-collapse: collapse; background: #fff; display: block; overflow-x: auto; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid #eee; white-space: nowrap; }
+.error { color: #b00020; }
