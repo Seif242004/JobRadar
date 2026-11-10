@@ -1,0 +1,31 @@
+{
+  "email": "you@example.com",
+  "dailyApplyCap": 5,
+  "preferences": {
+    "roles": ["Backend Engineer"],
+    "cities": ["Cairo"],
+    "remote": true,
+    "jobTypes": ["internship", "full-time"],
+    "graduationDate": "2027-06-30"
+  },
+  "entries": [
+    {
+      "section": "experience",
+      "title": "Software Engineering Intern · Example Co",
+      "dates": "Jul 2026 – Aug 2026",
+      "context": "Payments Team",
+      "tags": ["Spring Boot", "PostgreSQL"],
+      "bullets": [
+        { "text": "Built 15+ REST services with Spring Boot and PostgreSQL.", "verify": false }
+      ]
+    },
+    {
+      "section": "skill",
+      "title": "Languages",
+      "tags": ["Java", "SQL"],
+      "bullets": [
+        { "text": "Languages: Java, SQL", "verify": false }
+      ]
+    }
+  ]
+}

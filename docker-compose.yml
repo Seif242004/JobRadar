@@ -1,0 +1,36 @@
+# Local stack: Postgres + pgvector, and LocalStack for SQS (hot, backlog, DLQ) and S3.
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: jobradar
+      POSTGRES_USER: jobradar
+      POSTGRES_PASSWORD: jobradar        # local only; real credentials live in Secrets Manager
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jobradar -d jobradar"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  localstack:
+    image: localstack/localstack:4.4     # pinned: this release runs without an auth token
+    environment:
+      SERVICES: sqs,s3
+      AWS_DEFAULT_REGION: eu-central-1
+    ports:
+      - "4566:4566"
+    volumes:
+      # Scripts in ready.d run once LocalStack is up; this one creates the queues and the bucket.
+      - ./localstack/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "awslocal sqs get-queue-url --queue-name jobradar-backlog"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  pgdata:

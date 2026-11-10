@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      # Runs unit tests, the Modulith boundary checks and the Flyway migration test
+      # (Testcontainers starts Postgres + pgvector on the runner's Docker).
+      - name: Maven verify
+        run: ./mvnw -B -ntp verify
+
+  terraform:
+    name: Terraform validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Format check
+        run: terraform -chdir=infra fmt -check -recursive
+
+      # -backend=false: validation needs the providers but no state and no AWS credentials.
+      - name: Validate
+        run: |
+          terraform -chdir=infra init -backend=false -input=false
+          terraform -chdir=infra validate
