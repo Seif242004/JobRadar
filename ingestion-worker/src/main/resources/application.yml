@@ -1,6 +1,21 @@
 spring:
   application:
     name: jobradar-ingestion-worker
+  datasource:
+    # Defaults match docker-compose.yml; production values come from env vars / Secrets Manager.
+    url: ${JOBRADAR_DB_URL:jdbc:postgresql://localhost:5432/jobradar}
+    username: ${JOBRADAR_DB_USER:jobradar}
+    password: ${JOBRADAR_DB_PASSWORD:jobradar}
+
+jobradar:
+  aws:
+    region: ${AWS_REGION:eu-central-1}
+    # Set only for LocalStack (http://localhost:4566); empty means the real AWS endpoints.
+    endpoint: ${JOBRADAR_AWS_ENDPOINT:}
+  ingestion:
+    queues:
+      hot-url: ${JOBRADAR_SQS_HOT_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-hot}
+      backlog-url: ${JOBRADAR_SQS_BACKLOG_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-backlog}
 
 server:
   port: ${PORT:8081}

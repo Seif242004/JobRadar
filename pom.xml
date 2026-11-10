@@ -20,6 +20,7 @@
     <properties>
         <java.version>25</java.version>
         <spring-modulith.version>2.1.2</spring-modulith.version>
+        <aws-sdk.version>2.57.12</aws-sdk.version>
     </properties>
 
     <!-- Seven Spring Modulith modules (one Maven module each), then the three deployables. -->
@@ -42,6 +43,13 @@
                 <groupId>org.springframework.modulith</groupId>
                 <artifactId>spring-modulith-bom</artifactId>
                 <version>${spring-modulith.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws-sdk.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

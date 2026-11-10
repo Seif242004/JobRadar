@@ -1,0 +1,4 @@
+spring:
+  flyway:
+    # The api owns the migrations; tests apply them from its source tree.
+    locations: filesystem:../api/src/main/resources/db/migration
