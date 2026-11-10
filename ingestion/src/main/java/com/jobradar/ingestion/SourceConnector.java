@@ -18,4 +18,9 @@ public interface SourceConnector {
      * {@link IngestionService} drops those.
      */
     List<RawPosting> fetch();
+
+    /** The source's own schedule and rate limit. Defaults to the 15 minute ATS poll interval. */
+    default SourceSchedule schedule() {
+        return SourceSchedule.ATS;
+    }
 }

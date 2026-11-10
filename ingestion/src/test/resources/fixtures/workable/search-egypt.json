@@ -1,0 +1,218 @@
+{
+ "title": "Workable",
+ "totalSize": 2078,
+ "nextPageToken": "eyJzZWFyY2hBdCI6IjIwMjYtMTEtMTBUMTc6NTk6NTkuOTk5WiIsIm9mZnNldCI6WzAuOTk5OTY2MywwLDE3ODY1MTY3MDMxMjYsImViNmI3MGE4LTAzMDctNGMyYi05ODFlLWU2YTc1MWU1MGZlNCJdfQ==",
+ "jobs": [
+  {
+   "id": "26ff2609-5f5d-437e-8981-72b471c98f9b",
+   "title": "Senior Generative AI Video Specialist - Remote - Octopus by RTG",
+   "state": "published",
+   "description": "<p>A senior, hands-on expert who produces professional, brand-ready videos with generative AI. This</p><p>person understands the science behind video generation, prepares assets carefully, plans every scene with intent,</p><p>and turns AI video from experiments into a reliable production capability.</p><p></p><p><strong>Key Responsibilities</strong></p><p>1. AI Video Generation</p><p>• Produce high-quality corporate videos end to end using AI, with Higgsfield as a core platform alongside other leading</p><p>image and video models.</p><p>• Choose the right model, mode and settings for each shot based on a real understanding of how the models behave</p><p>and where they fail.</p><p>• Deliver consistent results across characters, environments, lighting, style and brand from one shot to the next.</p><p>2. The Science Behind the Generation</p><p>• Apply a deep understanding of how diffusion and video models work, including motion, temporal consistency,</p><p>camera control, seeds, reference conditioning and how prompts are interpreted.</p><p>• Engineer prompts and references with intent, not trial and error, and document what works as reusable recipes.</p><p>• Diagnose and fix common issues such as flicker, warping, identity drift, unnatural motion and artefacts.</p><p>3. Asset Preparation</p><p>• Prepare production-ready inputs, including reference images, character sheets, product and location references,</p><p>style frames, start and end frames, and brand elements.</p><p>• Build and maintain a reusable asset library (characters, styles, environments, prompts) for consistency across</p><p>projects.</p><p>• Upscale, clean up, retouch and composite assets so they are ready for generation and final delivery.</p><p>4. Scene &amp; Story Preparation</p><p>• Turn briefs into scripts, storyboards, shot lists and scene breakdowns before any generation starts.</p><p>• Plan every scene with intent: framing, camera movement, lens feel, pacing, lighting, mood and transitions.</p><p>• Direct the full flow from concept to generation, editing, sound, voice-over, music, colour and final export.</p><p>5. Quality, Governance &amp; Enablement</p><p>• Ensure outputs meet brand, quality, legal, IP and responsible-AI standards, including the use of people's likeness</p><p>and approved content.</p><p>• Define a repeatable AI video production workflow with clear review points, turnaround times and quality standards.</p><p>• Coach designers and content teams, and stay ahead of new AI video tools and techniques.</p>",
+   "socialSharingDescription": "A senior, hands-on expert who produces professional, brand-ready videos with generative AI. Thisperson understands the science behind video generation, prepares assets carefully, plans every scene with intent,and turns AI video from experiments into a ...",
+   "employmentType": "",
+   "benefitsSection": "",
+   "requirementsSection": "<p>• 8+ years in video production, motion design, VFX, animation or content creation, with 2+ years of hands-on</p><p>generative AI video work.</p><p>• Must: Expert-level, hands-on Higgsfield experience, backed by a strong portfolio of AI-generated videos.</p><p>• Strong working knowledge of other AI image and video tools (for example Runway, Kling, Veo, Sora, Midjourney, Flux),</p><p>and the judgement to pick the right one for each shot.</p><p>• Deep understanding of how generative video models work and how to control them.</p><p>• Strong grounding in film language: storytelling, cinematography, composition, lighting, editing and pacing.</p><p>• Proficiency in editing and finishing tools such as Premiere Pro, After Effects, DaVinci Resolve and Photoshop.</p><p>• Experience with AI voice, music and lip-sync tools is a strong plus.</p><p>• Experience delivering for corporate or brand audiences, and presenting concepts and outputs to stakeholders.</p><p><strong>What We Are Looking For</strong></p><p>• Technical depth: knows why a generation works or fails, not only which prompt to use.</p><p>• Creative direction: thinks like a director: story, shots and pacing come first.</p><p>• Production discipline: prepares assets and scenes before generating and works to repeatable workflows.</p><p>• Quality eye: will not accept artefacts, inconsistency or off-brand output.</p><p></p><p><strong>Portfolio Requirement</strong></p><p>• Candidates must share a portfolio of AI-generated videos, with a short breakdown of 1–2 projects: tools used, asset</p><p>preparation, scene planning, prompting approach and post-production.</p>",
+   "url": "https://jobs.workable.com/view/5Pig55HaRRFECzaEYxQaYX/senior-generative-ai-video-specialist---remote---octopus-by-rtg-in-cairo-at-robusta",
+   "language": "en",
+   "locations": [
+    "TELECOMMUTE",
+    "Cairo, Cairo Governorate, Egypt"
+   ],
+   "location": {
+    "city": "Cairo",
+    "subregion": "Cairo Governorate",
+    "countryName": "Egypt"
+   },
+   "created": "2026-11-10T16:24:05.916Z",
+   "updated": "2026-11-10T16:24:05.916Z",
+   "company": {
+    "id": "e8728263-5f85-4d67-b5c7-92a7de059f3a",
+    "title": "robusta",
+    "website": "https://robustastudio.com/",
+    "image": "https://workablehr.s3.amazonaws.com/uploads/account/logo/276361/logo",
+    "description": "<p>robusta is a tech agency working with a diverse client base across different sectors &amp; industries on implementing digital transformation programs. Engagements are typically focused on digitization of existing operations &amp; processes and/or activation of digital customer engagement channels. With a team of 100+ tech and market consultants, robusta maintains an impactful footprint across EMEA and engages with its clients through its two key operations hubs in Egypt and Germany.</p>",
+    "url": "https://jobs.workable.com/company/uGNRDE2QgsGUtGKrRkBhB5/jobs-at-robusta",
+    "socialSharingImage": "https://workablehr.s3.amazonaws.com/uploads/account/open_graph_logo/276361/social",
+    "socialSharingDescription": "Robusta is a tech agency that works with a diverse client base across different sectors &amp; industries on implementing digital transformation programs. "
+   },
+   "isFeatured": false,
+   "workplace": "remote"
+  },
+  {
+   "department": "ADVANSYS",
+   "id": "bc2d50fb-69ed-47b7-8fdb-d83ff4f886c1",
+   "title": "Enterprise Solutions Architect",
+   "state": "published",
+   "description": "<ul><li>We are seeking an experienced Enterprise &amp; Solution Architect to define, design, and govern enterprise-wide technology solutions aligned with business objectives and IT strategy. The ideal candidate will have a strong background in solution architecture, application and data architecture, business analysis, and enterprise architecture governance.</li><li>The candidate will work closely with business stakeholders, technology teams, and senior management to translate business requirements into scalable, secure, and integrated technology solutions while supporting the establishment and continuous development of the Enterprise Architecture (EA) function.</li><li>Key Responsibilities</li><li>1. Enterprise &amp; Solution Architecture</li><ul><li><p>Design and develop end-to-end solution architectures aligned with enterprise strategy and business objectives.</p></li><li><p>Translate business requirements into scalable, flexible, and sustainable technical solutions.</p></li><li><p>Evaluate existing systems and recommend architectural improvements and modernization initiatives.</p></li><li><p>Ensure solutions adhere to enterprise architecture principles, standards, and best practices.</p></li><li><p>Assess technology options and provide recommendations based on business needs.</p></li></ul><li>2. Application &amp; Data Architecture</li><ul><li><p>Assess existing application landscapes, data structures, and technology environments.</p></li><li><p>Define application architecture, integration patterns, and data flows.</p></li><li><p>Design solutions that ensure interoperability, scalability, security, and performance.</p></li><li><p>Identify opportunities for application rationalization and technology optimization.</p></li><li><p>Support data architecture assessments and ensure alignment with enterprise data standards.</p></li></ul><li>3. Business Analysis &amp; Stakeholder Management</li><ul><li><p>Engage with business stakeholders to understand business needs, challenges, and requirements.</p></li><li><p>Translate business requirements into functional and technical architecture specifications.</p></li><li><p>Conduct business and technical impact assessments.</p></li><li><p>Facilitate discussions between business and IT teams to ensure alignment.</p></li><li><p>Develop architecture documentation, solution designs, and recommendations.</p></li></ul><li>4. Enterprise Architecture (EA) Governance</li><ul><li><p>Support the establishment, development, or operation of an Enterprise Architecture function/office.</p></li><li><p>Contribute to defining EA frameworks, methodologies, principles, and standards.</p></li><li><p>Establish and support architecture governance processes and compliance mechanisms.</p></li><li><p>Develop and maintain architecture repositories, reference models, and documentation.</p></li><li><p>Review proposed solutions to ensure compliance with enterprise architecture standards.</p></li><li><p>Support technology roadmaps and enterprise-wide transformation initiatives.</p></li></ul></ul>",
+   "socialSharingDescription": "We are seeking an experienced Enterprise &amp;amp; Solution Architect to define, design, and govern enterprise-wide technology solutions aligned with business objectives and IT strategy. The ideal candidate will have a strong background in solution arc...",
+   "employmentType": "Full-time",
+   "benefitsSection": "",
+   "requirementsSection": "<ul><li><p>8–12 years of overall experience in IT, technology, or architecture-related roles.</p></li><li><p>4–6 years of hands-on experience in Solution Architecture.</p></li><li><p>Strong experience in application architecture, data assessment, integration, and solution design.</p></li><li><p>Proven ability to understand business requirements and translate them into technical solutions.</p></li><li><p>Practical experience in establishing, developing, or supporting an Enterprise Architecture function or office.</p></li><li><p>Knowledge of enterprise architecture frameworks, governance models, and architectural standards.</p></li><li><p>Experience working with cross-functional teams and senior business and IT stakeholders.</p></li><li><p>Strong analytical, problem-solving, and communication skills.</p></li></ul><h3>Preferred Skills &amp; Knowledge</h3><ul><li><p>Familiarity with enterprise architecture frameworks such as TOGAF.</p></li><li><p>Knowledge of application and data architecture principles.</p></li><li><p>Understanding of system integration, APIs, and enterprise integration patterns.</p></li><li><p>Experience in architecture governance, technology roadmaps, and solution assessments.</p></li><li><p>Ability to develop architecture diagrams, technical documentation, and solution blueprints.</p></li><li><p>Relevant certifications in TOGAF, Enterprise Architecture, or Solution Architecture are an advantage.</p></li></ul>",
+   "url": "https://jobs.workable.com/view/peJW6dPE5mE4xfnguSVyeF/hybrid-enterprise-solutions-architect-in-nasr-city-at-advansys",
+   "language": "en",
+   "locations": [
+    "Nasr City, Al Manteqah Al Oula, Egypt"
+   ],
+   "location": {
+    "city": "Nasr City",
+    "subregion": "Al Manteqah Al Oula",
+    "countryName": "Egypt"
+   },
+   "created": "2026-11-10T14:30:36.347Z",
+   "updated": "2026-11-10T14:30:36.347Z",
+   "company": {
+    "id": "7f67f2f1-db59-4497-9ed9-8ea0518f7a9e",
+    "title": "Advansys",
+    "website": "https://www.advansys-esc.com/",
+    "image": "https://workablehr.s3.amazonaws.com/uploads/account/logo/637087/logo",
+    "description": "<p><strong>Advansys</strong> is a dynamic solutions provider that delivers smart, modular, and sustainable technology solutions that enhance operations, improve customer experiences, and drive business modernization. With over 400 skilled engineers, we serve 100+ enterprise customers across 14 countries. Specialized in a wide array of premium services including Business Automation, Industrial Digitization, Low code Development, Cloud Services, Warehouse Automation &amp; Strategic Outsourcing.</p><p>Founded in <strong>2014</strong>, Advansys is part of the INTRO Group, a private conglomerate established in 1980 with diverse investments across different business areas, oil and gas, real estate, specialized engineering, financial investment, Food &amp; manufacturing.</p>",
+    "url": "https://jobs.workable.com/company/gJuBiNFMLE7eoxCqoDL9m7/jobs-at-advansys",
+    "socialSharingImage": "https://workablehr.s3.amazonaws.com/uploads/account/open_graph_logo/637087/social",
+    "socialSharingDescription": "At Advansys, we believe that diversity leads to innovation, We&#39;re always on the lookout for individuals who are eager to make a difference and push the boundaries of what&#39;s possible.“"
+   },
+   "isFeatured": false,
+   "workplace": "hybrid"
+  },
+  {
+   "department": "Nawy Partners",
+   "id": "4cc080d0-775c-4a97-a6c1-be417c3db07b",
+   "title": "Growth Ops Associate",
+   "state": "published",
+   "description": "<p>We are eagerly looking for a proactive \"Growth Ops Associate\" who will play a vital role in scaling our Freelancers Program in Nawy Partners by driving freelancer acquisition, managing accounts and ensuring high engagement and retention. This role involves a mix of outreach, onboarding support, account management and performing tracking to help freelancers succeed on our platform. We are looking for someone who’s not afraid to roll up their sleeves and make big things happen 🚀 </p><p><br />Responsibilities:<br />1. Develop and execute strategies to increase the freelancer base (outreach campaigns, referrals, partnerships)<br />2. Guide new freelancers through the onboarding process (product setup, training, best practices)<br />3. Track and improve onboarding completion rates to reduce drop-offs.<br />4. Serve as the primary point of contact for freelancers, addressing questions via email, chat, or calls to drive engagement and resolve issues.<br />5. Monitor freelancer activity metrics (logins, deals closed, engagement)<br />6. Provide insights to leadership on freelancer growth trends &amp; bottlenecks </p>",
+   "socialSharingDescription": "We are eagerly looking for a proactive &quot;Growth Ops Associate&quot; who will play a vital role in scaling our Freelancers Program in Nawy Partners by driving freelancer acquisition, managing accounts and ensuring high engagement and retention. This...",
+   "employmentType": "",
+   "benefitsSection": "",
+   "requirementsSection": "<p>1. 1-3 years in growth operations , sales operations, account management or community management.<br />2. Data driven mindset with ability to track KPIs (e.g., conversion rates, churn, engagement)<br />3. Problem solving skills &amp; ability to troubleshoot freelancer issues quickly.<br />4. Strong communication skills (calls, mails, presentations) </p>",
+   "url": "https://jobs.workable.com/view/atGRbxzbAkctFUPbV19pYP/growth-ops-associate-in-new-cairo-city-at-nawy-real-estate",
+   "language": "en",
+   "locations": [
+    "New Cairo City, Cairo Governorate, Egypt"
+   ],
+   "location": {
+    "city": "New Cairo City",
+    "subregion": "Cairo Governorate",
+    "countryName": "Egypt"
+   },
+   "created": "2026-11-10T12:33:55.418Z",
+   "updated": "2026-11-10T12:33:55.418Z",
+   "company": {
+    "id": "51fa8152-d3c2-4475-a024-1e1717d7b153",
+    "title": "Nawy Real Estate",
+    "website": "https://www.nawy.com/",
+    "image": "https://workablehr.s3.amazonaws.com/uploads/account/logo/558141/logo",
+    "description": "<p>Nawy is an end to end platform providing a seamless experience for prospective buyers, sellers and  investors in the real estate space.</p><p>We are a tech-based information and services hub with multiple arms that tackle every step of our clients journey from searching for a home, to buying, selling, consulting and/or investing in properties on a fully immersive digitized platform.</p><p>As a prop-tech property startup, we provide various services through our website and mobile application to our customers including brokerage and property financing services. </p>",
+    "url": "https://jobs.workable.com/company/b88YiLMpZ789kL6vgFZdeZ/jobs-at-nawy-real-estate",
+    "socialSharingImage": "https://workablehr.s3.amazonaws.com/uploads/account/open_graph_logo/558141/social",
+    "socialSharingDescription": "Nawy is a tech-based information and services hub with multiple arms that tackle every step of our clients journey from searching for a home, to buying, selling, consulting and/or investing in properties on a fully immersive digitized platform.\n"
+   },
+   "isFeatured": false,
+   "workplace": "on_site"
+  },
+  {
+   "department": "ADVANSYS",
+   "id": "fa7b7517-00e8-4143-899a-c55db6ff28e2",
+   "title": "Senior Frontend Developer (Angular)",
+   "state": "published",
+   "description": "<p></p><ul><li>Design and develop dynamic, high-performance web applications using Angular.</li><li>Collaborate with UX/UI designers to translate wireframes and mock-ups into responsive web applications.</li><li>Enhance application performance through optimization techniques and best practices.</li><li>Implement state management solutions effectively, ensuring efficient data handling and application flow.</li><li>Conduct code reviews and provide constructive feedback to peers, ensuring high code quality.</li><li>Stay informed on the latest trends and advancements in the Angular ecosystem and web development.</li><li>Troubleshoot and debug issues to improve front-end performance and user experience.</li></ul><p></p><p></p>",
+   "socialSharingDescription": "Design and develop dynamic, high-performance web applications using Angular.Collaborate with UX/UI designers to translate wireframes and mock-ups into responsive web applications.Enhance application performance through optimization techniques and best ...",
+   "employmentType": "Full-time",
+   "benefitsSection": "<p>-Hybrid working model</p><p>-Social and medical insurance</p><p>-Transportation</p>",
+   "requirementsSection": "<p></p><ul><li>Bachelor’s degree in Computer Science, Engineering, or a related field (or equivalent work experience).</li><li>3+ years of experience in front-end development, with a strong focus on Angular.</li><li>Proficient in HTML, CSS, and JavaScript/TypeScript.</li><li>Experience with state management libraries (e.g., NgRx) and component libraries.</li><li>Familiarity with RESTful APIs and integrating back-end services.</li><li>Understanding of responsive design and web accessibility standards.</li><li>Experience with version control systems (e.g., Git) and agile methodologies.</li><li>Strong analytical and problem-solving skills.</li></ul>",
+   "url": "https://jobs.workable.com/view/wVYAuQLSFVTovG8yGUR2tY/hybrid-senior-frontend-developer-(angular)-in-cairo-at-advansys",
+   "language": "en",
+   "locations": [
+    "Cairo, Cairo Governorate, Egypt"
+   ],
+   "location": {
+    "city": "Cairo",
+    "subregion": "Cairo Governorate",
+    "countryName": "Egypt"
+   },
+   "created": "2026-11-10T11:16:46.050Z",
+   "updated": "2026-11-10T11:16:46.050Z",
+   "company": {
+    "id": "7f67f2f1-db59-4497-9ed9-8ea0518f7a9e",
+    "title": "Advansys",
+    "website": "https://www.advansys-esc.com/",
+    "image": "https://workablehr.s3.amazonaws.com/uploads/account/logo/637087/logo",
+    "description": "<p><strong>Advansys</strong> is a dynamic solutions provider that delivers smart, modular, and sustainable technology solutions that enhance operations, improve customer experiences, and drive business modernization. With over 400 skilled engineers, we serve 100+ enterprise customers across 14 countries. Specialized in a wide array of premium services including Business Automation, Industrial Digitization, Low code Development, Cloud Services, Warehouse Automation &amp; Strategic Outsourcing.</p><p>Founded in <strong>2014</strong>, Advansys is part of the INTRO Group, a private conglomerate established in 1980 with diverse investments across different business areas, oil and gas, real estate, specialized engineering, financial investment, Food &amp; manufacturing.</p>",
+    "url": "https://jobs.workable.com/company/gJuBiNFMLE7eoxCqoDL9m7/jobs-at-advansys",
+    "socialSharingImage": "https://workablehr.s3.amazonaws.com/uploads/account/open_graph_logo/637087/social",
+    "socialSharingDescription": "At Advansys, we believe that diversity leads to innovation, We&#39;re always on the lookout for individuals who are eager to make a difference and push the boundaries of what&#39;s possible.“"
+   },
+   "isFeatured": false,
+   "workplace": "hybrid"
+  },
+  {
+   "department": "Backend",
+   "id": "3d07e14c-a528-4686-b015-97f57eefb84f",
+   "title": "Senior Software Engineer PAY (Back-End)",
+   "state": "published",
+   "description": "<p><strong>Who Are We❓</strong></p><p>We Are Foodics! a leading restaurant management ecosystem and payment tech provider. Founded in 2014 with headquarter in Riyadh and offices across 5 countries, including UAE, Egypt, Jordan and Kuwait. We are currently serving customers and partners in over 35 different countries worldwide. Our innovative products have successfully processed over 6 billion (yes, billion with a B) orders so far! making Foodics one of the most rapidly evolving SaaS companies to ever emerge from the MENA region.</p><p></p><p><strong>The Job in a Nutshell💡</strong></p><p>The Senior Backend Engineer will be part of the tech team and will be expected to create, maintain, test, and debug our back-end web applications. The ultimate goal is to provide fully functional and stable applications.</p><p></p><p><strong>What You Will Do❓</strong></p><ul> <li>Establish and guide the architecture of several web applications.</li> <li>Collaborate with other designers, engineers, and product managers.</li> <li>Design and implement new features and functionalities.</li> <li>Use test-driven development to write well-tested code.</li> <li>Solve complex performance problems and architectural challenges.</li> <li>Write beautiful and well-designed code that explains itself.</li> <li>Integrate data from various services and databases.</li> <li>Offer coaching and mentoring to Junior engineers.</li> <li>Research and lead the adoption of new systems/technologies.</li> <li>Look for ways to eliminate technical debt, improve performance, and organize the code base.</li> </ul><p></p><p><strong>What Are We Looking For❓</strong></p><ul> <li>A minimum of 5 years experience in developing large-scale web applications.</li> <li>Extensive experience with relational databases.</li> <li>Strong PHP / Laravel experience is preferable. However, we also welcome experience in other languages.</li> <li>Experience writing unit and integration tests.</li> <li>Experience in designing, implementing, and deploying backend services with a focus on high availability, low latency, and consistency</li> <li>Solid understanding of REST APIs.</li> <li>Good understanding of Redis and caching.</li> <li>Experienced in leading technical projects in a fast paced environment</li> <li>Knowledge of modern queuing and caching systems like Redis.</li> <li>Great communication skills and a proven past of working effectively with different stakeholders.</li> <li>Strong analytical skills and problem-solving abilities.</li> <li>Experience with building fintech applications is a PLUS.</li> <li>Proficiency in the English language, both written and verbal.</li> <li>Ability to adapt to a time zone difference, and thrive in a remote working environment.</li> </ul><p></p><p><strong>Who Will Excel❓</strong></p><ul> <li>Participated in the design of large-scale systems, handling performance, scalability and latency</li> <li>Proven background on Fintechs and Foodtechs is a plus.</li> </ul><p></p><p><strong>What We Offer You❗</strong></p><p>We believe you will love working at Foodics!</p><ul><ul> <li>We offer highly competitive compensation packages, including bonuses and the potential for shares.</li> <li>We prioritize personal development and offer regular training and an annual learning stipend to tackle new challenges and grow your career in a hyper-growth environment.</li> <li>Join a talented team of over 30 nationalities working in 14 countries, and gain valuable experience in an exciting industry.</li> <li>We offer autonomy, mentoring, and challenging goals that create incredible opportunities for both you and the company.</li> </ul></ul>",
+   "socialSharingDescription": "Who Are We❓We Are Foodics! a leading restaurant management ecosystem and payment tech provider. Founded in 2014 with headquarter in Riyadh and offices across 5 countries, including UAE, Egypt, Jordan and Kuwait. We are currently serving customers and p...",
+   "employmentType": "Full-time",
+   "benefitsSection": "",
+   "requirementsSection": "",
+   "url": "https://jobs.workable.com/view/8x7fzQEsUfPyyeiSWmYKqk/remote-senior-software-engineer-pay-(back-end)-in-cairo-at-foodics",
+   "language": "en",
+   "locations": [
+    "TELECOMMUTE",
+    "Cairo, Cairo Governorate, Egypt"
+   ],
+   "location": {
+    "city": "Cairo",
+    "subregion": "Cairo Governorate",
+    "countryName": "Egypt"
+   },
+   "created": "2026-11-10T11:01:20.785Z",
+   "updated": "2026-11-10T11:01:20.785Z",
+   "company": {
+    "id": "67b0fd1b-5480-45a7-87d3-d7e07f39926a",
+    "title": "Foodics",
+    "website": "http://www.foodics.com",
+    "image": "https://workablehr.s3.amazonaws.com/uploads/account/logo/414416/logo",
+    "description": "<p><strong>We Are Foodics. </strong>Your number one source for all restaurant management needs and your gateway to the F&amp;B &amp; Fintech ecosystem. We are dedicated to providing you with the best industry solutions to help you manage your business and grow seamlessly. Foodics POS solution is a cloud-based software compatible with all platforms in multiple languages (Arabic, English, and French). Throughout the years, we have updated and improved this solution for the ultimate streamlining of restaurant operations.</p><p>Founded in 2014 and headquartered in Riyadh,Saudi Arabia. Foodics is currently available across the MENA region, with offices based in Saudi Arabia, United Arab Emirates, Jordan, Egypt and Kuwait with a culture retaining talents and promoting creativity and efficiency.</p><p>We are expanding<strong> internationally</strong> and look forward to our next new branch soon.</p><p><br /></p><p><strong>Vision</strong></p><p>Our aim is to become the one-stop-shop solution for the restaurant industry and their door to the ecosystem.<br /><br /></p><p><strong>Mission</strong></p><p>Empowering restaurant owners with the technology they need to operate their business, get in control of their operations, and unleash their potential.</p>",
+    "url": "https://jobs.workable.com/company/dNDv7kYXzuuC6vh18jDDQf/jobs-at-foodics",
+    "socialSharingImage": "https://workablehr.s3.amazonaws.com/uploads/account/open_graph_logo/414416/social",
+    "socialSharingDescription": "We Are Foodics. \nYour number one source for all restaurant management needs and your gateway to the F&amp;B &amp; Fintech ecosystem. We are dedicated to providing you with the best industry solutions to help you manage your business and grow seamlessly."
+   },
+   "isFeatured": false,
+   "workplace": "remote"
+  },
+  {
+   "id": "3f17415a-7655-4ad8-8d96-a3dcc51f8380",
+   "title": "Senior Backend Developer - Node.js",
+   "state": "published",
+   "description": "<p></p><h3>Job Summary</h3><p> </p><p>We are seeking a <strong>Senior Backend Developer</strong> with 6-7 years of experience in backend development using <strong>Node.js and TypeScript</strong>. The ideal candidate will have strong expertise in developing scalable microservices, enterprise integrations, API development, and production support. The role requires excellent troubleshooting and problem-solving capabilities to investigate and resolve complex issues across microservices, workflows, messaging systems, databases, and external integrations.</p><p> </p><h3>Key Responsibilities</h3><p> </p><ul><li>Design, develop, and maintain backend applications and microservices using <strong>Node.js</strong> and <strong>TypeScript</strong>.</li><li>Build, enhance, and support <strong>RESTful APIs</strong> and <strong>GraphQL services</strong>.</li><li>Develop, maintain, and troubleshoot <strong>Camunda workflows</strong> (Camunda experience is a plus but not mandatory; training will be provided).</li><li>Investigate and resolve workflow execution issues, stuck processes, worker failures, and production incidents.</li><li>Develop and support messaging integrations using <strong>RabbitMQ</strong> and <strong>Azure Service Bus</strong>.</li><li>Diagnose and resolve production issues across APIs, microservices, workflows, messaging queues, databases, and third-party integrations.</li><li>Conduct root cause analysis and implement long-term technical solutions.</li><li>Manage source code using <strong>Git/GitLab</strong>, including branching, merging, rebasing, cherry-picking, conflict resolution, and release management.</li><li>Understand, support, and troubleshoot existing <strong>Java/Spring Boot</strong> services.</li><li>Participate in code reviews, deployments, production support activities, and critical incident resolution.</li><li>Collaborate closely with DevOps, Infrastructure, QA, and Integration teams to deliver high-quality solutions.</li><li>Work with <strong>Oracle Databases</strong> and troubleshoot database performance and application-related issues.</li></ul>",
+   "socialSharingDescription": "Job Summary We are seeking a Senior Backend Developer with 6-7 years of experience in backend development using Node.js and TypeScript. The ideal candidate will have strong expertise in developing scalable microservices, enterprise integrations, API de...",
+   "employmentType": "Full-time",
+   "benefitsSection": "",
+   "requirementsSection": "<p> a { text-decoration: none; color: #464feb; } tr th, tr td { border: 1px solid #e6e6e6; } tr th { background-color: #f5f5f5; } </p><p>6-7 years of hands-on experience in backend software development.</p><p> </p><p>Strong expertise in <strong>Node.js</strong>, <strong>TypeScript</strong>, and microservices architecture.</p><p> </p><p>Experience developing and supporting <strong>REST APIs</strong> and <strong>GraphQL APIs</strong>.</p><p> </p><p>Hands-on experience with <strong>RabbitMQ</strong>, <strong>Azure Service Bus</strong>, or similar messaging platforms.</p><p> </p><p>Strong production support, troubleshooting, and problem-resolution skills.</p><p> </p><p>Experience with <strong>Git/GitLab</strong> version control and release management practices.</p><p> </p><p>Good understanding of database concepts and experience with <strong>Oracle Database</strong>.</p><p> </p><p>Ability to investigate issues across distributed systems and enterprise integrations.</p><p> </p><p>Experience with <strong>Java/Spring Boot</strong> support and troubleshooting is highly preferred.</p><p> </p><p>Experience with workflow engines such as <strong>Camunda</strong> is a plus.</p><p> </p><p>Strong analytical, communication, and problem-solving skills.</p><p> </p><p><strong>Arabic language proficiency is mandatory.</strong></p>",
+   "url": "https://jobs.workable.com/view/8MS18LacG1vkANV2ECNVeJ/remote-senior-backend-developer---node.js-in-egypt-at-blackstone-eit",
+   "language": "en",
+   "locations": [
+    "TELECOMMUTE",
+    "Egypt"
+   ],
+   "location": {
+    "city": "",
+    "subregion": null,
+    "countryName": "Egypt"
+   },
+   "created": "2026-11-10T10:22:42.767Z",
+   "updated": "2026-11-10T10:22:42.767Z",
+   "company": {
+    "id": "dd0ceb54-6df5-499f-bbdc-5fc33e7f50ba",
+    "title": "BlackStone eIT",
+    "website": "https://www.blackstoneeit.com/",
+    "image": "https://workablehr.s3.amazonaws.com/uploads/account/logo/612443/logo",
+    "description": "",
+    "url": "https://jobs.workable.com/company/tibAGcW55dzHFist5SpD3s/jobs-at-blackstone-eit",
+    "socialSharingDescription": ""
+   },
+   "isFeatured": false,
+   "workplace": "remote"
+  }
+ ],
+ "autoAppliedFilters": {}
+}
