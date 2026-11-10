@@ -1,0 +1,58 @@
+name: Deploy
+
+# Builds the three images and pushes them to ECR on every push to main.
+# One-time setup after the first `terraform apply`: add two repository variables in GitHub
+# (Settings > Secrets and variables > Actions > Variables):
+#   AWS_ROLE_ARN  = the github_deploy_role_arn Terraform output
+#   AWS_REGION    = eu-central-1
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write   # lets the job request the OIDC token that AWS exchanges for credentials
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  images:
+    name: Build and push images
+    # Skipped until the AWS side exists, so pushes before `terraform apply` stay green.
+    if: vars.AWS_ROLE_ARN != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Build jars
+        run: ./mvnw -B -ntp verify
+
+      - name: Assume the deploy role (OIDC, no stored keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Log in to ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          TAG: ${{ github.sha }}
+        run: |
+          # Tags are immutable in ECR, so each image is tagged with the commit SHA only.
+          for app in api ingestion-worker tailoring-worker; do
+            image="$REGISTRY/jobradar/$app:$TAG"
+            docker build --build-arg APP="$app" -t "$image" .
+            docker push "$image"
+          done

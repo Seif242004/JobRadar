@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: jobradar-tailoring-worker
+
+server:
+  port: ${PORT:8082}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

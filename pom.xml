@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.2</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.jobradar</groupId>
+    <artifactId>jobradar</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>JobRadar</name>
+    <description>Egypt-first job-search copilot</description>
+
+    <properties>
+        <java.version>25</java.version>
+        <spring-modulith.version>2.1.2</spring-modulith.version>
+    </properties>
+
+    <!-- Seven Spring Modulith modules (one Maven module each), then the three deployables. -->
+    <modules>
+        <module>profile</module>
+        <module>ingestion</module>
+        <module>matching</module>
+        <module>tailoring</module>
+        <module>apply</module>
+        <module>notifier</module>
+        <module>tracker</module>
+        <module>api</module>
+        <module>ingestion-worker</module>
+        <module>tailoring-worker</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.modulith</groupId>
+                <artifactId>spring-modulith-bom</artifactId>
+                <version>${spring-modulith.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.jobradar</groupId>
+                <artifactId>profile</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jobradar</groupId>
+                <artifactId>ingestion</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jobradar</groupId>
+                <artifactId>matching</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jobradar</groupId>
+                <artifactId>tailoring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jobradar</groupId>
+                <artifactId>apply</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jobradar</groupId>
+                <artifactId>notifier</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jobradar</groupId>
+                <artifactId>tracker</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: jobradar-api
+  datasource:
+    # Defaults match docker-compose.yml; production values come from env vars / Secrets Manager.
+    url: ${JOBRADAR_DB_URL:jdbc:postgresql://localhost:5432/jobradar}
+    username: ${JOBRADAR_DB_USER:jobradar}
+    password: ${JOBRADAR_DB_PASSWORD:jobradar}
+  flyway:
+    enabled: true
+
+server:
+  port: ${PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
