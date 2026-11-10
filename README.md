@@ -54,6 +54,19 @@ Health endpoints: api `:8080/actuator/health`, ingestion-worker `:8081`, tailori
 
 Local queues: `jobradar-hot`, `jobradar-backlog`, `jobradar-dlq`. Local bucket: `jobradar-local`.
 
+## Master profile
+
+The profile is a JSON seed file of CV bullets grouped by entry; see `seed/profile.example.json`.
+Real seed files hold personal data and are git-ignored (`seed/*`).
+
+```sh
+JOBRADAR_PROFILE_SEED_FILE=seed/me.profile.json java -jar api/target/api.jar
+```
+
+The import runs on api startup and is safe to repeat: existing bullets keep their IDs, new ones
+are added, nothing is deleted. Each bullet is tagged with its entry's technologies, an
+`entry:<slug>` tag, and `verify` when its wording is not confirmed yet.
+
 ## Infrastructure
 
 ```sh

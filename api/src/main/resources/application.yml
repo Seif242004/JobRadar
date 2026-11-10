@@ -17,3 +17,9 @@ management:
     web:
       exposure:
         include: health
+
+jobradar:
+  profile:
+    # Optional path to a profile seed file (see seed/profile.example.json). Imported on startup;
+    # safe to re-run. Empty means no import.
+    seed-file: ${JOBRADAR_PROFILE_SEED_FILE:}

@@ -5,27 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.postgresql.PostgreSQLContainer;
-import org.testcontainers.utility.DockerImageName;
 
-/**
- * Boots the api against a real Postgres + pgvector container, so Flyway V1 is applied exactly as
- * it will be in production, then checks the multi-user rules of the data model.
- */
-@SpringBootTest
-@Testcontainers
-class SchemaMigrationTests {
-
-    // Same image as docker-compose.yml; declared compatible so Testcontainers treats it as Postgres.
-    @Container
-    @ServiceConnection
-    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(
-            DockerImageName.parse("pgvector/pgvector:pg17").asCompatibleSubstituteFor("postgres"));
+/** Checks that Flyway V1 produces the multi-user data model of docs/PLAN.md. */
+class SchemaMigrationTests extends PostgresIntegrationTest {
 
     /** Per-user tables from docs/PLAN.md; each must carry user_id. */
     private static final List<String> PER_USER_TABLES = List.of(
@@ -59,20 +42,23 @@ class SchemaMigrationTests {
     @Test
     void deletingAUserRemovesAllOfTheirDataButKeepsSharedPostings() {
         Long userId = jdbc.queryForObject(
-                "INSERT INTO app_user (email, daily_apply_cap) VALUES ('u@example.com', 5) RETURNING id",
+                "INSERT INTO app_user (email, daily_apply_cap) VALUES ('cascade@example.com', 5) RETURNING id",
                 Long.class);
         Long postingId = jdbc.queryForObject(
                 "INSERT INTO posting (source, source_id, title, content_hash) "
-                        + "VALUES ('fixture', '1', 'Backend Intern', 'h1') RETURNING id",
+                        + "VALUES ('fixture', 'cascade-1', 'Backend Intern', 'h1') RETURNING id",
                 Long.class);
         jdbc.update("INSERT INTO bullet (user_id, section, text) VALUES (?, 'project', 'Built X')", userId);
         jdbc.update("INSERT INTO match (user_id, posting_id, eligible) VALUES (?, ?, TRUE)", userId, postingId);
 
         jdbc.update("DELETE FROM app_user WHERE id = ?", userId);
 
-        assertThat(jdbc.queryForObject("SELECT count(*) FROM bullet", Long.class)).isZero();
-        assertThat(jdbc.queryForObject("SELECT count(*) FROM match", Long.class)).isZero();
-        assertThat(jdbc.queryForObject("SELECT count(*) FROM posting", Long.class)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM bullet WHERE user_id = ?", Long.class, userId))
+                .isZero();
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM match WHERE user_id = ?", Long.class, userId))
+                .isZero();
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM posting WHERE id = ?", Long.class, postingId))
+                .isEqualTo(1);
     }
 
     @Test

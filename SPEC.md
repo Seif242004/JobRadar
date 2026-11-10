@@ -30,7 +30,8 @@ the rest"). All of them are configuration, so any can be changed later without a
   Runnable apps: `api`, `ingestion-worker`, `tailoring-worker`. `web/` and `infra/` directories.
 - Flyway migration V1: the 11 tables of the plan's data model, exactly those fields, plus the
   `vector` extension. Every per-user table carries `user_id`.
-- Master profile stored as `bullet` rows with IDs (seed import from a file Seif provides).
+- Master profile stored as `bullet` rows with IDs, imported from a git-ignored JSON seed file
+  (`jobradar.profile.seed-file`); idempotent, IDs stable across re-imports.
 - `docker-compose.yml`: Postgres + pgvector, LocalStack (SQS hot queue, backlog queue, DLQ; S3).
 - Terraform in `infra/`: VPC, RDS PostgreSQL, S3, ECR. `plan` only from tooling; Seif runs `apply`.
 - GitHub Actions: build and test on push; deploy with OIDC (no long-lived AWS keys).
@@ -90,6 +91,11 @@ queue when age < 2 h, otherwise on the backlog queue. Failed parses go to the DL
 - Bands: Hot (< 2 h, fit >= 80), Warm (2–24 h, batched every 3 h), Backlog (> 24 h, never pushed),
   Deadline (exempt from decay until 3 days before the closing date, then pushed once).
 - Dedupe key: apply URL, and a hash of company + title + location (`content_hash`).
+
+**Open for M2 (CV rendering):** the plan's `bullet` table has no place for an entry's heading,
+dates and sub-heading, or for the CV header, education, programs and languages. M0 keeps them in
+the seed file and links bullets of one entry with an `entry:<slug>` tag. M2 must decide where the
+renderer reads them from.
 
 ## 4. Testing strategy
 - Connector tests use recorded fixtures; no live network calls in tests.
