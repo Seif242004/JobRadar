@@ -35,6 +35,11 @@
             <artifactId>tracker</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sqs</artifactId>
+        </dependency>
+
         <!-- HTTP is used for the actuator health endpoint that ECS checks. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
