@@ -21,6 +21,7 @@
         <java.version>25</java.version>
         <spring-modulith.version>2.1.2</spring-modulith.version>
         <aws-sdk.version>2.57.12</aws-sdk.version>
+        <pdfbox.version>3.0.8</pdfbox.version>
     </properties>
 
     <!-- The shared LLM client library, the seven Spring Modulith modules, then the three deployables. -->

@@ -53,7 +53,7 @@ class OpenAiCompatibleClientTests {
     private OpenAiCompatibleClient client(String key, int dailyCap, Clock clock) {
         AiProperties properties = new AiProperties(
                 "http://127.0.0.1:" + server.getAddress().getPort() + "/v1/",
-                key, "primary-model", List.of("backup-model"), "embed-model", dailyCap, Duration.ofSeconds(5));
+                key, "primary-model", List.of("backup-model"), "embed-model", 1024, "passage", dailyCap, Duration.ofSeconds(5));
         return new OpenAiCompatibleClient(properties, JsonMapper.builder().build(), clock);
     }
 
@@ -133,7 +133,8 @@ class OpenAiCompatibleClientTests {
         assertThat(vectors).hasSize(2);
         assertThat(vectors.get(0)).hasSize(EmbeddingClient.DIMENSIONS).containsOnly(0.25f);
         assertThat(vectors.get(1)).containsOnly(0.5f);
-        assertThat(requestBodies.get(0)).contains("\"embed-model\"", "first", "second");
+        assertThat(requestBodies.get(0))
+                .contains("\"embed-model\"", "first", "second", "\"dimensions\":1024", "\"input_type\":\"passage\"");
     }
 
     @Test

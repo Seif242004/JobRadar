@@ -85,11 +85,15 @@ public class OpenAiCompatibleClient implements LlmClient, EmbeddingClient {
         if (texts.isEmpty()) {
             return List.of();
         }
-        JsonNode data = parse(post("/embeddings", Map.of(
-                        "model", properties.embeddingModel(),
-                        "input", texts,
-                        "encoding_format", "float")))
-                .path("data");
+        Map<String, Object> body = new java.util.LinkedHashMap<>();
+        body.put("model", properties.embeddingModel());
+        body.put("input", texts);
+        body.put("encoding_format", "float");
+        body.put("dimensions", properties.embeddingDimensions());
+        if (!properties.embeddingInputType().isBlank()) {
+            body.put("input_type", properties.embeddingInputType());
+        }
+        JsonNode data = parse(post("/embeddings", body)).path("data");
         if (data.size() != texts.size()) {
             throw new LlmUnavailableException("Expected " + texts.size() + " embeddings, got " + data.size());
         }
