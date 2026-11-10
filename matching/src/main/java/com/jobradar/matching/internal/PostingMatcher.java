@@ -8,6 +8,8 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -21,10 +23,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class PostingMatcher {
 
+    private static final Logger log = LoggerFactory.getLogger(PostingMatcher.class);
+
     private final MatchRepository matches;
     private final FitScorer fitScorer;
     private final ProfileService profiles;
     private final ApplicationEventPublisher events;
+    private final TailorRequestPublisher tailorRequests;
+    private final FitProperties fitProperties;
     private final Clock clock;
 
     PostingMatcher(
@@ -32,11 +38,15 @@ public class PostingMatcher {
             FitScorer fitScorer,
             ProfileService profiles,
             ApplicationEventPublisher events,
+            TailorRequestPublisher tailorRequests,
+            FitProperties fitProperties,
             Clock clock) {
         this.matches = matches;
         this.fitScorer = fitScorer;
         this.profiles = profiles;
         this.events = events;
+        this.tailorRequests = tailorRequests;
+        this.fitProperties = fitProperties;
         this.clock = clock;
     }
 
@@ -62,8 +72,29 @@ public class PostingMatcher {
             Band band = Bands.classify(age, fitScore, posting.deadline());
             String reasons = eligibility.reason() + fit.map(f -> "; " + f.reason()).orElse("");
             matches.upsert(user.userId(), postingId, eligibility.eligible(), fitScore, priority, band, reasons);
-            events.publishEvent(new MatchScored(user.userId(), postingId, eligibility.eligible(), band));
+            requestCv(user.userId(), postingId, eligibility.eligible(), fitScore, band);
+            events.publishEvent(new MatchScored(user.userId(), postingId, eligibility.eligible(), band, fitScore));
         }
         return true;
+    }
+
+    /**
+     * Hot and Warm matches with a fit score of at least {@code tailorMinFit} get a tailored CV
+     * (SPEC.md, "tailoring consumes Hot/Warm"): Hot ones on the hot tailoring queue, Warm ones on
+     * the backlog queue. Without a fit score
+     * nothing is tailored, so an unavailable LLM or embedding endpoint never queues work.
+     *
+     * <p>A failed publish is logged and does not fail the match: redelivering the posting would
+     * repeat the fit scoring and its LLM call.
+     */
+    private void requestCv(long userId, long postingId, boolean eligible, Double fitScore, Band band) {
+        if (!eligible || fitScore == null || (band != Band.HOT && band != Band.WARM) || fitScore < fitProperties.tailorMinFit()) {
+            return;
+        }
+        try {
+            tailorRequests.publish(userId, postingId, band == Band.HOT);
+        } catch (RuntimeException e) {
+            log.warn("Could not request a CV for user {} posting {}", userId, postingId, e);
+        }
     }
 }

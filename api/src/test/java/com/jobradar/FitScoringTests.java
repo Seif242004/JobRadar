@@ -112,7 +112,10 @@ class FitScoringTests extends PostgresIntegrationTest {
         assertThat(((Number) row.get("priority")).doubleValue()).isCloseTo(91.0 * Math.pow(0.5, 5.0 / 360), within(0.5));
         // The LLM saw the posting and the user's own bullets, nothing invented.
         verify(llmClient).complete(anyString(), contains("Built backend services"));
-        verify(telegram).sendMessage(anyLong(), contains("Apply now"), any(), any());
+        // With a fit score the Apply-now push waits for the tailored CV (see ApplyNowTests); here a
+        // hot-queue request for that CV goes out instead.
+        verify(telegram, never()).sendMessage(anyLong(), any(), any(), any());
+        verify(tailorRequests).publish(userId, id, true);
     }
 
     @Test
@@ -128,6 +131,8 @@ class FitScoringTests extends PostgresIntegrationTest {
         assertThat(row.get("band")).isEqualTo("warm");
         verify(llmClient, never()).complete(anyString(), anyString());
         verify(telegram, never()).sendMessage(anyLong(), any(), any(), any());
+        // A warm match with fit 0 is not worth a CV: no tailoring request.
+        verify(tailorRequests, never()).publish(anyLong(), anyLong(), org.mockito.ArgumentMatchers.anyBoolean());
     }
 
     @Test

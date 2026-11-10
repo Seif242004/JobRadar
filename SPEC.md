@@ -76,7 +76,7 @@ Names are binding; signatures are finalized when each milestone starts.
 | `profile` | `ProfileService`: preferences and bullets by `user_id`; one-click delete of all user data | matching, tailoring, apply |
 | `ingestion` | `SourceConnector { fetch() -> List<RawPosting> }`, one per source, each with its own schedule and rate limit; `Normalizer`; `Deduper`; publishes `PostingIngested` | matching (via SQS) |
 | `matching` | Consumes `PostingIngested`; writes `match` (eligible, fit_score, priority, band, reasons); publishes `MatchScored` | tailoring, notifier |
-| `tailoring` | Consumes `MatchScored` for Hot/Warm; `LlmClient` and `EmbeddingClient` (interfaces, fakes in tests); `TailoringValidator`; `PdfRenderer`; writes `cv_version`; publishes `CvReady` | notifier, apply |
+| `tailoring` | Runs in the tailoring-worker. Consumes `TailorRequested` from `jobradar-tailor-hot` / `jobradar-tailor-backlog` (published by `matching` for eligible Hot matches, and for Warm matches with fit >= 60; never for Backlog); `LlmClient` (bullet IDs only); `TailoringValidator`; `PdfRenderer` (Typst); writes `cv_version` and the PDF under `cv/` in S3; publishes `CvReady` to `jobradar-cv-ready` | notifier, apply |
 | `notifier` | `NotificationChannel` (Telegram first, email for digests); emits `UserAction` (Approve, Skip, Later) | apply, tracker |
 | `apply` | `ApplyChannel` per channel; runs only on an Approve `UserAction`; enforces `daily_apply_cap`; writes `application` | tracker |
 | `tracker` | Application status, follow-up timers, response rates by source and CV version | notifier, api |

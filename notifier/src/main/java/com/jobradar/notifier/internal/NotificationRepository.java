@@ -20,7 +20,8 @@ public class NotificationRepository {
     private static final String ALERT_COLUMNS =
             """
             SELECT m.user_id, u.telegram_chat_id, p.id AS posting_id, p.title, c.name AS company, p.location,
-                   p.apply_channel, p.apply_target, p.deadline, m.reasons
+                   p.apply_channel, p.apply_target, p.deadline, m.reasons, m.fit_score,
+                   LEAST(p.posted_at, p.first_seen_at) AS fresh_since
             FROM match m
             JOIN app_user u ON u.id = m.user_id
             JOIN posting p ON p.id = m.posting_id
@@ -73,8 +74,18 @@ public class NotificationRepository {
                 userId, type.dbValue(), postingId, Timestamp.from(sentAt));
     }
 
+    /** The stored PDF of one of the user's own CV versions, or empty. */
+    public Optional<String> findCvKey(long userId, long cvVersionId) {
+        return jdbc.queryForList(
+                        "SELECT pdf_s3_key FROM cv_version WHERE id = ? AND user_id = ? AND pdf_s3_key IS NOT NULL",
+                        String.class, cvVersionId, userId)
+                .stream()
+                .findFirst();
+    }
+
     private static AlertPosting map(ResultSet rs, int rowNum) throws SQLException {
         Timestamp deadline = rs.getTimestamp("deadline");
+        java.math.BigDecimal fit = rs.getBigDecimal("fit_score");
         return new AlertPosting(
                 rs.getLong("user_id"),
                 rs.getLong("telegram_chat_id"),
@@ -85,6 +96,8 @@ public class NotificationRepository {
                 rs.getString("apply_channel"),
                 rs.getString("apply_target"),
                 deadline == null ? null : deadline.toInstant(),
-                rs.getString("reasons"));
+                rs.getString("reasons"),
+                fit == null ? null : fit.doubleValue(),
+                rs.getTimestamp("fresh_since").toInstant());
     }
 }
