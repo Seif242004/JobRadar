@@ -36,6 +36,7 @@ These rules are enforced in code and reviewed on every change to ingestion or ap
 | `tailoring-worker/` | Deployable: tailoring |
 | `infra/` | Terraform: VPC, RDS PostgreSQL, S3, ECR, GitHub OIDC deploy role, budget alarm |
 | `web/` | React dashboard (M4) |
+| `scripts/` | `gmail_authorize.py`: one-time Gmail consent (scope `gmail.send` only) that prints the refresh-token secret to store |
 | `localstack/` | Init script that creates the local SQS queues and S3 bucket |
 
 ## Requirements

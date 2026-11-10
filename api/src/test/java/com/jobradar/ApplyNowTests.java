@@ -18,6 +18,7 @@ import com.jobradar.matching.Band;
 import com.jobradar.matching.MatchScored;
 import com.jobradar.matching.internal.PostingMatcher;
 import com.jobradar.notifier.internal.AlertService;
+import com.jobradar.notifier.internal.TelegramClient;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
@@ -94,8 +95,15 @@ class ApplyNowTests extends PostgresIntegrationTest {
         assertThat(alerts.onCvReady(userId, ids[0], ids[1], 62.5)).isFalse();
 
         ArgumentCaptor<String> text = ArgumentCaptor.forClass(String.class);
-        verify(telegram, times(1)).sendMessage(eq(CHAT_ID), text.capture(), eq("Open posting"), eq("https://example.com/j"));
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<List<TelegramClient.Button>>> rows = ArgumentCaptor.forClass(List.class);
+        verify(telegram, times(1)).sendWithButtons(eq(CHAT_ID), text.capture(), rows.capture());
         assertThat(text.getValue()).contains("Apply now", "Fit 90", "ATS keywords 63%", LINK);
+        // The posting is an ATS form: the user applies there and taps "I applied". Nothing is sent.
+        assertThat(rows.getValue().get(0)).containsExactly(TelegramClient.Button.link("Open posting", "https://example.com/j"));
+        assertThat(rows.getValue().get(1))
+                .extracting(TelegramClient.Button::label)
+                .containsExactly("I applied", "Skip", "Later");
         verify(cvLinks).presign("cv/" + userId + "/" + ids[0] + "/x.pdf");
         assertThat(jdbc.queryForObject("SELECT type FROM notification WHERE posting_id = ?", String.class, ids[0]))
                 .isEqualTo("apply_now");
@@ -107,7 +115,7 @@ class ApplyNowTests extends PostgresIntegrationTest {
 
         assertThat(alerts.onCvReady(userId, ids[0], ids[1], 50)).isFalse();
 
-        verify(telegram, never()).sendMessage(anyLong(), any(), any(), any());
+        nothingPushed();
     }
 
     @Test
@@ -116,7 +124,7 @@ class ApplyNowTests extends PostgresIntegrationTest {
 
         assertThat(alerts.onCvReady(userId, ids[0], ids[1], 50)).isFalse();
 
-        verify(telegram, never()).sendMessage(anyLong(), any(), any(), any());
+        nothingPushed();
     }
 
     @Test
@@ -130,7 +138,7 @@ class ApplyNowTests extends PostgresIntegrationTest {
         // The message claims the other user's match but names this user's CV version.
         assertThat(alerts.onCvReady(other, ids[0], ids[1], 50)).isFalse();
 
-        verify(telegram, never()).sendMessage(anyLong(), any(), any(), any());
+        nothingPushed();
         verify(cvLinks, never()).presign(any());
     }
 
@@ -140,7 +148,7 @@ class ApplyNowTests extends PostgresIntegrationTest {
 
         events.publishEvent(new MatchScored(userId, ids[0], true, Band.HOT, 92.0));
 
-        verify(telegram, never()).sendMessage(anyLong(), any(), any(), any());
+        nothingPushed();
     }
 
     @Test
@@ -188,6 +196,11 @@ class ApplyNowTests extends PostgresIntegrationTest {
         assertThat(matcher.match(id)).isTrue();
 
         assertThat(jdbc.queryForObject("SELECT count(*) FROM match WHERE posting_id = ?", Integer.class, id)).isEqualTo(1);
+    }
+
+    private void nothingPushed() {
+        verify(telegram, never()).sendMessage(anyLong(), any(), any(), any());
+        verify(telegram, never()).sendWithButtons(anyLong(), any(), any());
     }
 
     private static float[] backend() {

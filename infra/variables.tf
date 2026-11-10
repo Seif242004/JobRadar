@@ -56,3 +56,9 @@ variable "deploy_services" {
   type        = bool
   default     = false
 }
+
+variable "google_client_id" {
+  description = "Client ID of the Google OAuth client used to send applications from the users' Gmail. Not a secret."
+  type        = string
+  default     = ""
+}

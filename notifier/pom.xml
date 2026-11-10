@@ -24,6 +24,14 @@
             <artifactId>matching</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.jobradar</groupId>
+            <artifactId>apply</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jobradar</groupId>
+            <artifactId>tracker</artifactId>
+        </dependency>
+        <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
         </dependency>

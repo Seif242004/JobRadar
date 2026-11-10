@@ -74,6 +74,22 @@ public class NotificationRepository {
                 userId, type.dbValue(), postingId, Timestamp.from(sentAt));
     }
 
+    /** The user linked to this Telegram chat, or empty. */
+    public Optional<Long> findUserByChat(long chatId) {
+        return jdbc.queryForList("SELECT id FROM app_user WHERE telegram_chat_id = ?", Long.class, chatId).stream()
+                .findFirst();
+    }
+
+    /** Records the user's choice on the Apply-now alert; the first choice stands. */
+    public void recordAction(long userId, long postingId, String action, Instant at) {
+        jdbc.update(
+                """
+                UPDATE notification SET acted_at = ?, action = ?
+                WHERE user_id = ? AND posting_id = ? AND type = 'apply_now' AND acted_at IS NULL
+                """,
+                Timestamp.from(at), action, userId, postingId);
+    }
+
     /** The stored PDF of one of the user's own CV versions, or empty. */
     public Optional<String> findCvKey(long userId, long cvVersionId) {
         return jdbc.queryForList(

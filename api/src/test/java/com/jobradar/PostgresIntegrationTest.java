@@ -2,6 +2,8 @@ package com.jobradar;
 
 import com.jobradar.llm.EmbeddingClient;
 import com.jobradar.llm.LlmClient;
+import com.jobradar.apply.internal.CvPdfReader;
+import com.jobradar.apply.internal.GmailSender;
 import com.jobradar.matching.internal.TailorRequestPublisher;
 import com.jobradar.notifier.internal.CvLinks;
 import com.jobradar.notifier.internal.TelegramClient;
@@ -45,6 +47,13 @@ abstract class PostgresIntegrationTest {
     /** Signing needs AWS credentials; tests only care that a link is shown. */
     @MockitoBean
     CvLinks cvLinks;
+
+    /** No test may send a real email or read S3. */
+    @MockitoBean
+    GmailSender gmail;
+
+    @MockitoBean
+    CvPdfReader cvReader;
 
     static {
         POSTGRES.start();

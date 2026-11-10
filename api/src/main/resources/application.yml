@@ -12,7 +12,9 @@ spring:
     scheduling:
       pool:
         # The hot and backlog queue polls must never wait on each other or on the alert jobs.
-        size: 4
+        # Four of these run long polls (two posting queues, CV-ready, Telegram taps); the rest
+        # is left for the alert and follow-up jobs.
+        size: 8
 
 server:
   port: ${PORT:8080}
@@ -51,6 +53,13 @@ jobradar:
     cv-link-ttl: ${JOBRADAR_CV_LINK_TTL:12h}
     queues:
       cv-ready-url: ${JOBRADAR_SQS_CV_READY_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-cv-ready}
+  apply:
+    follow-up-days: ${JOBRADAR_FOLLOW_UP_DAYS:8}
+    cv-bucket: ${JOBRADAR_S3_BUCKET:jobradar-local}
+  google:
+    # OAuth client of the Google Cloud project; users' refresh tokens live in Secrets Manager.
+    client-id: ${JOBRADAR_GOOGLE_CLIENT_ID:}
+    client-secret: ${JOBRADAR_GOOGLE_CLIENT_SECRET:}
   telegram:
     # Bot token from @BotFather; empty disables sending (alerts are logged instead).
     bot-token: ${JOBRADAR_TELEGRAM_BOT_TOKEN:}

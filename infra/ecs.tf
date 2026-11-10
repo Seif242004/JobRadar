@@ -51,6 +51,7 @@ locals {
       { name = "JOBRADAR_SQS_TAILOR_HOT_URL", value = local.queue_urls["tailor-hot"] },
       { name = "JOBRADAR_SQS_TAILOR_BACKLOG_URL", value = local.queue_urls["tailor-backlog"] },
       { name = "JOBRADAR_SQS_CV_READY_URL", value = local.queue_urls["cv-ready"] },
+      { name = "JOBRADAR_GOOGLE_CLIENT_ID", value = var.google_client_id },
     ]
     ingestion-worker = [
       { name = "JOBRADAR_SQS_HOT_URL", value = local.queue_urls["hot"] },
@@ -65,7 +66,7 @@ locals {
     ]
   }
   service_secrets = {
-    api              = [local.db_password_secret, local.ai_key_secret, { name = "JOBRADAR_TELEGRAM_BOT_TOKEN", valueFrom = aws_secretsmanager_secret.telegram_bot_token.arn }]
+    api              = [local.db_password_secret, local.ai_key_secret, { name = "JOBRADAR_TELEGRAM_BOT_TOKEN", valueFrom = aws_secretsmanager_secret.telegram_bot_token.arn }, { name = "JOBRADAR_GOOGLE_CLIENT_SECRET", valueFrom = aws_secretsmanager_secret.google_client_secret.arn }]
     ingestion-worker = [local.db_password_secret]
     tailoring-worker = [local.db_password_secret, local.ai_key_secret]
   }
@@ -113,6 +114,7 @@ data "aws_iam_policy_document" "execution_secrets" {
       aws_db_instance.main.master_user_secret[0].secret_arn,
       aws_secretsmanager_secret.ai_key.arn,
       aws_secretsmanager_secret.telegram_bot_token.arn,
+      aws_secretsmanager_secret.google_client_secret.arn,
     ]
   }
 }
@@ -140,6 +142,8 @@ locals {
       { actions = ["sqs:SendMessage"], resources = [for key in ["tailor-hot", "tailor-backlog"] : aws_sqs_queue.work[key].arn] },
       # The api signs download links for generated CVs.
       { actions = ["s3:GetObject"], resources = ["${aws_s3_bucket.data.arn}/cv/*"] },
+      # Users' Gmail refresh tokens, one secret per user under jobradar/gmail/.
+      { actions = ["secretsmanager:GetSecretValue"], resources = ["arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:${var.name}/gmail/*"] },
     ]
     ingestion-worker = [
       { actions = ["sqs:SendMessage"], resources = [for key in ["hot", "backlog"] : aws_sqs_queue.work[key].arn] },
