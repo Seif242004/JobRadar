@@ -2,6 +2,8 @@ package com.jobradar;
 
 import com.jobradar.llm.EmbeddingClient;
 import com.jobradar.llm.LlmClient;
+import com.jobradar.matching.internal.TailorRequestPublisher;
+import com.jobradar.notifier.internal.CvLinks;
 import com.jobradar.notifier.internal.TelegramClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -17,7 +19,7 @@ import org.testcontainers.utility.DockerImageName;
  * which also lets Spring reuse one application context across the test classes.
  */
 // The SQS listener is off: tests call the matcher directly and need no queue.
-@SpringBootTest(properties = "jobradar.matching.listener.enabled=false")
+@SpringBootTest(properties = {"jobradar.matching.listener.enabled=false", "jobradar.notifier.listener.enabled=false"})
 abstract class PostgresIntegrationTest {
 
     // Same image as docker-compose.yml; declared compatible so Testcontainers treats it as Postgres.
@@ -35,6 +37,14 @@ abstract class PostgresIntegrationTest {
 
     @MockitoBean
     LlmClient llmClient;
+
+    /** No test may publish to SQS: tailoring requests are recorded by the mock. */
+    @MockitoBean
+    TailorRequestPublisher tailorRequests;
+
+    /** Signing needs AWS credentials; tests only care that a link is shown. */
+    @MockitoBean
+    CvLinks cvLinks;
 
     static {
         POSTGRES.start();

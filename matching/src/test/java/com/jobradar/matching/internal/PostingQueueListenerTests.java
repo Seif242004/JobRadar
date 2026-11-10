@@ -22,7 +22,7 @@ class PostingQueueListenerTests {
     private final SqsClient sqs = mock(SqsClient.class);
     private final PostingMatcher matcher = mock(PostingMatcher.class);
     private final PostingQueueListener listener = new PostingQueueListener(
-            sqs, JsonMapper.builder().build(), matcher, new MatchingProperties(new MatchingProperties.Queues("hot", "backlog")));
+            sqs, JsonMapper.builder().build(), matcher, new MatchingProperties(new MatchingProperties.Queues("hot", "backlog", "tailor-hot", "tailor-backlog")));
 
     @SuppressWarnings("unchecked")
     private void queueHolds(String... bodies) {

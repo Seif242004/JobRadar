@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.SqsClientBuilder;
 
@@ -31,6 +33,19 @@ class ApiConfiguration {
         SqsClientBuilder builder = SqsClient.builder().region(Region.of(region));
         if (!endpoint.isBlank()) {
             builder.endpointOverride(URI.create(endpoint));
+        }
+        return builder.build();
+    }
+
+    /** Signs CV download links locally; no request leaves the process. */
+    @Bean
+    S3Presigner s3Presigner(
+            @Value("${jobradar.aws.region}") String region, @Value("${jobradar.aws.endpoint:}") String endpoint) {
+        S3Presigner.Builder builder = S3Presigner.builder().region(Region.of(region));
+        if (!endpoint.isBlank()) {
+            // LocalStack serves buckets under the path, not as a sub-domain.
+            builder.endpointOverride(URI.create(endpoint))
+                    .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build());
         }
         return builder.build();
     }

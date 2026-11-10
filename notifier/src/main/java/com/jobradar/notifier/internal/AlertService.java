@@ -16,7 +16,8 @@ import org.springframework.stereotype.Service;
  * Alerts by freshness band (docs/PLAN.md, "Freshness first"):
  *
  * <ul>
- *   <li>Hot: pushed the moment the match is scored.
+ *   <li>Hot with fit 85+ and under 1 hour old: pushed when its tailored CV is ready. Hot without a
+ *       fit score: pushed the moment the match is scored.
  *   <li>Warm (2 to 24 hours old): one batched message every 3 hours, best first.
  *   <li>Backlog (over 24 hours): never pushed.
  *   <li>Deadline: pushed once, when the closing date is at most 3 days away.
@@ -31,22 +32,29 @@ public class AlertService {
 
     static final Duration HOT_WINDOW = Duration.ofHours(2);
     static final Duration WARM_WINDOW = Duration.ofHours(24);
+    static final double APPLY_NOW_MIN_FIT = 85.0;
+    static final Duration APPLY_NOW_MAX_AGE = Duration.ofHours(1);
     static final Duration DEADLINE_WINDOW = Duration.ofDays(3);
 
     private final NotificationRepository notifications;
     private final TelegramClient telegram;
+    private final CvLinks cvLinks;
     private final Clock clock;
 
-    AlertService(NotificationRepository notifications, TelegramClient telegram, Clock clock) {
+    AlertService(NotificationRepository notifications, TelegramClient telegram, CvLinks cvLinks, Clock clock) {
         this.notifications = notifications;
         this.telegram = telegram;
+        this.cvLinks = cvLinks;
         this.clock = clock;
     }
 
-    /** Hot band: instant "Apply now" push. */
+    /**
+     * Hot band without a fit score (SPEC.md D8): instant push, since no tailored CV will follow.
+     * With a fit score the push waits for the CV, see {@link #onCvReady}.
+     */
     @EventListener
     public void onMatchScored(MatchScored match) {
-        if (!match.eligible() || match.band() != Band.HOT) {
+        if (!match.eligible() || match.band() != Band.HOT || match.fitScore() != null) {
             return;
         }
         notifications.findPending(match.userId(), match.postingId()).ifPresent(posting -> {
@@ -58,6 +66,30 @@ public class AlertService {
                     hasLink ? posting.applyTarget() : null);
             notifications.recordSent(posting.userId(), posting.postingId(), NotificationType.APPLY_NOW, clock.instant());
         });
+    }
+
+    /**
+     * Apply now (SPEC.md D7): fit at least 85, posting under 1 hour old, and the CV is ready.
+     * Anything else stays pending and falls through to the warm batch or the dashboard.
+     *
+     * @return true when a push was sent
+     */
+    public boolean onCvReady(long userId, long postingId, long cvVersionId, double atsScore) {
+        Instant now = clock.instant();
+        return notifications.findPending(userId, postingId)
+                .filter(posting -> posting.fitScore() != null && posting.fitScore() >= APPLY_NOW_MIN_FIT)
+                .filter(posting -> Duration.between(posting.freshSince(), now).compareTo(APPLY_NOW_MAX_AGE) < 0)
+                .flatMap(posting -> notifications.findCvKey(userId, cvVersionId).map(key -> {
+                    boolean hasLink = AlertFormatter.isUrl(posting.applyTarget());
+                    telegram.sendMessage(
+                            posting.chatId(),
+                            AlertFormatter.applyNowWithCv(posting, atsScore, cvLinks.presign(key)),
+                            hasLink ? "Open posting" : null,
+                            hasLink ? posting.applyTarget() : null);
+                    notifications.recordSent(userId, postingId, NotificationType.APPLY_NOW, now);
+                    return true;
+                }))
+                .orElse(false);
     }
 
     /** Warm band: every 3 hours, one message per user with everything aged 2 to 24 hours. */

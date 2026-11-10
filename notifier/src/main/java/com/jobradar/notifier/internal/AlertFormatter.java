@@ -23,6 +23,14 @@ final class AlertFormatter {
         return "🔥 Apply now\n" + headline(posting) + "\n" + nullToEmpty(posting.reasons());
     }
 
+    /** Apply-now push with the tailored CV: fit, ATS keyword coverage and the presigned PDF link. */
+    static String applyNowWithCv(AlertPosting posting, double atsScore, String cvLink) {
+        return "🔥 Apply now\n" + headline(posting)
+                + "\nFit " + Math.round(posting.fitScore()) + " · ATS keywords " + Math.round(atsScore) + "%"
+                + "\n" + nullToEmpty(posting.reasons())
+                + "\n\nTailored CV: " + cvLink;
+    }
+
     static String deadlineSoon(AlertPosting posting, Instant now) {
         long hours = Math.max(1, Duration.between(now, posting.deadline()).toHours());
         String left = hours >= 48 ? (hours / 24) + " days" : hours + " hours";

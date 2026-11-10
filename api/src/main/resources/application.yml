@@ -41,6 +41,16 @@ jobradar:
     queues:
       hot-url: ${JOBRADAR_SQS_HOT_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-hot}
       backlog-url: ${JOBRADAR_SQS_BACKLOG_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-backlog}
+      tailor-hot-url: ${JOBRADAR_SQS_TAILOR_HOT_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-tailor-hot}
+      tailor-backlog-url: ${JOBRADAR_SQS_TAILOR_BACKLOG_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-tailor-backlog}
+  notifier:
+    listener:
+      enabled: ${JOBRADAR_QUEUE_LISTENER_ENABLED:true}
+    cv-bucket: ${JOBRADAR_S3_BUCKET:jobradar-local}
+    # How long the CV link in an Apply-now alert stays valid.
+    cv-link-ttl: ${JOBRADAR_CV_LINK_TTL:12h}
+    queues:
+      cv-ready-url: ${JOBRADAR_SQS_CV_READY_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-cv-ready}
   telegram:
     # Bot token from @BotFather; empty disables sending (alerts are logged instead).
     bot-token: ${JOBRADAR_TELEGRAM_BOT_TOKEN:}

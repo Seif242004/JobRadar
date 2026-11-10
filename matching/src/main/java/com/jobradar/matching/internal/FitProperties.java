@@ -11,10 +11,13 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
  * @param topBullets        how many of the user's closest bullets are averaged
  * @param rerankMinFit      only postings with at least this embedding fit are sent to the LLM,
  *                          which keeps the LLM to "the top few postings a day"
+ * @param tailorMinFit      Warm matches below this fit get no automatic CV; Hot matches always
+ *                          qualify (their fit is at least 80)
  */
 @ConfigurationProperties("jobradar.matching.fit")
 public record FitProperties(
         @DefaultValue("0.30") double similarityFloor,
         @DefaultValue("0.70") double similarityCeiling,
         @DefaultValue("5") int topBullets,
-        @DefaultValue("55") double rerankMinFit) {}
+        @DefaultValue("55") double rerankMinFit,
+        @DefaultValue("60") double tailorMinFit) {}
