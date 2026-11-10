@@ -1,5 +1,7 @@
 package com.jobradar;
 
+import com.jobradar.llm.EmbeddingClient;
+import com.jobradar.llm.LlmClient;
 import com.jobradar.notifier.internal.TelegramClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -26,6 +28,13 @@ abstract class PostgresIntegrationTest {
     /** No test may reach the real Telegram API. Declared here so all subclasses share one context. */
     @MockitoBean
     TelegramClient telegram;
+
+    /** No test may reach the real AI provider either. Unstubbed, they behave as unavailable. */
+    @MockitoBean
+    EmbeddingClient embeddingClient;
+
+    @MockitoBean
+    LlmClient llmClient;
 
     static {
         POSTGRES.start();

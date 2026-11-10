@@ -14,19 +14,27 @@ import org.springframework.stereotype.Component;
 /**
  * Flow 2 for one posting: run the hard filters for every user, store the match, announce it.
  *
- * <p>Milestone M1 has no fit score yet, so {@code fit_score} and {@code priority} stay null and
- * the band depends on age alone (SPEC.md D8).
+ * <p>Only eligible postings are scored. When no fit score can be computed (embeddings unavailable,
+ * or a profile without bullets) {@code fit_score} and {@code priority} stay null and the band
+ * depends on age alone (SPEC.md D8).
  */
 @Component
 public class PostingMatcher {
 
     private final MatchRepository matches;
+    private final FitScorer fitScorer;
     private final ProfileService profiles;
     private final ApplicationEventPublisher events;
     private final Clock clock;
 
-    PostingMatcher(MatchRepository matches, ProfileService profiles, ApplicationEventPublisher events, Clock clock) {
+    PostingMatcher(
+            MatchRepository matches,
+            FitScorer fitScorer,
+            ProfileService profiles,
+            ApplicationEventPublisher events,
+            Clock clock) {
         this.matches = matches;
+        this.fitScorer = fitScorer;
         this.profiles = profiles;
         this.events = events;
         this.clock = clock;
@@ -47,8 +55,13 @@ public class PostingMatcher {
 
         for (UserPreferences user : profiles.findAllPreferences()) {
             Eligibility eligibility = EligibilityFilter.check(posting, user, now);
-            Band band = Bands.classify(age, null, posting.deadline());
-            matches.upsert(user.userId(), postingId, eligibility.eligible(), null, null, band, eligibility.reason());
+            // The hard filters run first: an ineligible posting costs no embedding or LLM call.
+            Optional<Fit> fit = eligibility.eligible() ? fitScorer.score(posting, user.userId()) : Optional.empty();
+            Double fitScore = fit.map(Fit::score).orElse(null);
+            Double priority = fit.map(f -> Bands.priority(f.score(), age)).orElse(null);
+            Band band = Bands.classify(age, fitScore, posting.deadline());
+            String reasons = eligibility.reason() + fit.map(f -> "; " + f.reason()).orElse("");
+            matches.upsert(user.userId(), postingId, eligibility.eligible(), fitScore, priority, band, reasons);
             events.publishEvent(new MatchScored(user.userId(), postingId, eligibility.eligible(), band));
         }
         return true;
