@@ -50,7 +50,7 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-# Attached to the Fargate tasks (added with ECS in a later milestone). Outbound only.
+# Attached to the Fargate tasks (ecs.tf). Outbound only.
 resource "aws_security_group" "app" {
   name        = "${var.name}-app"
   description = "JobRadar application tasks"
