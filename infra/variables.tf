@@ -44,3 +44,15 @@ variable "budget_alert_email" {
   description = "Email address that receives the budget alerts."
   type        = string
 }
+
+variable "image_tag" {
+  description = "Image tag the ECS task definitions run (ECR tags are immutable, so use the commit SHA that CI pushed)."
+  type        = string
+  default     = "unset"
+}
+
+variable "deploy_services" {
+  description = "Run one task per service. Keep false until images exist in ECR and the secrets have values."
+  type        = bool
+  default     = false
+}

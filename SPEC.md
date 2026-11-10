@@ -33,7 +33,7 @@ the rest"). All of them are configuration, so any can be changed later without a
 - Master profile stored as `bullet` rows with IDs, imported from a git-ignored JSON seed file
   (`jobradar.profile.seed-file`); idempotent, IDs stable across re-imports.
 - `docker-compose.yml`: Postgres + pgvector, LocalStack (SQS hot queue, backlog queue, DLQ; S3).
-- Terraform in `infra/`: VPC, RDS PostgreSQL, S3, ECR. `plan` only from tooling; Seif runs `apply`.
+- Terraform in `infra/`: VPC, RDS PostgreSQL, S3, ECR, SQS queues + DLQ, Secrets Manager shells, ECS Fargate services (no load balancer, no NAT). `plan` only from tooling; Seif runs `apply`.
 - GitHub Actions: build and test on push; deploy with OIDC (no long-lived AWS keys).
 - Committed config from the plan: `CLAUDE.md`, `.claude/settings.json`, `.githooks/commit-msg`,
   the two skills, the `compliance-reviewer` agent, README with the 7 guardrails.
