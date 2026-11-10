@@ -12,7 +12,7 @@ class SchemaMigrationTests extends PostgresIntegrationTest {
 
     /** Per-user tables from docs/PLAN.md; each must carry user_id. */
     private static final List<String> PER_USER_TABLES = List.of(
-            "profile", "bullet", "watchlist", "match", "cv_version", "application", "notification");
+            "profile", "bullet", "cv_entry", "watchlist", "match", "cv_version", "application", "notification");
 
     /** Shared tables: no user_id. */
     private static final List<String> SHARED_TABLES = List.of("company", "posting", "source_run");

@@ -26,6 +26,11 @@ class ProfileSeedImportTests extends PostgresIntegrationTest {
                 new ProfileSeed.Preferences(
                         List.of("Backend Engineer"), List.of("Cairo"), true,
                         List.of("internship"), LocalDate.of(2027, 6, 30)),
+                new ProfileSeed.Cv(
+                        "Test Person", "B.Sc. Computer Engineering",
+                        List.of(new ProfileSeed.Contact("Cairo, Egypt", null)),
+                        List.of(new ProfileSeed.Education("B.Sc. · Example University", "2022 – Present", null)),
+                        "Arabic (Native)"),
                 List.of(
                         new ProfileSeed.Entry(
                                 "experience", "Intern · Example Co", "Jul 2026 – Aug 2026", null,
@@ -52,6 +57,18 @@ class ProfileSeedImportTests extends PostgresIntegrationTest {
                 "SELECT array_to_string(tags, '|') FROM bullet WHERE user_id = ? AND text = 'Unconfirmed claim.'",
                 String.class, result.userId());
         assertThat(tags).isEqualTo("Spring Boot|entry:intern-example-co-jul-2026-aug-2026|verify");
+
+        // Entry heading and dates are stored once and every bullet points at its entry.
+        assertThat(jdbc.queryForObject(
+                        """
+                        SELECT e.title || ' / ' || e.dates FROM bullet b JOIN cv_entry e ON e.id = b.entry_id
+                        WHERE b.user_id = ? AND b.text = 'Built 15+ REST services.'
+                        """,
+                        String.class, result.userId()))
+                .isEqualTo("Intern · Example Co / Jul 2026 – Aug 2026");
+        assertThat(jdbc.queryForObject(
+                        "SELECT cv_static ->> 'name' FROM profile WHERE user_id = ?", String.class, result.userId()))
+                .isEqualTo("Test Person");
     }
 
     @Test
@@ -69,6 +86,8 @@ class ProfileSeedImportTests extends PostgresIntegrationTest {
         assertThat(second.bulletsInserted()).isEqualTo(1);
         assertThat(second.bulletsAlreadyPresent()).isEqualTo(2);
         assertThat(bulletIds(userId)).startsWith(idsBefore.toArray(Long[]::new)).hasSize(3);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM cv_entry WHERE user_id = ?", Long.class, userId))
+                .isEqualTo(2);
     }
 
     private List<Long> bulletIds(long userId) {

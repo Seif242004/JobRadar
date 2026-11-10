@@ -10,7 +10,21 @@ import java.util.List;
  * to the CV it was written from. The database stores bullets flat; see {@link ProfileSeedImporter}
  * for the mapping.
  */
-public record ProfileSeed(String email, int dailyApplyCap, Preferences preferences, List<Entry> entries) {
+public record ProfileSeed(String email, int dailyApplyCap, Preferences preferences, Cv cv, List<Entry> entries) {
+
+    /**
+     * Fixed parts of the CV, stored as JSON in {@code profile.cv_static}. May be null in a seed
+     * file; tailoring then cannot render a CV for the user.
+     *
+     * @param headline  one line under the contacts, for example the degree; may be null
+     * @param languages one line, for example "Arabic (Native), English (Fluent)"; may be null
+     */
+    public record Cv(String name, String headline, List<Contact> contacts, List<Education> education, String languages) {}
+
+    /** @param url link target, or null for plain text such as the city */
+    public record Contact(String text, String url) {}
+
+    public record Education(String title, String dates, String context) {}
 
     /** Maps one to one onto the {@code profile} table. */
     public record Preferences(

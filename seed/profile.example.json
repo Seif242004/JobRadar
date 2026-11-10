@@ -2,11 +2,44 @@
   "email": "you@example.com",
   "dailyApplyCap": 5,
   "preferences": {
-    "roles": ["Backend Engineer"],
-    "cities": ["Cairo"],
+    "roles": [
+      "Backend Engineer"
+    ],
+    "cities": [
+      "Cairo"
+    ],
     "remote": true,
-    "jobTypes": ["internship", "full-time"],
+    "jobTypes": [
+      "internship",
+      "full-time"
+    ],
     "graduationDate": "2027-06-30"
+  },
+  "cv": {
+    "name": "Your Name",
+    "headline": "B.Sc. Computer Engineering · Example University",
+    "contacts": [
+      {
+        "text": "Cairo, Egypt",
+        "url": null
+      },
+      {
+        "text": "you@example.com",
+        "url": "mailto:you@example.com"
+      },
+      {
+        "text": "github.com/you",
+        "url": "https://github.com/you"
+      }
+    ],
+    "education": [
+      {
+        "title": "B.Sc. Computer Engineering · Example University",
+        "dates": "2022 – Present",
+        "context": "Expected Graduation: 2027"
+      }
+    ],
+    "languages": "Arabic (Native), English (Fluent)"
   },
   "entries": [
     {
@@ -14,17 +47,29 @@
       "title": "Software Engineering Intern · Example Co",
       "dates": "Jul 2026 – Aug 2026",
       "context": "Payments Team",
-      "tags": ["Spring Boot", "PostgreSQL"],
+      "tags": [
+        "Spring Boot",
+        "PostgreSQL"
+      ],
       "bullets": [
-        { "text": "Built 15+ REST services with Spring Boot and PostgreSQL.", "verify": false }
+        {
+          "text": "Built 15+ REST services with Spring Boot and PostgreSQL.",
+          "verify": false
+        }
       ]
     },
     {
       "section": "skill",
       "title": "Languages",
-      "tags": ["Java", "SQL"],
+      "tags": [
+        "Java",
+        "SQL"
+      ],
       "bullets": [
-        { "text": "Languages: Java, SQL", "verify": false }
+        {
+          "text": "Languages: Java, SQL",
+          "verify": false
+        }
       ]
     }
   ]
