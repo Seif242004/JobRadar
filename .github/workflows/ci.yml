@@ -21,6 +21,16 @@ jobs:
           java-version: "25"
           cache: maven
 
+      # The tailoring-worker tests render real PDFs: they need the Typst CLI and the CV font.
+      - name: Install Typst and fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-crosextra-carlito
+          curl -fsSL https://github.com/typst/typst/releases/download/v0.15.1/typst-x86_64-unknown-linux-musl.tar.xz \
+            | tar -xJ --strip-components=1 -C /tmp typst-x86_64-unknown-linux-musl/typst
+          sudo install /tmp/typst /usr/local/bin/typst
+          typst --version
+
       # Runs unit tests, the Modulith boundary checks and the Flyway migration test
       # (Testcontainers starts Postgres + pgvector on the runner's Docker).
       - name: Maven verify

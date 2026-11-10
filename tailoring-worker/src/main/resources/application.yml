@@ -1,6 +1,38 @@
 spring:
   application:
     name: jobradar-tailoring-worker
+  datasource:
+    # Defaults match docker-compose.yml; production values come from env vars / Secrets Manager.
+    url: ${JOBRADAR_DB_URL:jdbc:postgresql://localhost:5432/jobradar}
+    username: ${JOBRADAR_DB_USER:jobradar}
+    password: ${JOBRADAR_DB_PASSWORD:jobradar}
+  task:
+    scheduling:
+      pool:
+        # The hot and backlog queue polls must never wait on each other.
+        size: 2
+
+jobradar:
+  ai:
+    # OpenAI-compatible endpoint (SPEC.md D1). An empty key makes tailoring fall back to the
+    # embedding order for bullet selection.
+    base-url: ${JOBRADAR_AI_BASE_URL:https://integrate.api.nvidia.com/v1}
+    key: ${JOBRADAR_AI_KEY:}
+    model: ${JOBRADAR_AI_MODEL:openai/gpt-oss-20b}
+    daily-call-cap: ${JOBRADAR_AI_DAILY_CALL_CAP:200}
+  aws:
+    region: ${AWS_REGION:eu-central-1}
+    # Set only for LocalStack (http://localhost:4566); empty means the real AWS endpoints.
+    endpoint: ${JOBRADAR_AWS_ENDPOINT:}
+  tailoring:
+    typst-binary: ${JOBRADAR_TYPST_BINARY:typst}
+    bucket: ${JOBRADAR_S3_BUCKET:jobradar-local}
+    listener:
+      enabled: ${JOBRADAR_QUEUE_LISTENER_ENABLED:true}
+    queues:
+      tailor-hot-url: ${JOBRADAR_SQS_TAILOR_HOT_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-tailor-hot}
+      tailor-backlog-url: ${JOBRADAR_SQS_TAILOR_BACKLOG_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-tailor-backlog}
+      cv-ready-url: ${JOBRADAR_SQS_CV_READY_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-cv-ready}
 
 server:
   port: ${PORT:8082}

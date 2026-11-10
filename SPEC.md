@@ -13,7 +13,7 @@ the rest"). All of them are configuration, so any can be changed later without a
 | --- | --- | --- |
 | D1 | LLM provider (rerank + tailor) | Same as fitcrew: NVIDIA Build, OpenAI-compatible endpoint `https://integrate.api.nvidia.com/v1`, default model `openai/gpt-oss-20b`, with an ordered fallback list when a model ID is retired (404). Config: `JOBRADAR_AI_BASE_URL`, `JOBRADAR_AI_MODEL`, `JOBRADAR_AI_KEY`. Called over plain HTTP behind `LlmClient`; no provider SDK |
 | D2 | Monthly LLM budget cap | 0 USD: free endpoints only. The cap is enforced as a daily call limit (default 200 calls/day); when reached, rerank and tailoring stop and matching falls back to embedding score only |
-| D3 | Embedding model and dimension | `baai/bge-m3` on the same NVIDIA endpoint (`/v1/embeddings`), multilingual (Arabic + English), **`vector(1024)`**. Availability on the free account is checked with Seif's key before the V1 migration is merged; behind `EmbeddingClient` |
+| D3 | Embedding model and dimension | **Changed 2026-11-10:** `baai/bge-m3` is not in NVIDIA Build's `GET /v1/models` list. Default is now `nvidia/llama-3.2-nv-embedqa-1b-v1` (multilingual, Matryoshka output sizes) requested with `dimensions=1024` and `input_type=passage`, so **`vector(1024)`** and the V1 schema stay as they are. Not yet verified with a real key: if the endpoint rejects `dimensions`, pick another model in `JOBRADAR_AI_EMBEDDING_MODEL`; a model with a different size needs a migration. Behind `EmbeddingClient` |
 | D4 | PDF renderer | Typst |
 | D5 | AWS region | eu-central-1 |
 | D6 | ATS poll interval | 15 min |
