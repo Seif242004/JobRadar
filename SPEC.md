@@ -81,6 +81,15 @@ Names are binding; signatures are finalized when each milestone starts.
 | `apply` | `ApplyChannel` per channel; runs only on an Approve `UserAction`; enforces `daily_apply_cap`; writes `application` | tracker |
 | `tracker` | Application status, follow-up timers, response rates by source and CV version | notifier, api |
 
+**Shared library `llm`:** matching (api) and tailoring (worker) run in different deployables and
+both call the model, so `LlmClient`, `EmbeddingClient` and their OpenAI-compatible HTTP
+implementation live in an eighth Maven module, `llm`, that both depend on.
+
+**Fit score:** mean cosine similarity of the posting to the user's 5 nearest bullets (pgvector),
+mapped linearly from [0.30, 0.70] to [0, 100]. Postings with an embedding fit of 55 or more are
+reranked by the LLM, which returns the final fit and a one-line reason. Bullets tagged `verify`
+are ignored. Without embeddings there is no fit and the band depends on age alone.
+
 **Queue messages (SQS, JSON):** `PostingIngested { postingId, firstSeenAt, postedAt? }` on the hot
 queue when age < 2 h, otherwise on the backlog queue. Failed parses go to the DLQ.
 

@@ -24,6 +24,13 @@ management:
         include: health
 
 jobradar:
+  ai:
+    # OpenAI-compatible endpoint (SPEC.md D1 to D3). An empty key disables rerank and embeddings.
+    base-url: ${JOBRADAR_AI_BASE_URL:https://integrate.api.nvidia.com/v1}
+    key: ${JOBRADAR_AI_KEY:}
+    model: ${JOBRADAR_AI_MODEL:openai/gpt-oss-20b}
+    embedding-model: ${JOBRADAR_AI_EMBEDDING_MODEL:baai/bge-m3}
+    daily-call-cap: ${JOBRADAR_AI_DAILY_CALL_CAP:200}
   aws:
     region: ${AWS_REGION:eu-central-1}
     # Set only for LocalStack (http://localhost:4566); empty means the real AWS endpoints.
