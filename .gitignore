@@ -1,0 +1,25 @@
+# Build output
+target/
+*.class
+
+# Secrets: never commit
+.env
+.env.*
+!.env.example
+
+# Terraform
+infra/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Node (web/)
+node_modules/
+dist/

@@ -1,0 +1,8 @@
+#!/bin/sh
+# Strip AI attribution lines so every commit stays authored by Seif only.
+# $1 is the path to the commit message file git passes to this hook.
+sed -i.bak \
+  -e '/^Co-[Aa]uthored-[Bb]y: .*Claude/d' \
+  -e '/^Claude-Session:/d' \
+  -e '/Generated with \[Claude Code\]/d' \
+  "$1" && rm -f "$1.bak"
