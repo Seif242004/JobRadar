@@ -72,6 +72,8 @@ the rest"). All of them are configuration, so any can be changed later without a
 ### M4 Extras (cut first if time is tight)
 - Brave Search for public LinkedIn posts; ATS autofill extension for Workable and Greenhouse;
   weekly digest; React dashboard; invite flow.
+- **Decision (Seif):** the dashboard is local only: read-only, single user, no login, served on
+  127.0.0.1 under the `local-dashboard` profile. No load balancer and no invite flow.
 - **Verify:** the weekly digest shows replies by source and by CV version.
 
 ## 3. Module interfaces

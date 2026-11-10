@@ -1,0 +1,12 @@
+# Profile for the local dashboard (see web/README.md). Binds the api to the loopback address
+# only, and turns off everything that talks to the outside world.
+server:
+  address: 127.0.0.1
+
+jobradar:
+  matching:
+    listener:
+      enabled: false
+  notifier:
+    listener:
+      enabled: false
