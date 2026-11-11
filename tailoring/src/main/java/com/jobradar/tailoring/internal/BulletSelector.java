@@ -32,7 +32,7 @@ public class BulletSelector {
             You select CV bullets for a job posting. You are given the posting and the candidate's \
             bullets, each with an ID in square brackets. Choose the 12 to 18 bullets that best match \
             the posting, most relevant first. Include the skill rows that fit the role. Use only \
-            IDs from the list. Do not write, rephrase or add any text. Reply with one JSON object \
+            IDs from the list. Do not write, rephrase or add any text. IDs are plain JSON integers, never strings. Reply with one JSON object \
             and nothing else: {"bullet_ids": [<id>, <id>, ...]}""";
 
     private final LlmClient llm;
