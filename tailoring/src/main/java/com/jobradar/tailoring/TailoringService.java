@@ -1,6 +1,7 @@
 package com.jobradar.tailoring;
 
 import com.jobradar.tailoring.internal.AtsScorer;
+import com.jobradar.tailoring.internal.BulletBalancer;
 import com.jobradar.tailoring.internal.BulletSelector;
 import com.jobradar.tailoring.internal.CvComposer;
 import com.jobradar.tailoring.internal.CvStore;
@@ -75,7 +76,9 @@ public class TailoringService {
             }
         }
 
-        // 3. Render; drop the lowest-ranked bullet until the CV is exactly one page.
+        // 3. Spread the bullets over the relevant entries, then render; drop the lowest-ranked
+        //    bullet until the CV is exactly one page.
+        ranked = BulletBalancer.balance(ranked, selectable);
         OnePageFitter.Fitted fitted = fitter.fit(data, ranked);
 
         // 4. Keyword coverage of the posting by the text that actually made it onto the page.
