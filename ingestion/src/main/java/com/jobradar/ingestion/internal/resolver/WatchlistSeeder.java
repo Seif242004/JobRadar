@@ -9,7 +9,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Seeds the 30 watchlist companies of docs/PLAN.md into the shared {@code company} table from
+ * Seeds the 30 watchlist companies of docs/RESEARCH.md into the shared {@code company} table from
  * {@code watchlist/companies.json} ({@code name}, {@code careersUrl}). Idempotent.
  *
  * <p>The file only says where each careers page is. Which ATS a company uses is never written

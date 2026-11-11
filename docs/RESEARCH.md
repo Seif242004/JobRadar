@@ -1,10 +1,12 @@
-# JobRadar (working name) — Research & Plan
+# JobRadar: research and architecture notes
 
-Nov 10, 2026 · @Seif
+Written November 2026. These are the planning notes the project started from. Where the implementation differs
+(push notifications go through ntfy instead of Telegram, and the AWS deployment is defined in Terraform but optional),
+the README and SPEC.md are current.
 
 ## Summary
 
-**Verdict:** worth building, as a portfolio project and as your own 2027 job-search tool. Not as a startup yet: the global market is crowded, and the Egyptian players are single-platform.
+**Verdict:** worth building as a personal job-search tool and as an engineering project. Not as a startup yet: the global market is crowded, and the Egyptian players are single-platform.
 
 **The gap it fills:** global auto-apply tools (Jobright, Simplify, LoopCV, LazyApply) are built around US boards and LinkedIn Easy Apply. Egyptian platforms (Wuzzuf, Bayt) only match jobs inside their own site. Nobody aggregates **Egypt + remote-from-Egypt** sources, scores them, tailors a 1-page CV, and tells you **what to do and when**.
 
@@ -14,7 +16,7 @@ Nov 10, 2026 · @Seif
 2. **No manual capture as the core.** LinkedIn posts are covered automatically, as far as compliance allows, through LinkedIn's own emails to your inbox and a search API over public posts, with zero clicks from you.
 3. **"One-tap apply", not blind auto-apply.** Egypt's real channels are email-your-CV, Google Forms, Wuzzuf, and company ATS forms. The system prepares everything; you approve. Email applications are sent for you on approval.
 4. **Notifications drive everything:** apply now, deadline soon, follow up, weekly review.
-5. **Spring Boot on AWS**, so this becomes the Phase 2 AWS project in your cert plan.
+5. **Spring Boot on AWS**, as a modular monolith with three deployables.
 
 **Decided since:** working name JobRadar; multi-user from day one so friends can join later; English CV only; and **freshness first**, because most CVs are never read once a posting is past its first 24 hours. The newest postings always jump the queue, while older ones stay visible but stop interrupting you.
 
@@ -79,7 +81,7 @@ Many Egyptian roles appear only as LinkedIn posts, and there is no compliant way
 | --- | --- | --- |
 | Feed-scanning extension | Tools like FeedJobs auto-scroll your LinkedIn feed and detect hiring posts | **Rejected.** This is exactly the extension behaviour LinkedIn bans; your account carries the risk |
 | Cloud scraper | A server logs in or crawls LinkedIn | **Rejected.** Same ban, plus legal exposure |
-| Manual share to a bot | You forward posts you see | **Demoted** to an optional fallback; you were right that it adds hassle |
+| Manual share to a bot | You forward posts you see | **Demoted** to an optional fallback, because it adds hassle |
 | **LinkedIn's own emails** | Job alert emails, plus notification emails for people and companies you follow, read from **your own inbox** | **Accepted.** Your data, no LinkedIn access by the system. Test in week one which post notifications LinkedIn actually emails |
 | **Search API over public posts** | Queries like `site:linkedin.com/posts hiring backend intern Cairo` on a search API, newest first; follow only the outbound apply link (Google Form, careers page) | **Accepted.** The system never touches LinkedIn. Google's Custom Search JSON API closed to new customers in January 2026 and shuts down January 1, 2027, so use **Brave Search API** (its own index, structured JSON) |
 
@@ -159,7 +161,7 @@ These 30 employers with engineering teams in Egypt seed the watchlist; friends c
 | 6 | Synopsys Egypt | Multinational R&D | EDA software, strong C++ and tooling |
 | 7 | \_VOIS Egypt (Vodafone) | Multinational tech hub | Large Java and cloud engineering hub |
 | 8 | Instabug | Product startup | B2B SaaS built in Cairo for global customers |
-| 9 | Paymob | Fintech | Payments backend, close to your e-wallet work |
+| 9 | Paymob | Fintech | Payments backend |
 | 10 | MNT-Halan | Fintech | Egypt's unicorn; lending and payments platforms |
 | 11 | Breadfast | Commerce | Top-ranked Egyptian startup; logistics-heavy backend |
 | 12 | Thndr | Fintech | Retail investing app |
@@ -172,7 +174,7 @@ These 30 employers with engineering teams in Egypt seed the watchlist; friends c
 | 19 | Vezeeta | Healthtech | Booking platform at regional scale |
 | 20 | Sylndr | Marketplace | Used-car platform |
 | 21 | elmenus | Consumer | Food discovery and ordering |
-| 22 | Rology | AI healthtech | AI radiology across 13 countries; fits your AI profile |
+| 22 | Rology | AI healthtech | AI radiology across 13 countries |
 | 23 | Fawry | Fintech (established) | Egypt's largest payments network; big Java estate |
 | 24 | Sumerge | Software house | Banking and enterprise Java |
 | 25 | ITWorx | Software house | Enterprise and government software |
@@ -202,7 +204,7 @@ Every posting moves one way through a queue, so a slow LLM call never blocks ing
 - **Data:** RDS PostgreSQL with pgvector for embeddings; S3 for raw postings and generated PDFs.
 - **Messaging:** SQS between ingestion, matching and tailoring, with a dead-letter queue for failed parses.
 - **Secrets:** Secrets Manager for LLM keys and your Gmail and Telegram tokens.
-- **Ops:** CloudWatch logs and alarms; Terraform for everything; GitHub Actions with OIDC for deploys (your Phase 2 plan).
+- **Ops:** CloudWatch logs and alarms; Terraform for everything; GitHub Actions with OIDC for deploys.
 - **Cost guard:** $5 budget alarm; one small RDS instance; scale the workers to zero between runs.
 
 **LLM use, kept cheap:** filters and embeddings cut the list first, so the LLM only reranks and tailors the top few postings a day. Keep the provider behind an interface so you can swap models.
@@ -253,7 +255,7 @@ These rules are what make the project safe to use and a good interview story; wr
 
 &#91;embedded content: roadmap · 5 milestones, no fixed dates\]
 
-Each milestone ships something usable, and M1 alone already helps your own search. The project replaces the small demo app in Phase 2 of your cert plan.
+Each milestone ships something usable, and M1 alone already helps your own search.
 
 | Milestone | Build | Done when |
 | --- | --- | --- |
@@ -265,239 +267,6 @@ Each milestone ships something usable, and M1 alone already helps your own searc
 
 If time gets tight, cut M4 first. M0 to M3 is a complete, deployable project.
 
-## Portfolio value and open decisions
-
-The project shows the exact mix your target roles ask for: event-driven backend, cloud, and applied AI with guardrails.
-
-**CV bullet target:** *Built an Egypt-focused job-search copilot on AWS: Spring Boot services fed by public ATS feeds and email alerts through SQS, pgvector matching, LLM CV tailoring with a no-invention validator, Telegram one-tap apply; Terraform and GitHub Actions OIDC.*
-
-**Interview stories it gives you:** idempotent dedupe across sources, queue design and dead-letter handling, LLM guardrails and cost control, and choosing compliant data sources over scraping.
-
-**LinkedIn post angle:** "I built the tool I needed for my own search, without risking my LinkedIn account", with the architecture diagram and your first real result.
-
-**Decisions made:** working name JobRadar; multi-user tables from day one; English CV only; freshness-first ranking; the 30-company watchlist above.
-
-**Still open:**
-
-- [ ] LLM provider and a monthly budget cap
-
-## Building it with Claude Code
-
-Use **Claude Code**, not a regular chat. Cowork's capabilities are now part of the Claude app, and that side is built for documents and knowledge work; a multi-module Java codebase needs a tool that runs your build, tests, Docker and git inside the repo, which is what Claude Code does.
-
-**Where to run it:** the terminal or the Claude desktop app's Code tab, opened on your repo folder. Use the IntelliJ or VS Code integration if you want diffs inside your editor.
-
-**One-time setup, in order**
-
-1. **Create the repo** and put this plan in it as `docs/PLAN.md` (export this doc as Markdown).
-2. **Install the Java language server** (`jdtls`) and the TypeScript one (`npm install -g typescript-language-server typescript`) so Claude sees compile errors after every edit.
-3. **Install plugins** from the official marketplace inside a Claude Code session:
-   - `/plugin install jdtls-lsp@claude-plugins-official` — Java diagnostics and symbol navigation
-   - `/plugin install typescript-lsp@claude-plugins-official` — same for the React dashboard
-   - `/plugin install code-review@claude-plugins-official` — diff reviews before you commit
-   - `/plugin install security-guidance@claude-plugins-official` — security checks on edits, important for OAuth tokens and Gmail access
-   - `/plugin install skill-creator@claude-plugins-official` — to test and improve the project skills below
-4. **Add the settings, CLAUDE.md, commit hook, skills and subagent** from the next sections, and commit them.
-5. **Run `/run-skill-generator` once** after M0, so `/run` and `/verify` know how to start your stack (Docker Compose, env vars, the three apps).
-
-**Bundled skills you'll use constantly:** `/verify` (build and run the app to confirm a change), `/code-review` (fresh-context review of the diff), `/claude-api` (loads Claude API reference when you wire the LLM calls), and `/doctor` (checks your setup and trims CLAUDE.md).
-
-## Config files to commit
-
-CLAUDE.md holds the rules Claude can't infer from code; settings and a git hook enforce the ones that must never slip.
-
-**`CLAUDE.md`** at the repo root. Keep it this short; long files get ignored.
-
-```markdown
-# JobRadar
-Egypt-first job-search copilot. Spec: SPEC.md. Research and architecture: docs/PLAN.md.
-
-## Stack
-Java (current LTS), Spring Boot, Spring Modulith, Maven wrapper, PostgreSQL + pgvector, Flyway,
-SQS, S3, React (web/), Terraform (infra/), GitHub Actions.
-
-## Commands
-- Build + all tests: ./mvnw verify
-- One module: ./mvnw -pl <module> test
-- Local stack: docker compose up -d   (Postgres+pgvector, LocalStack for SQS/S3)
-- Infra: terraform -chdir=infra plan  (never apply or destroy; Seif runs those)
-
-## Rules
-- IMPORTANT: never scrape or automate LinkedIn or Wuzzuf. Sources are official/public APIs, RSS,
-  or the user's own Gmail label only.
-- Never submit an application without an explicit user approval event.
-- Tailoring only selects and reorders existing bullet IDs. Never invent skills, numbers or employers.
-- Postings are shared; every per-user table has user_id.
-- Freshness first: postings under 2 hours old go to the hot queue.
-- Connector tests use recorded fixtures; no live network calls in tests.
-- Secrets come from env vars or Secrets Manager; never commit .env.
-- Commits: author is Seif only. No Co-Authored-By, no Claude-Session trailer, and no mention
-  of Claude in commit messages or PR descriptions.
-```
-
-**`.claude/settings.json`** turns off commit and PR attribution, pre-approves safe commands, and blocks dangerous ones.
-
-```json
-{
-  "attribution": { "commit": "", "pr": "", "sessionUrl": false },
-  "permissions": {
-    "allow": [
-      "Bash(./mvnw *)",
-      "Bash(docker compose *)",
-      "Bash(terraform -chdir=infra plan*)",
-      "Bash(git status*)", "Bash(git diff*)", "Bash(git add *)", "Bash(git commit *)"
-    ],
-    "deny": [
-      "Bash(terraform *apply*)", "Bash(terraform *destroy*)",
-      "Bash(git push --force*)",
-      "Read(./.env)", "Read(./.env.*)"
-    ]
-  }
-}
-```
-
-**`.githooks/commit-msg`**, a backstop in case any trailer slips through. Enable it once with `git config core.hooksPath .githooks` and `chmod +x .githooks/commit-msg`.
-
-```sh
-#!/bin/sh
-# Strip AI attribution lines so every commit stays authored by Seif only.
-# $1 is the path to the commit message file git passes to this hook.
-sed -i.bak \
-  -e '/^Co-[Aa]uthored-[Bb]y: .*Claude/d' \
-  -e '/^Claude-Session:/d' \
-  -e '/Generated with \[Claude Code\]/d' \
-  "$1" && rm -f "$1.bak"
-```
-
-## Project skills and subagent
-
-Skills hold the procedures you'll repeat; they load only when used, so they don't bloat every session. Create them under `.claude/skills/<name>/SKILL.md`.
-
-**`add-source-connector`** — run as `/add-source-connector workable` for each new source.
-
-```markdown
----
-name: add-source-connector
-description: Add or change a job source connector (ATS feed, RSS, or email-alert parser).
-disable-model-invocation: true
----
-Add the connector for $ARGUMENTS:
-1. Confirm the source is allowed: official/public API, RSS, or the user's Gmail label.
-   If it needs scraping, a login, or LinkedIn/Wuzzuf access, stop and tell me.
-2. Record 2-3 real responses as fixtures in src/test/resources/fixtures/$ARGUMENTS/.
-3. Implement SourceConnector: fetch, map to Posting (postedAt if the source gives it,
-   firstSeenAt always), return.
-4. Respect the source's rate limit in its schedule (Remotive: at most 4 calls a day).
-5. Tests: mapping from fixtures, dedupe against an existing posting, freshness band.
-6. Run ./mvnw -pl ingestion verify and show the output.
-```
-
-**`tailoring-eval`** — run after any change to prompts or the tailoring code.
-
-```markdown
----
-name: tailoring-eval
-description: Check CV tailoring against golden postings for invented content and page length.
-disable-model-invocation: true
----
-1. Run the tailoring worker on every posting in src/test/resources/golden-postings/.
-2. For each output, fail if: a bullet ID does not exist in the profile, a skill or number
-   appears that is not in the profile, or the PDF is not exactly one page.
-3. Print a table: posting, pass/fail, ATS score, reason for any failure.
-```
-
-**`.claude/agents/compliance-reviewer.md`** — a read-only reviewer for anything touching sources or applying. Ask for it with "use the compliance-reviewer subagent on this diff".
-
-```markdown
----
-name: compliance-reviewer
-description: Reviews ingestion and apply changes against JobRadar's guardrails. Use after any change in the ingestion or apply modules.
-tools: Read, Grep, Glob
----
-Review the changed code against these rules and report only violations, with file and line:
-- No scraping or automation of LinkedIn or Wuzzuf; no CAPTCHA or bot-detection workarounds.
-- Only official/public APIs, RSS, or the user's own Gmail label as sources.
-- Each source's rate limits and terms respected in its schedule.
-- No application is submitted without an explicit user approval event.
-- Tailoring never adds skills, numbers or employers absent from the profile.
-- Gmail scopes are the narrowest that work; tokens never logged or committed.
-```
-
-## Workflow and prompts
-
-One milestone (or smaller) per session, plan before multi-file changes, tests as the definition of done, and a fresh-context review before every commit.
-
-**The loop for every piece of work**
-
-1. Start a fresh session (`/clear` between unrelated tasks).
-2. Switch to plan mode (`Shift+Tab` until it shows plan mode) and ask for a plan; edit it if needed, then approve.
-3. Claude implements, runs `./mvnw verify`, and shows the output as evidence.
-4. Run `/code-review`, plus the compliance-reviewer subagent for ingestion or apply changes.
-5. Commit. If Claude goes wrong twice on the same thing, `/clear` and re-prompt with what you learned.
-
-**Prompt 1 — turn this plan into a spec (first session only)**
-
-```text
-I'm building JobRadar, an Egypt-first job-search copilot. The research and architecture are in
-docs/PLAN.md. Read it fully first.
-Then interview me with the AskUserQuestion tool, only about decisions the plan leaves open or
-ambiguous: data model edge cases, notification rules, LLM provider, testing strategy. Don't ask
-what the plan already answers.
-When done, write SPEC.md: scope per milestone M0-M4, the interfaces between modules, an
-out-of-scope list, and an end-to-end verification step for each milestone. No code yet.
-```
-
-**Prompt 2 — scaffold M0 (start in plan mode)**
-
-```text
-Read SPEC.md, milestone M0. Plan the repo: latest stable Spring Boot on the current Java LTS,
-Maven wrapper, Spring Modulith modules (profile, ingestion, matching, tailoring, apply, notifier,
-tracker), three runnable apps (api, ingestion-worker, tailoring-worker), docker-compose with
-Postgres+pgvector and LocalStack (SQS hot and backlog queues, S3), Flyway migrations matching the
-data model in docs/PLAN.md, Terraform skeleton in infra/, GitHub Actions deploying with OIDC.
-Show the plan and wait for my approval. Then implement, run ./mvnw verify and
-docker compose up -d, and show me the output.
-```
-
-**Prompt 3 — first connectors (M1)**
-
-```text
-/add-source-connector workable
-```
-
-Then repeat for `greenhouse`, `lever` and `remotive`, followed by:
-
-```text
-Implement the careers resolver from SPEC.md M1 and seed the 30 companies listed in
-docs/PLAN.md. For each, detect the ATS from its careers page and store the board token; mark
-custom sites as "email-alerts". Then wire freshness bands and the hot/backlog routing, and add
-a Telegram notifier for Hot postings. Write tests first for the band rules in the plan.
-```
-
-**Prompt 4 — tailoring with guardrails (M2)**
-
-```text
-Implement the tailoring worker from SPEC.md M2. Write the failing tests first: a fixture profile
-and five fixture postings; assert that (1) output contains only bullet IDs that exist, (2) no
-skill appears that isn't in the profile, (3) the PDF is exactly one page. Put the LLM client
-behind an interface with a fake for tests. Implement until the tests pass, then run
-/tailoring-eval and show the table.
-```
-
-**Prompt 5 — review before committing**
-
-```text
-Use a subagent to review this diff against SPEC.md and the rules in CLAUDE.md. Report only gaps
-that affect correctness, compliance or the stated requirements, not style.
-```
-
-## Do you need an orchestrator?
-
-No, for either side of the project.
-
-- **For building it:** Claude Code is already the orchestrator. Plan mode does the planning, subagents handle research and review in their own context, and git worktrees let you run two sessions in parallel (for example the React dashboard in one, the backend in another). Skip third-party orchestration layers and Claude Code's experimental agent teams: on a solo project they mostly add token cost and coordination overhead.
-- **For JobRadar itself:** no agent framework (LangChain, LangGraph, CrewAI). The product is a deterministic pipeline (scheduler, queues, Spring services) with exactly two LLM steps, rerank and tailor, each returning structured JSON that your code validates. Call the model through the Anthropic Java SDK or Spring AI behind your own interface. That gives you control over retries, cost and guardrails, and it's a stronger interview story than "I used a framework".
-
 ## Sources
 
 Checked November 10, 2026.
@@ -508,4 +277,3 @@ Checked November 10, 2026.
 - **Data sources:** [Workable public endpoints](https://dev.to/kunnu_data/workable-has-a-public-search-api-across-every-employer-heres-how-to-use-it-47k6) · [Greenhouse Job Board API](https://jobspipe.dev/guides/greenhouse-jobs-api) · [Remotive API](https://github.com/remotive-com/remote-jobs-api) · [Google Custom Search API shutdown](https://www.firecrawl.dev/blog/google-search-json-api-alternative) · [Brave Search API](https://brave.com/learn/google-api-shutdown/)
 
 * **Egypt employers:** [Seedtable via Mean CEO (Nov 2026)](https://blog.mean.ceo/startups-egypt-news-november-2026/) · [Startupik top Egyptian startups](https://startupik.com/top-startups-in-egypt/?amp=1) · [Nucamp: companies hiring in Egypt](https://www.nucamp.co/blog/top-10-tech-startups-hiring-junior-developers-in-egypt-in-2026) · [ITIDA startup ecosystem report 2026](https://itida.gov.eg/English/MediaCenter/Announcements/Documents/egypt-startup-ecosystem-report-2026.pdf) · [Clutch: software developers in Egypt](https://clutch.co/eg/developers)
-* **Claude Code:** [Best practices](https://code.claude.com/docs/en/best-practices) · [Skills](https://code.claude.com/docs/en/skills) · [Code intelligence plugins](https://code.claude.com/docs/en/plugins/code-intelligence) · [Anthropic's plugin marketplaces](https://code.claude.com/docs/en/plugins/anthropic-marketplaces) · [Attribution setting walkthrough (Classmethod)](https://dev.classmethod.jp/en/articles/claude-code-attribution-setting/)

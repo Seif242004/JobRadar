@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-/** Checks that Flyway V1 produces the multi-user data model of docs/PLAN.md. */
+/** Checks that Flyway V1 produces the multi-user data model of docs/RESEARCH.md. */
 class SchemaMigrationTests extends PostgresIntegrationTest {
 
-    /** Per-user tables from docs/PLAN.md; each must carry user_id. */
+    /** Per-user tables from docs/RESEARCH.md; each must carry user_id. */
     private static final List<String> PER_USER_TABLES = List.of(
             "profile", "bullet", "cv_entry", "watchlist", "match", "cv_version", "application", "notification", "cv_summary", "base_cv");
 

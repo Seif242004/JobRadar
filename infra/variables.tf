@@ -19,7 +19,7 @@ variable "vpc_cidr" {
 variable "github_repository" {
   description = "GitHub repository (owner/name) allowed to assume the deploy role through OIDC."
   type        = string
-  default     = "Seif242004/JobRadar"
+  default     = "your-github-user/jobradar"
 }
 
 variable "create_github_oidc_provider" {

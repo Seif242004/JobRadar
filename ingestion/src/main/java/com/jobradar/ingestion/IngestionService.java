@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Flow 1 of docs/PLAN.md: normalise, dedupe, store, publish.
+ * Flow 1 of docs/RESEARCH.md: normalise, dedupe, store, publish.
  *
  * <p>Delivery is at-least-once. Each posting is stored and published inside one transaction: if
  * publishing fails the row is rolled back and the next run retries it. If the commit fails after

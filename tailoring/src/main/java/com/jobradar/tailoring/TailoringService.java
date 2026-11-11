@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * Flow 3 of docs/PLAN.md: select bullets, validate, render, fit to one page, score, store.
+ * Flow 3 of docs/RESEARCH.md: select bullets, validate, render, fit to one page, score, store.
  *
  * <p>The no-invention guarantee is structural. The LLM is only ever asked for bullet IDs; the
  * validator rejects any ID that is not one of the user's confirmed bullets; and the CV text is

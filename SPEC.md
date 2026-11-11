@@ -1,13 +1,12 @@
 # JobRadar — SPEC (v0.2)
 
-Source of truth for research and architecture: `docs/PLAN.md`. This spec adds only what the plan
-leaves open and fixes the contracts between modules. Where the two disagree, the plan wins until
-Seif says otherwise.
+Source of truth for research and architecture: `docs/RESEARCH.md`. This spec adds only what the plan
+leaves open and fixes the contracts between modules. Where the two disagree, the research notes win until
+the maintainer says otherwise.
 
 ## 1. Decisions
 
-Seif accepted the recommended defaults on 2026-11-10 ("same LLM provider as fitcrew, defaults for
-the rest"). All of them are configuration, so any can be changed later without a redesign.
+The defaults below were accepted on 2026-11-10. All of them are configuration, so any can be changed later without a redesign.
 
 | # | Decision | Value |
 | --- | --- | --- |
@@ -20,7 +19,6 @@ the rest"). All of them are configuration, so any can be changed later without a
 | D7 | Push thresholds | Hot band = age < 2 h and fit >= 80 (hot queue, immediate tailoring). **Apply now** push = fit >= 85 and age < 1 h, CV ready |
 | D8 | Hot alerts in M1 (no fit score before M2) | M1 Hot alert = age < 2 h and passes the hard filters; the fit condition is added in M2 |
 | D9 | Network layout vs the 5 USD budget alarm | Public subnets, no NAT gateway; RDS not publicly accessible, security-group restricted |
-| D10 | Commit and PR attribution | Commits authored by Seif only, no trailers. PRs opened from the Claude project keep its "Requested by" line unless Seif asks to drop it |
 
 ## 2. Scope per milestone
 
@@ -33,10 +31,9 @@ the rest"). All of them are configuration, so any can be changed later without a
 - Master profile stored as `bullet` rows with IDs, imported from a git-ignored JSON seed file
   (`jobradar.profile.seed-file`); idempotent, IDs stable across re-imports.
 - `docker-compose.yml`: Postgres + pgvector, LocalStack (SQS hot queue, backlog queue, DLQ; S3).
-- Terraform in `infra/`: VPC, RDS PostgreSQL, S3, ECR, SQS queues + DLQ, Secrets Manager shells, ECS Fargate services (no load balancer, no NAT). `plan` only from tooling; Seif runs `apply`.
+- Terraform in `infra/`: VPC, RDS PostgreSQL, S3, ECR, SQS queues + DLQ, Secrets Manager shells, ECS Fargate services (no load balancer, no NAT). `plan` only from tooling; the maintainer runs `apply`.
 - GitHub Actions: build and test on push; deploy with OIDC (no long-lived AWS keys).
-- Committed config from the plan: `CLAUDE.md`, `.claude/settings.json`, `.githooks/commit-msg`,
-  the two skills, the `compliance-reviewer` agent, README with the 7 guardrails.
+- README with the 7 guardrails.
 - **Verify:** `./mvnw verify` green; `docker compose up -d` healthy and Flyway applies V1;
   `terraform apply` and a deploy run green from a push.
 
@@ -53,7 +50,7 @@ the rest"). All of them are configuration, so any can be changed later without a
   one-line reason each.
 - Tailoring worker: LLM returns bullet IDs and order only; no-invention validator; PDF render;
   page-fit loop; ATS keyword coverage score.
-- **Verify:** a Hot posting arrives with a fit score and a CV Seif would send; `/tailoring-eval`
+- **Verify:** a Hot posting arrives with a fit score and a CV worth sending; `/tailoring-eval`
   passes on all golden postings.
 
 ### M3 Apply
@@ -72,7 +69,7 @@ the rest"). All of them are configuration, so any can be changed later without a
 ### M4 Extras (cut first if time is tight)
 - Brave Search for public LinkedIn posts; ATS autofill extension for Workable and Greenhouse;
   weekly digest; React dashboard; invite flow.
-- **Decision (Seif):** the dashboard is local only: read-only, single user, no login, served on
+- **Decision:** the dashboard is local only: read-only, single user, no login, served on
   127.0.0.1 under the `local-dashboard` profile. No load balancer and no invite flow.
 - **Verify:** the weekly digest shows replies by source and by CV version.
 

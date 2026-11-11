@@ -58,9 +58,9 @@ class ApplyFlowTests extends PostgresIntegrationTest {
         reset(telegram, gmail, cvReader);
         when(cvReader.read(anyString())).thenReturn(PDF);
         jdbc.update("TRUNCATE app_user, posting, company CASCADE");
-        userId = user("seif@example.com", CHAT, 5);
+        userId = user("applicant@example.com", CHAT, 5);
         jdbc.update("UPDATE app_user SET gmail_token_ref = 'jobradar/gmail/1' WHERE id = ?", userId);
-        jdbc.update("INSERT INTO profile (user_id, cv_static) VALUES (?, '{\"name\":\"Seif Tamer\"}'::jsonb)", userId);
+        jdbc.update("INSERT INTO profile (user_id, cv_static) VALUES (?, '{\"name\":\"Jane Doe\"}'::jsonb)", userId);
         postingId = posting("Backend Intern", "email", "mailto:hr@acme.example?subject=x");
         cvId = cv(userId, postingId);
     }
@@ -114,8 +114,8 @@ class ApplyFlowTests extends PostgresIntegrationTest {
         ArgumentCaptor<OutgoingEmail> email = ArgumentCaptor.forClass(OutgoingEmail.class);
         verify(gmail, times(1)).send(eq("jobradar/gmail/1"), email.capture());
         assertThat(email.getValue().to()).isEqualTo("hr@acme.example");
-        assertThat(email.getValue().from()).isEqualTo("seif@example.com");
-        assertThat(email.getValue().subject()).isEqualTo("Application: Backend Intern - Seif Tamer");
+        assertThat(email.getValue().from()).isEqualTo("applicant@example.com");
+        assertThat(email.getValue().subject()).isEqualTo("Application: Backend Intern - Jane Doe");
         assertThat(email.getValue().attachment()).isEqualTo(PDF);
 
         Map<String, Object> row = application();
@@ -274,7 +274,7 @@ class ApplyFlowTests extends PostgresIntegrationTest {
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<List<TelegramClient.Button>>> rows = ArgumentCaptor.forClass(List.class);
         verify(telegram, times(1)).sendWithButtons(eq(CHAT), text.capture(), rows.capture());
-        assertThat(text.getValue()).contains("Follow up: Backend Intern · Acme", "Draft:", "Best regards,\nSeif Tamer");
+        assertThat(text.getValue()).contains("Follow up: Backend Intern · Acme", "Draft:", "Best regards,\nJane Doe");
         assertThat(rows.getValue().get(0)).extracting(TelegramClient.Button::label).containsExactly("Got a reply", "Rejected");
     }
 

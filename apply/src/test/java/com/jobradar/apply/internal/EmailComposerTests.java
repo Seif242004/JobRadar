@@ -12,13 +12,13 @@ class EmailComposerTests {
 
     @Test
     void fillsTheTemplateFromThePostingAndTheUsersOwnName() {
-        OutgoingEmail email = EmailComposer.compose(context("Backend Intern", "Instabug", "Seif Tamer"), "hr@example.com", new byte[] {1});
+        OutgoingEmail email = EmailComposer.compose(context("Backend Intern", "Instabug", "Jane Doe"), "hr@example.com", new byte[] {1});
 
         assertThat(email.from()).isEqualTo("me@example.com");
         assertThat(email.to()).isEqualTo("hr@example.com");
-        assertThat(email.subject()).isEqualTo("Application: Backend Intern - Seif Tamer");
-        assertThat(email.body()).contains("apply for the Backend Intern at Instabug position", "Best regards,\nSeif Tamer\nme@example.com");
-        assertThat(email.attachmentName()).isEqualTo("Seif_Tamer_CV.pdf");
+        assertThat(email.subject()).isEqualTo("Application: Backend Intern - Jane Doe");
+        assertThat(email.body()).contains("apply for the Backend Intern at Instabug position", "Best regards,\nJane Doe\nme@example.com");
+        assertThat(email.attachmentName()).isEqualTo("Jane_Doe_CV.pdf");
         assertThat(email.attachment()).containsExactly(1);
     }
 
@@ -34,9 +34,9 @@ class EmailComposerTests {
     @Test
     void aPostingTitleCannotInjectHeaders() {
         OutgoingEmail email = EmailComposer.compose(
-                context("Intern\r\nBcc: victim@example.com", "Acme\nCo", "Seif"), "hr@example.com", new byte[0]);
+                context("Intern\r\nBcc: victim@example.com", "Acme\nCo", "Jane"), "hr@example.com", new byte[0]);
 
         assertThat(email.subject()).doesNotContain("\r", "\n");
-        assertThat(email.subject()).isEqualTo("Application: Intern Bcc: victim@example.com - Seif");
+        assertThat(email.subject()).isEqualTo("Application: Intern Bcc: victim@example.com - Jane");
     }
 }

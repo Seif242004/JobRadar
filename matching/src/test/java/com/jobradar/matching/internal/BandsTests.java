@@ -8,7 +8,7 @@ import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 
-/** Band and priority rules from docs/PLAN.md, "Freshness first". */
+/** Band and priority rules from docs/RESEARCH.md, "Freshness first". */
 class BandsTests {
 
     private static final Instant NOW = Instant.parse("2026-11-10T12:00:00Z");
