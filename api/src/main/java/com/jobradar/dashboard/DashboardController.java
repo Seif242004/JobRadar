@@ -48,7 +48,8 @@ class DashboardController {
             String applyTarget,
             Instant firstSeenAt,
             boolean cvReady,
-            List<String> levels) {}
+            List<String> levels,
+            boolean thin) {}
 
     record PreferencesView(
             List<String> roles,
@@ -124,6 +125,7 @@ class DashboardController {
                         """
                         SELECT p.id, p.title, c.name AS company, p.location, m.band, m.fit_score, m.reasons,
                                p.apply_channel, p.apply_target, COALESCE(p.posted_at, p.first_seen_at) AS first_seen_at, p.description,
+                               char_length(coalesce(p.description, '')) < 600 AS thin,
                                EXISTS (SELECT 1 FROM cv_version v WHERE v.user_id = m.user_id AND v.posting_id = m.posting_id) AS cv_ready
                         FROM match m
                         JOIN posting p ON p.id = m.posting_id
@@ -141,7 +143,8 @@ class DashboardController {
                                 rs.getBigDecimal("fit_score") == null ? null : rs.getBigDecimal("fit_score").doubleValue(),
                                 rs.getString("reasons"), rs.getString("apply_channel"), rs.getString("apply_target"),
                                 rs.getTimestamp("first_seen_at").toInstant(), rs.getBoolean("cv_ready"),
-                                com.jobradar.matching.PostingLevel.ids(rs.getString("title"), rs.getString("description"))),
+                                com.jobradar.matching.PostingLevel.ids(rs.getString("title"), rs.getString("description")),
+                                rs.getBoolean("thin")),
                         id, capped))
                 .orElse(List.of());
     }

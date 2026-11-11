@@ -23,6 +23,7 @@ export interface MatchRow {
   firstSeenAt: string;
   cvReady: boolean;
   levels: string[];
+  thin: boolean;
 }
 
 export interface ApplicationRow {
@@ -79,6 +80,8 @@ export interface PostingDetail {
   applyTarget: string | null;
   cv: CvInfo | null;
   baseScores: BaseScore[];
+  thin: boolean;
+  enrichStatus: string | null;
 }
 
 export interface BaseCv { id: number; label: string; filename: string }

@@ -180,6 +180,7 @@ function Matches({ rows, onOpen }: { rows: MatchRow[]; onOpen: (id: number) => v
                   <span className={`tag ${m.band}`}>{m.band}</span>
                   {m.cvReady && <span className="tag cv">CV ready</span>}
                   {m.levels.map((l) => <span key={l} className="tag">{l}</span>)}
+                  {m.thin && <span className="tag" title="Only a short description is stored, so the score is low-confidence">short text</span>}
                   <span className="muted">{ago(m.firstSeenAt)}</span>
                 </span>
               </button>
@@ -221,6 +222,12 @@ function PostingSheet({ id, onClose }: { id: number; onClose: () => void }) {
             <h2 dir="auto">{posting.title}</h2>
             <p dir="auto" className="muted">{posting.company ?? "Unknown company"} · {posting.location ?? "Location not listed"}</p>
             {posting.reasons && <p className="why">{posting.reasons}</p>}
+            {posting.thin && (
+              <p className="muted small" role="note">
+                Low-confidence score: only a short description is stored
+                {posting.enrichStatus === "blocked" ? " (the full page is on a site that does not allow automated reading)" : ""}. Open the posting to read the full text.
+              </p>
+            )}
 
             <div className="actions">
               {posting.cv && <a className="button primary" href={posting.cv.pdfUrl} target="_blank" rel="noreferrer">Open tailored CV</a>}

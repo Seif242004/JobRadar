@@ -5,11 +5,15 @@ import com.jobradar.ingestion.SourceConnector;
 import com.jobradar.ingestion.internal.PostingRepository;
 import com.jobradar.ingestion.internal.resolver.CareersResolver;
 import com.jobradar.ingestion.internal.resolver.WatchlistSeeder;
+import com.jobradar.ingestion.PostingPublisher;
+import com.jobradar.ingestion.internal.enrich.DescriptionEnricher;
+import com.jobradar.ingestion.internal.source.HttpFetcher;
 import java.time.Clock;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -32,5 +36,12 @@ class SchedulingConfiguration {
             CareersResolver resolver,
             Clock clock) {
         return new ConnectorScheduler(connectors, ingestion, runs, postings, seeder, resolver, clock);
+    }
+
+    /** Fetches the full text of thin postings from their public apply pages. */
+    @Bean
+    DescriptionEnricher descriptionEnricher(
+            JdbcTemplate jdbc, HttpFetcher http, PostingPublisher publisher, Clock clock) {
+        return new DescriptionEnricher(jdbc, http, publisher, clock);
     }
 }
