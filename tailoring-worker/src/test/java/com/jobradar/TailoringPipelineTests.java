@@ -286,6 +286,52 @@ class TailoringPipelineTests {
                 .isEqualTo(ready.atsScore());
     }
 
+    @Test
+    void aConfirmedSummaryAppearsOnTheCvAndAnUnconfirmedOneNever() throws IOException {
+        long postingId = posting("backend-java");
+        when(llm.complete(anyString(), anyString())).thenReturn(selection(confirmedBulletIds.subList(0, 6)));
+        // Only words that the profile contains, so the CV still passes the profile-text check.
+        jdbc.update("INSERT INTO cv_summary (user_id, label, focus, text, verify, sort_order) VALUES (?, 'java', ARRAY['java','spring'], ?, false, 0)",
+                userId, "Computer Engineering student building Java services with Spring Boot and PostgreSQL.");
+        jdbc.update("INSERT INTO cv_summary (user_id, label, focus, text, verify, sort_order) VALUES (?, 'draft', ARRAY['java'], ?, true, 1)",
+                userId, "Unconfirmed draft about quantum databases.");
+
+        CvReady ready = tailoring.tailor(userId, postingId).orElseThrow();
+
+        profileWords.add("summary");
+        assertOnePageWithOnlyProfileText(ready);
+        assertThat(pdfText(ready)).contains("Computer Engineering student building Java services").doesNotContain("quantum");
+        assertThat(jdbc.queryForObject("SELECT summary FROM cv_version WHERE id = ?", String.class, ready.cvVersionId()))
+                .startsWith("Computer Engineering student");
+    }
+
+    @Test
+    void aSummaryWithAnInventedTermIsSkippedNotPrinted() throws IOException {
+        long postingId = posting("backend-java");
+        when(llm.complete(anyString(), anyString())).thenReturn(selection(confirmedBulletIds.subList(0, 6)));
+        jdbc.update("INSERT INTO cv_summary (user_id, label, focus, text, verify, sort_order) VALUES (?, 'bad', ARRAY['java'], ?, false, 0)",
+                userId, "Engineer who led Kubernetes migrations at Google.");
+
+        CvReady ready = tailoring.tailor(userId, postingId).orElseThrow();
+
+        assertThat(pdfText(ready)).doesNotContain("Kubernetes");
+        assertThat(jdbc.queryForObject("SELECT summary FROM cv_version WHERE id = ?", String.class, ready.cvVersionId())).isNull();
+    }
+
+    @Test
+    void theAtsReportIsStoredWithChecksAndKeywords() throws IOException {
+        long postingId = posting("backend-java");
+        when(llm.complete(anyString(), anyString())).thenReturn(selection(confirmedBulletIds.subList(0, 6)));
+
+        CvReady ready = tailoring.tailor(userId, postingId).orElseThrow();
+
+        JsonNode report = json.readTree(jdbc.queryForObject("SELECT ats_report::text FROM cv_version WHERE id = ?", String.class, ready.cvVersionId()));
+        assertThat(report.path("score").asDouble()).isEqualTo(ready.atsScore());
+        assertThat(report.path("checks")).extracting(c -> c.path("name").asString())
+                .contains("Selectable text", "Contact details", "Standard headings", "One page");
+        assertThat(report.path("checks").get(0).path("ok").asBoolean()).isTrue();
+    }
+
     // ------------------------------------------------------------------------------ helpers
 
     private static String selection(List<Long> ids) {

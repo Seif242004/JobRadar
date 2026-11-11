@@ -10,7 +10,22 @@ import java.util.List;
  * to the CV it was written from. The database stores bullets flat; see {@link ProfileSeedImporter}
  * for the mapping.
  */
-public record ProfileSeed(String email, int dailyApplyCap, Preferences preferences, Cv cv, List<Entry> entries) {
+public record ProfileSeed(
+        String email, int dailyApplyCap, Preferences preferences, Cv cv, List<Entry> entries, List<Summary> summaries) {
+
+    /** A seed without summary variants. */
+    public ProfileSeed(String email, int dailyApplyCap, Preferences preferences, Cv cv, List<Entry> entries) {
+        this(email, dailyApplyCap, preferences, cv, entries, List.of());
+    }
+
+    /**
+     * One CV summary line for a kind of role. Imported as unconfirmed: it reaches a CV only after
+     * the user confirms it in the dashboard.
+     *
+     * @param focus words of a posting that select this variant
+     */
+    public record Summary(String label, List<String> focus, String text) {}
+
 
     /**
      * Fixed parts of the CV, stored as JSON in {@code profile.cv_static}. May be null in a seed

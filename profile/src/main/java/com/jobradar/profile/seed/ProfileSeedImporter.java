@@ -111,6 +111,20 @@ public class ProfileSeedImporter {
                 }
             }
         }
+
+        // 4. Summary variants. A variant the user has confirmed is never rewritten by the seed.
+        int summaryOrder = 0;
+        for (ProfileSeed.Summary summary : seed.summaries() == null ? List.<ProfileSeed.Summary>of() : seed.summaries()) {
+            jdbc.update(
+                    """
+                    INSERT INTO cv_summary (user_id, label, focus, text, sort_order)
+                    VALUES (?, ?, ?::text[], ?, ?)
+                    ON CONFLICT (user_id, label) DO UPDATE SET
+                        focus = EXCLUDED.focus, text = EXCLUDED.text, sort_order = EXCLUDED.sort_order
+                    WHERE cv_summary.verify
+                    """,
+                    userId, summary.label(), textArray(summary.focus()), summary.text(), summaryOrder++);
+        }
         return new Result(userId, inserted, present);
     }
 

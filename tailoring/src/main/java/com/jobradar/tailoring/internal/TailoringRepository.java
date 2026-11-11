@@ -42,6 +42,12 @@ public class TailoringRepository {
                             rs.getBoolean("verify"), rs.wasNull() ? null : entryId);
                 },
                 userId);
+        List<CvSummary> summaries = jdbc.query(
+                "SELECT id, label, focus, text, verify, sort_order FROM cv_summary WHERE user_id = ? ORDER BY sort_order, id",
+                (rs, n) -> new CvSummary(
+                        rs.getLong("id"), rs.getString("label"), List.of((String[]) rs.getArray("focus").getArray()),
+                        rs.getString("text"), rs.getBoolean("verify"), rs.getInt("sort_order")),
+                userId);
         return jdbc.query(
                         """
                         SELECT p.title, c.name AS company, p.location, p.description
@@ -50,7 +56,7 @@ public class TailoringRepository {
                         (rs, n) -> new TailoringData(
                                 userId, postingId, rs.getString("title"), rs.getString("company"),
                                 rs.getString("location"), rs.getString("description"),
-                                json.readValue(cvStatic.get(0), CvStatic.class), entries, bullets),
+                                json.readValue(cvStatic.get(0), CvStatic.class), entries, bullets, summaries),
                         postingId)
                 .stream()
                 .findFirst();
@@ -81,15 +87,16 @@ public class TailoringRepository {
                 .findFirst();
     }
 
-    public long insertCvVersion(long userId, long postingId, List<Long> bulletIds, String pdfKey, double atsScore) {
+    public long insertCvVersion(
+            long userId, long postingId, List<Long> bulletIds, String pdfKey, double atsScore, String summary, AtsReport report) {
         Array ids = jdbc.execute(
                 (ConnectionCallback<Array>) connection -> connection.createArrayOf("bigint", bulletIds.toArray()));
         return jdbc.queryForObject(
                 """
-                INSERT INTO cv_version (user_id, posting_id, bullet_ids, pdf_s3_key, ats_score)
-                VALUES (?, ?, ?, ?, ?) RETURNING id
+                INSERT INTO cv_version (user_id, posting_id, bullet_ids, pdf_s3_key, ats_score, summary, ats_report)
+                VALUES (?, ?, ?, ?, ?, ?, ?::jsonb) RETURNING id
                 """,
                 Long.class,
-                userId, postingId, ids, pdfKey, atsScore);
+                userId, postingId, ids, pdfKey, atsScore, summary, json.writeValueAsString(report));
     }
 }

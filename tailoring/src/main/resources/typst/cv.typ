@@ -41,6 +41,12 @@
   #if cv.headline != none [\ #cv.headline]
 ]
 
+// ---------------- summary, when a confirmed one was chosen ----------------
+#if cv.summary != none {
+  section("Summary")
+  [#cv.summary]
+}
+
 // ---------------- sections, in the order given ----------------
 #for s in cv.sections {
   section(s.title)
