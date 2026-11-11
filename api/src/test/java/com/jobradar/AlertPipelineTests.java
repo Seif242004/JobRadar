@@ -66,8 +66,8 @@ class AlertPipelineTests extends PostgresIntegrationTest {
         return jdbc.queryForObject(
                 """
                 INSERT INTO posting (company_id, source, source_id, title, location, apply_channel, apply_target,
-                                     deadline, first_seen_at, content_hash)
-                VALUES (?, 'fixture', ?, ?, ?, 'ats_form', ?, ?, ?, ?) RETURNING id
+                                     deadline, first_seen_at, content_hash, description)
+                VALUES (?, 'fixture', ?, ?, ?, 'ats_form', ?, ?, ?, ?, 'Open to fresh graduates.') RETURNING id
                 """,
                 Long.class,
                 companyId, title + age, title, location, "https://example.com/jobs/" + title.hashCode(),

@@ -85,7 +85,7 @@ class FitScoringTests extends PostgresIntegrationTest {
                 """
                 INSERT INTO posting (source, source_id, title, location, description, apply_channel, apply_target,
                                      first_seen_at, content_hash)
-                VALUES ('fixture', ?, ?, 'Cairo, Egypt', 'Description', 'ats_form', 'https://example.com/j', ?, ?)
+                VALUES ('fixture', ?, ?, 'Cairo, Egypt', 'Description. Fresh graduates welcome.', 'ats_form', 'https://example.com/j', ?, ?)
                 RETURNING id
                 """,
                 Long.class,

@@ -62,13 +62,15 @@ final class AlertExtractor {
                 skipped++;
                 continue;
             }
+            String[] companyAndPlace = splitCompany(candidate.company);
+            String location = cleanLocation(candidate.location != null ? candidate.location : companyAndPlace[1]);
             postings.add(new RawPosting(
                     SOURCE,
                     board.board() + ":" + entry.getKey(),
-                    candidate.company,
+                    companyAndPlace[0],
                     candidate.title,
-                    candidate.location,
-                    candidate.location != null && candidate.location.toLowerCase(Locale.ROOT).contains("remote") ? "remote" : null,
+                    location,
+                    location != null && location.toLowerCase(Locale.ROOT).contains("remote") ? "remote" : null,
                     null,
                     null,
                     // Applying happens on the board itself, by the user. Never automated.
@@ -276,6 +278,37 @@ final class AlertExtractor {
             location = clean(location.replaceAll("(?i)\\s+[·|•–—-]\\s+posted\\b.*$", ""));
         }
         candidate.offer(title, company, location);
+    }
+
+    /** LinkedIn social-proof lines that can land in the location slot: "2 connections", "8 company alumni". */
+    private static final Pattern SOCIAL_PROOF = Pattern.compile(
+            "(?i)^\\d+\\s+(company\\s+|school\\s+)?(alumni|alumnus|connections?|people|applicants?)\\b.*|^(be an early applicant|actively (hiring|recruiting)).*");
+
+    /**
+     * Company names in alert emails can carry an HTML entity and the location, for example
+     * {@code "Vodafone &amp;middot; Giza (Hybrid)"}. Returns {company, location or null}.
+     */
+    static String[] splitCompany(String raw) {
+        if (raw == null) {
+            return new String[] {null, null};
+        }
+        String text = raw;
+        for (int i = 0; i < 2; i++) {
+            text = SourceText.unescape(text).replace("&middot;", "\u00b7").replace("&bull;", "\u2022");
+        }
+        String[] parts = text.split("\\s*[\u00b7\u2022|]\\s*", 2);
+        String company = parts[0].replaceAll("\\s+", " ").strip();
+        String place = parts.length > 1 ? parts[1].replaceAll("\\s+", " ").strip() : null;
+        return new String[] {company.isEmpty() ? null : company, place == null || place.isEmpty() ? null : place};
+    }
+
+    /** Null for social-proof text; otherwise the location with entities decoded. */
+    static String cleanLocation(String raw) {
+        if (raw == null) {
+            return null;
+        }
+        String text = SourceText.unescape(raw).replaceAll("\\s+", " ").strip();
+        return text.isEmpty() || SOCIAL_PROOF.matcher(text).matches() ? null : text;
     }
 
     private static boolean isNoise(String line) {

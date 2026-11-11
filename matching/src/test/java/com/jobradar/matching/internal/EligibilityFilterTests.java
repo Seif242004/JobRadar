@@ -20,7 +20,8 @@ class EligibilityFilterTests {
             List.of("internship", "full-time"), LocalDate.of(2027, 6, 30));
 
     private static PostingView posting(String title, String location, String remotePolicy, Instant deadline) {
-        return new PostingView(1L, title, location, remotePolicy, null, deadline, null, NOW);
+        // The description carries the early-career signal most tests are not about.
+        return new PostingView(1L, title, location, remotePolicy, "Open to fresh graduates.", deadline, null, NOW);
     }
 
     private static Eligibility check(String title, String location, String remotePolicy) {
@@ -112,7 +113,9 @@ class EligibilityFilterTests {
     }
 
     private static PostingView withDescription(String title, String description) {
-        return new PostingView(1L, title, "Cairo", null, description, null, null, NOW);
+        // Most tests here are not about the early-career signal, so every description carries one.
+        String text = (description == null ? "" : description + " ") + "Fresh graduates welcome.";
+        return new PostingView(1L, title, "Cairo", null, text, null, null, NOW);
     }
 
     @Test
@@ -154,5 +157,42 @@ class EligibilityFilterTests {
                 1L, 42L, List.of(), List.of("Cairo"), true, List.of("full-time"), null, false, 2, List.of(), List.of());
 
         assertThat(EligibilityFilter.check(withDescription("Senior Engineer", "8+ years of experience"), user, NOW).eligible()).isTrue();
+    }
+
+    @Test
+    void aPostingWithNoEarlyCareerSignalIsRejectedForAnEntryLevelProfile() {
+        PostingView plain = new PostingView(1L, "Software Engineer", "Cairo", null, "Build services.", null, null, NOW);
+
+        Eligibility result = EligibilityFilter.check(plain, STUDENT, NOW);
+
+        assertThat(result.eligible()).isFalse();
+        assertThat(result.reason()).isEqualTo("No internship, graduate or junior signal in the posting");
+    }
+
+    @Test
+    void graduateProgramsAndWorkingStudentRolesAreRecognisedFromTheTitle() {
+        assertThat(EligibilityFilter.check(new PostingView(1L, "VOIS Graduate Program 2027", "Cairo", null, "", null, null, NOW), STUDENT, NOW).eligible())
+                .isTrue();
+        UserPreferences students = new UserPreferences(
+                1L, 42L, List.of(), List.of("Cairo"), true, List.of("working-student"), LocalDate.of(2027, 6, 30));
+        assertThat(EligibilityFilter.check(new PostingView(1L, "Working Student - Software Development", "Cairo", null, "", null, null, NOW), students, NOW).reason())
+                .isEqualTo("In Egypt, working-student");
+        assertThat(EligibilityFilter.check(new PostingView(1L, "Siemens Software Engineering Internship", "Cairo", null, "", null, null, NOW), STUDENT, NOW).eligible())
+                .isTrue();
+    }
+
+    @Test
+    void aDescriptionPhraseForFreshGraduatesIsASignal() {
+        PostingView view = new PostingView(1L, "Software Engineer", "Cairo", null, "Ideal for fresh graduates.", null, null, NOW);
+
+        assertThat(EligibilityFilter.check(view, STUDENT, NOW).eligible()).isTrue();
+    }
+
+    @Test
+    void salesAndOtherNonTechTitlesAreRejectedEvenWithADeveloperWord() {
+        Eligibility result = check("Sales - Pharmacies Channel Developer Intern", "Cairo", null);
+
+        assertThat(result.eligible()).isFalse();
+        assertThat(result.reason()).isEqualTo("Not a software or tech role");
     }
 }
