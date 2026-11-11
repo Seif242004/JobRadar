@@ -96,7 +96,7 @@ public class TailoringService {
 
         // 3. Spread the bullets over the relevant entries, then render; drop the lowest-ranked
         //    bullet until the CV is exactly one page.
-        ranked = BulletBalancer.balance(ranked, selectable);
+        ranked = BulletBalancer.balance(BulletBalancer.withRemainder(ranked, selectable), selectable);
 
         OnePageFitter.Fitted fitted = fitter.fit(data, ranked, summary);
 

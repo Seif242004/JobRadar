@@ -19,9 +19,26 @@ public final class BulletBalancer {
 
     /** Most bullets one job gets, and one project gets. Skill rows are one bullet each. */
     static final int MAX_PER_EXPERIENCE = 3;
-    static final int MAX_PER_PROJECT = 2;
+    static final int MAX_PER_PROJECT = 3;
 
     private BulletBalancer() {}
+
+    /**
+     * Appends every selectable bullet the model did not pick, in profile order, after the model's
+     * picks. The model's choice stays first, but the page-fit step now has enough bullets to fill
+     * the page and to give every job and project at least one bullet, as a hand-written CV does.
+     * Only the user's own confirmed bullets are added; nothing is created.
+     */
+    public static List<Long> withRemainder(List<Long> rankedIds, List<ProfileBullet> selectable) {
+        List<Long> result = new ArrayList<>(rankedIds);
+        java.util.Set<Long> seen = new java.util.HashSet<>(rankedIds);
+        for (ProfileBullet bullet : selectable) {
+            if (seen.add(bullet.id())) {
+                result.add(bullet.id());
+            }
+        }
+        return result;
+    }
 
     public static List<Long> balance(List<Long> rankedIds, List<ProfileBullet> bullets) {
         Map<Long, ProfileBullet> byId = new LinkedHashMap<>();
