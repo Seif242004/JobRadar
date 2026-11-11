@@ -1,6 +1,6 @@
 # Connector fixtures
 
-Real responses recorded on 2026-11-10 from the public endpoints below. Tests read these files and
+Real responses recorded on 2026-11-10 and 2026-11-11 from the public endpoints below. Tests read these files and
 never touch the network.
 
 | File | Request |
@@ -12,13 +12,9 @@ never touch the network.
 | `workable/search-egypt.json` | `GET https://jobs.workable.com/api/v1/jobs?location=Egypt` |
 | `workable/rate-limit-429.json` | same endpoint, body of the HTTP 429 answer (`Retry-After: 80921`) |
 | `remotive/remote-jobs.json` | `GET https://remotive.com/api/remote-jobs` |
+| `workable/board-foodics.json` | `GET https://apply.workable.com/api/v1/widget/accounts/foodics?details=true`, recorded 2026-11-11; 4 of 31 entries kept (one posting listed per city, one remote) |
+| `workable/board-moneyfellows-empty.json` | same endpoint for `moneyfellows`, recorded 2026-11-11; the board had no open jobs |
 
 The only edit: the `jobs` array (the top-level array for Lever) is cut down to a few entries to
 keep the repository small. Every remaining entry is byte-for-byte what the source returned apart
 from JSON re-indentation. `remotive/remote-jobs.json` is complete.
-
-## Synthetic fixtures (not recordings)
-
-| File | Why it is synthetic |
-| --- | --- |
-| `workable/board-synthetic.json`, `workable/board-empty-synthetic.json` | `GET https://apply.workable.com/api/v1/widget/accounts/{token}?details=true` answered HTTP 429 (Cloudflare 1015, `Retry-After` of hours) from the build environment on 2026-11-10 and 2026-11-11, so no real response could be recorded. These files are hand-written from the field list that public integrations document: `title`, `shortcode`, `shortlink`, `url`, `department`, `city`, `state`, `country`, `telecommuting`, `published_on`, `description`, with one entry per location for a posting open in several countries. **Unverified against the live API.** Replace them with recordings of a real board (for example `moneyfellows`) as soon as the endpoint is reachable. |
