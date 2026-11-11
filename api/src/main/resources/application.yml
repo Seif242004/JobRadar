@@ -31,7 +31,9 @@ jobradar:
     base-url: ${JOBRADAR_AI_BASE_URL:https://integrate.api.nvidia.com/v1}
     key: ${JOBRADAR_AI_KEY:}
     model: ${JOBRADAR_AI_MODEL:openai/gpt-oss-20b}
-    embedding-model: ${JOBRADAR_AI_EMBEDDING_MODEL:nvidia/llama-3.2-nv-embedqa-1b-v1}
+    embedding-model: ${JOBRADAR_AI_EMBEDDING_MODEL:nvidia/nemotron-3-embed-1b}
+    embedding-dimensions: ${JOBRADAR_AI_EMBEDDING_DIMENSIONS:0}
+    embedding-truncate: ${JOBRADAR_AI_EMBEDDING_TRUNCATE:true}
     daily-call-cap: ${JOBRADAR_AI_DAILY_CALL_CAP:200}
   aws:
     region: ${AWS_REGION:eu-central-1}
