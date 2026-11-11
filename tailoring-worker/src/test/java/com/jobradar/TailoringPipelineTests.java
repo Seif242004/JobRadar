@@ -298,15 +298,17 @@ class TailoringPipelineTests {
     void aConfirmedSummaryAppearsOnTheCvAndAnUnconfirmedOneNever() throws IOException {
         long postingId = posting("backend-java");
         when(llm.complete(anyString(), anyString())).thenReturn(selection(confirmedBulletIds.subList(0, 6)));
-        // Only words that the profile contains, so the CV still passes the profile-text check.
+        // The confirmed summary is the user's own text, so its words count as profile words below.
+        String confirmed = "Computer Engineering student building Java services with Spring Boot and PostgreSQL.";
         jdbc.update("INSERT INTO cv_summary (user_id, label, focus, text, verify, sort_order) VALUES (?, 'java', ARRAY['java','spring'], ?, false, 0)",
-                userId, "Computer Engineering student building Java services with Spring Boot and PostgreSQL.");
+                userId, confirmed);
         jdbc.update("INSERT INTO cv_summary (user_id, label, focus, text, verify, sort_order) VALUES (?, 'draft', ARRAY['java'], ?, true, 1)",
                 userId, "Unconfirmed draft about quantum databases.");
 
         CvReady ready = tailoring.tailor(userId, postingId).orElseThrow();
 
         profileWords.add("summary");
+        profileWords.addAll(words(confirmed));
         assertOnePageWithOnlyProfileText(ready);
         assertThat(pdfText(ready)).contains("Computer Engineering student building Java services").doesNotContain("quantum");
         assertThat(jdbc.queryForObject("SELECT summary FROM cv_version WHERE id = ?", String.class, ready.cvVersionId()))
