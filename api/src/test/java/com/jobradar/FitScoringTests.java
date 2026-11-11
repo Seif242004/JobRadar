@@ -120,7 +120,7 @@ class FitScoringTests extends PostgresIntegrationTest {
 
     @Test
     void aWeakMatchIsNotSentToTheLlmAndIsNotPushedAsHot() {
-        long id = posting("Marketing Specialist", Duration.ofMinutes(5));
+        long id = posting("Facilities Technician Intern", Duration.ofMinutes(5));
 
         matcher.match(id);
 
