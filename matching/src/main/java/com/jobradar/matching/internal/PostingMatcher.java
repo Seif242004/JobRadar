@@ -83,6 +83,11 @@ public class PostingMatcher {
         events.publishEvent(new MatchScored(user.userId(), postingId, eligibility.eligible(), band, fitScore));
     }
 
+    /** Asks tailoring for a (new) CV of this posting, on the backlog queue. */
+    public void requestTailor(long userId, long postingId) {
+        tailorRequests.publish(userId, postingId, false);
+    }
+
     /**
      * Re-runs the hard filters of one user over every stored posting after the user changed
      * preferences. A posting whose verdict did not change is left alone, so only newly eligible
