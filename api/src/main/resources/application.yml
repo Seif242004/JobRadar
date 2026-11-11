@@ -1,6 +1,10 @@
 spring:
   application:
     name: jobradar-api
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
   datasource:
     # Defaults match docker-compose.yml; production values come from env vars / Secrets Manager.
     url: ${JOBRADAR_DB_URL:jdbc:postgresql://localhost:5432/jobradar}

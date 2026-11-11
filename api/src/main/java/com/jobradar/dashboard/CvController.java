@@ -2,6 +2,7 @@ package com.jobradar.dashboard;
 
 import com.jobradar.matching.MatchingApi;
 import com.jobradar.notifier.CvLinkSigner;
+import com.jobradar.cvscore.BaseCvs;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
@@ -39,7 +42,8 @@ class CvController {
 
     record PostingDetail(
             long postingId, String title, String company, String location, String description, String band,
-            Double fit, String reasons, String applyChannel, String applyTarget, CvInfo cv) {}
+            Double fit, String reasons, String applyChannel, String applyTarget, CvInfo cv,
+            List<BaseCvs.Score> baseScores) {}
 
     record SummaryRow(long id, String label, String text, boolean confirmed, List<String> focus) {}
 
@@ -52,16 +56,18 @@ class CvController {
     private final JsonMapper json;
     private final CvLinkSigner signer;
     private final MatchingApi matcher;
+    private final BaseCvs baseCvs;
     private final String bucket;
 
     CvController(
-            JdbcTemplate jdbc, S3Client s3, JsonMapper json, CvLinkSigner signer, MatchingApi matcher,
+            JdbcTemplate jdbc, S3Client s3, JsonMapper json, CvLinkSigner signer, MatchingApi matcher, BaseCvs baseCvs,
             @Value("${jobradar.notifier.cv-bucket}") String bucket) {
         this.jdbc = jdbc;
         this.s3 = s3;
         this.json = json;
         this.signer = signer;
         this.matcher = matcher;
+        this.baseCvs = baseCvs;
         this.bucket = bucket;
     }
 
@@ -89,12 +95,51 @@ class CvController {
                                 rs.getString("description"), rs.getString("band"),
                                 rs.getBigDecimal("fit_score") == null ? null : rs.getBigDecimal("fit_score").doubleValue(),
                                 rs.getString("reasons"), rs.getString("apply_channel"), rs.getString("apply_target"),
-                                cv(user.get(), id)),
+                                cv(user.get(), id), List.of()),
                         user.get(), id)
                 .stream()
                 .findFirst()
+                .map(d -> new PostingDetail(
+                        d.postingId(), d.title(), d.company(), d.location(), d.description(), d.band(), d.fit(),
+                        d.reasons(), d.applyChannel(), d.applyTarget(), d.cv(),
+                        baseCvs.score(user.get(), d.title(), d.description())))
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/base-cvs")
+    List<BaseCvs.Info> baseCvList() {
+        return userId().map(baseCvs::list).orElse(List.of());
+    }
+
+    /** Stores the uploaded PDF unchanged under its own file name. */
+    @PostMapping("/base-cvs")
+    ResponseEntity<?> baseCvUpload(@RequestParam("file") MultipartFile file, @RequestParam("label") String label) {
+        long user = userId().orElseThrow(() -> new IllegalStateException("No user yet"));
+        String name = file.getOriginalFilename() == null ? "cv.pdf" : file.getOriginalFilename();
+        try {
+            return ResponseEntity.ok(baseCvs.save(user, label.strip(), name, file.getBytes()));
+        } catch (IllegalArgumentException | java.io.IOException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/base-cvs/{id}/file")
+    ResponseEntity<byte[]> baseCvFile(@PathVariable long id) {
+        long user = userId().orElse(-1L);
+        return baseCvs.pdf(user, id)
+                .map(bytes -> ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_PDF)
+                        .header(HttpHeaders.CONTENT_DISPOSITION,
+                                "inline; filename=\"" + baseCvs.info(user, id).map(BaseCvs.Info::filename).orElse("cv.pdf") + "\"")
+                        .body(bytes))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/base-cvs/{id}")
+    ResponseEntity<Void> baseCvDelete(@PathVariable long id) {
+        return userId().filter(u -> baseCvs.delete(u, id)).isPresent()
+                ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     private CvInfo cv(long userId, long postingId) {
