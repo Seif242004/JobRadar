@@ -23,6 +23,7 @@ import tools.jackson.databind.json.JsonMapper;
  * no public endpoint.
  */
 @Component
+@org.springframework.boot.autoconfigure.condition.ConditionalOnExpression("'${jobradar.ntfy.topic:}'.isEmpty()")
 class HttpTelegramClient implements TelegramClient {
 
     private static final Logger log = LoggerFactory.getLogger(HttpTelegramClient.class);

@@ -62,6 +62,10 @@ jobradar:
     # OAuth client of the Google Cloud project; users' refresh tokens live in Secrets Manager.
     client-id: ${JOBRADAR_GOOGLE_CLIENT_ID:}
     client-secret: ${JOBRADAR_GOOGLE_CLIENT_SECRET:}
+  ntfy:
+    # Free push channel (ntfy.sh) used instead of Telegram when the topic is set. Use a long random topic.
+    topic: ${JOBRADAR_NTFY_TOPIC:}
+    chat-id: ${JOBRADAR_NTFY_CHAT_ID:1}
   telegram:
     # Bot token from @BotFather; empty disables sending (alerts are logged instead).
     bot-token: ${JOBRADAR_TELEGRAM_BOT_TOKEN:}
