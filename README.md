@@ -52,9 +52,55 @@ docker compose up -d          # Postgres + pgvector on 5432, LocalStack (SQS, S3
 java -jar api/target/api.jar  # run the api; Flyway applies the schema on startup
 ```
 
-Health endpoints: api `:8080/actuator/health`, ingestion-worker `:8081`, tailoring-worker `:8082`.
+Health endpoints: api `:8080/actuator/health`, ingestion-worker `:8081`, tailoring-worker `:8082` (18080 to 18082 in the local run below).
 
 Local queues: `jobradar-hot`, `jobradar-backlog`, `jobradar-dlq`. Local bucket: `jobradar-local`.
+
+## Run locally (no AWS, no cost)
+
+Everything runs on one machine: Postgres with pgvector and LocalStack (SQS, S3, Secrets Manager)
+in Docker, and the three Spring Boot apps from Maven. Nothing here needs an AWS account.
+
+```sh
+cp .env.example .env                      # then fill in the keys listed below (git-ignored)
+docker compose up -d postgres localstack
+./mvnw -DskipTests install
+```
+
+Run each app from the repo root with the `.env` values exported (for example `set -a; . ./.env; set +a`).
+The ports below avoid 8080, which is often taken on a dev machine:
+
+```sh
+PORT=18080 ./mvnw -q -pl api spring-boot:run               # api, runs the Flyway migrations
+PORT=18081 ./mvnw -q -pl ingestion-worker spring-boot:run  # sources, Gmail alerts, resolver
+PORT=18082 ./mvnw -q -pl tailoring-worker spring-boot:run  # CV tailoring (needs Typst)
+```
+
+If the LocalStack init script did not run (it needs LF line endings, see `.gitattributes`), create
+the queues and bucket by hand: `docker compose exec -T localstack sh < localstack/init-aws.sh`.
+
+Environment keys (values stay in `.env`, never committed):
+
+| Key | What it is |
+| --- | --- |
+| `JOBRADAR_AI_KEY` | NVIDIA Build API key (free tier) for chat and embeddings |
+| `JOBRADAR_AI_MODEL` | chat model; default `nvidia/nemotron-3.5-lightning-30b-a3b` |
+| `JOBRADAR_MATCHING_FIT_SIMILARITY_FLOOR` / `_CEILING` | maps embedding similarity to fit 0..100; `0.10` / `0.35` suits the default embedding model |
+| `JOBRADAR_NTFY_TOPIC`, `JOBRADAR_NTFY_CHAT_ID` | free push channel through ntfy.sh; the topic is the secret, use a long random one |
+| `JOBRADAR_GOOGLE_CLIENT_ID`, `JOBRADAR_GOOGLE_CLIENT_SECRET` | OAuth "Desktop app" client of your own Google Cloud project (free, Gmail API enabled, you as test user) |
+| `JOBRADAR_GMAIL_ALERT_LABEL` | the one Gmail label the alert reader may read (default `JobRadar`) |
+| `JOBRADAR_TYPST_BINARY` | path of the Typst executable (`winget install Typst.Typst`) |
+| `JOBRADAR_PROFILE_SEED_FILE` | absolute path of your master profile JSON; the api imports it on startup |
+| `JOBRADAR_DB_*`, `JOBRADAR_AWS_ENDPOINT`, `JOBRADAR_SQS_*`, `AWS_*` | the local Postgres and LocalStack defaults from `.env.example` |
+
+Gmail alerts: create a Gmail label `JobRadar` and a filter that only applies it to the alert senders.
+Run `python scripts/gmail_authorize.py --read-only` (with `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
+set), store the printed JSON in LocalStack
+(`awslocal secretsmanager create-secret --name jobradar/gmail/<user id> --secret-string ...`) and set
+`app_user.gmail_token_ref` to that name.
+
+A new profile is not matched against postings that already exist. To match them, send each posting id
+to the backlog queue as `{"postingId": <id>}`.
 
 ## Master profile
 

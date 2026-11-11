@@ -59,13 +59,17 @@ public class OpenAiCompatibleClient implements LlmClient, EmbeddingClient {
         models.addAll(properties.fallbackModels());
         LlmUnavailableException last = null;
         for (String model : models) {
-            HttpResponse<String> response = post("/chat/completions", Map.of(
-                    "model", model,
-                    "temperature", 0.2,
-                    "max_tokens", 2000,
-                    "messages", List.of(
-                            Map.of("role", "system", "content", system),
-                            Map.of("role", "user", "content", user))));
+            Map<String, Object> body = new java.util.LinkedHashMap<>();
+            body.put("model", model);
+            body.put("temperature", 0.2);
+            body.put("max_tokens", 2000);
+            body.put("messages", List.of(
+                    Map.of("role", "system", "content", system),
+                    Map.of("role", "user", "content", user)));
+            if (properties.chatDisableThinking()) {
+                body.put("chat_template_kwargs", Map.of("enable_thinking", false));
+            }
+            HttpResponse<String> response = post("/chat/completions", body);
             if (response.statusCode() == 404) {
                 last = new LlmUnavailableException("Model " + model + " is not available");
                 continue;

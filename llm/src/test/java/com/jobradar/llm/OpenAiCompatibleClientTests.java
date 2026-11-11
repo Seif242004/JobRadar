@@ -53,7 +53,7 @@ class OpenAiCompatibleClientTests {
     private OpenAiCompatibleClient client(String key, int dailyCap, Clock clock) {
         AiProperties properties = new AiProperties(
                 "http://127.0.0.1:" + server.getAddress().getPort() + "/v1/",
-                key, "primary-model", List.of("backup-model"), "embed-model", 1024, "passage", false, dailyCap, Duration.ofSeconds(5));
+                key, "primary-model", List.of("backup-model"), "embed-model", 1024, "passage", false, false, dailyCap, Duration.ofSeconds(5));
         return new OpenAiCompatibleClient(properties, JsonMapper.builder().build(), clock);
     }
 
@@ -152,7 +152,7 @@ class OpenAiCompatibleClientTests {
         responder = body -> new Object[] {200, "{" + '"' + "data" + '"' + ":[{" + '"' + "index" + '"' + ":0," + '"' + "embedding" + '"' + ":" + wide + "}]}"};
         AiProperties properties = new AiProperties(
                 "http://127.0.0.1:" + server.getAddress().getPort() + "/v1/",
-                "secret", "m", List.of(), "wide-model", 0, "passage", true, 10, Duration.ofSeconds(5));
+                "secret", "m", List.of(), "wide-model", 0, "passage", true, false, 10, Duration.ofSeconds(5));
 
         float[] vector = new OpenAiCompatibleClient(properties, JsonMapper.builder().build(), Clock.systemUTC())
                 .embed(List.of("text")).get(0);
@@ -164,6 +164,18 @@ class OpenAiCompatibleClientTests {
         }
         assertThat(Math.sqrt(norm)).isCloseTo(1.0, org.assertj.core.data.Offset.offset(1e-5));
         assertThat(requestBodies.get(requestBodies.size() - 1)).doesNotContain("dimensions");
+    }
+
+    @Test
+    void chatCanAskTheProviderToSkipThinking() {
+        responder = body -> new Object[] {200, chatReply("ok")};
+        AiProperties properties = new AiProperties(
+                "http://127.0.0.1:" + server.getAddress().getPort() + "/v1/",
+                "secret", "m", List.of(), "embed-model", 1024, "passage", false, true, 10, Duration.ofSeconds(5));
+
+        new OpenAiCompatibleClient(properties, JsonMapper.builder().build(), Clock.systemUTC()).complete("s", "u");
+
+        assertThat(requestBodies.get(requestBodies.size() - 1)).contains("\"enable_thinking\":false");
     }
 
     private static String vector(double value) {

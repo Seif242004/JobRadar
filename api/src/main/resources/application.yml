@@ -30,7 +30,8 @@ jobradar:
     # OpenAI-compatible endpoint (SPEC.md D1 to D3). An empty key disables rerank and embeddings.
     base-url: ${JOBRADAR_AI_BASE_URL:https://integrate.api.nvidia.com/v1}
     key: ${JOBRADAR_AI_KEY:}
-    model: ${JOBRADAR_AI_MODEL:openai/gpt-oss-20b}
+    model: ${JOBRADAR_AI_MODEL:nvidia/nemotron-3.5-lightning-30b-a3b}
+    chat-disable-thinking: ${JOBRADAR_AI_CHAT_DISABLE_THINKING:true}
     embedding-model: ${JOBRADAR_AI_EMBEDDING_MODEL:nvidia/nemotron-3-embed-1b}
     embedding-dimensions: ${JOBRADAR_AI_EMBEDDING_DIMENSIONS:0}
     embedding-truncate: ${JOBRADAR_AI_EMBEDDING_TRUNCATE:true}
