@@ -89,8 +89,11 @@ public final class EligibilityFilter {
         // 2. Egypt, or remote and open to Egypt.
         String location = lower(posting.location());
         String remotePolicy = lower(posting.remotePolicy());
-        boolean inEgypt = EGYPT.matcher(location).find() || matchesAny(location, user.cities());
-        boolean remote = REMOTE.matcher(remotePolicy).find() || REMOTE.matcher(location).find();
+        // A posting with no location (a pasted post, or an alert whose footer text was dropped) is placed by its text.
+        String placed = location.isBlank() ? lower(posting.title()) + " " + lower(posting.description()) : location;
+        boolean inEgypt = EGYPT.matcher(placed).find() || matchesAny(placed, user.cities());
+        boolean remote = REMOTE.matcher(remotePolicy).find() || REMOTE.matcher(location).find()
+                || (location.isBlank() && REMOTE.matcher(placed).find());
         String where;
         if (inEgypt) {
             where = "In Egypt";

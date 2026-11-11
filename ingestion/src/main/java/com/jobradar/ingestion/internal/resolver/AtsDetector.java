@@ -28,6 +28,9 @@ public final class AtsDetector {
             // boards-api.greenhouse.io/v1/boards/acme/jobs
             new Rule("greenhouse", Pattern.compile("boards-api\\.greenhouse\\.io/v1/boards/([A-Za-z0-9_-]+)"), m -> m.group(1)),
             // jobs.lever.co/Acme (case-sensitive token), jobs.eu.lever.co/acme, api.lever.co/v0/postings/acme
+            // jobs.ashbyhq.com/acme and api.ashbyhq.com/posting-api/job-board/acme
+            new Rule("ashby", Pattern.compile("jobs\\.ashbyhq\\.com/([A-Za-z0-9_.-]+)"), m -> m.group(1)),
+            new Rule("ashby", Pattern.compile("api\\.ashbyhq\\.com/posting-api/job-board/([A-Za-z0-9_.-]+)"), m -> m.group(1)),
             new Rule("lever", Pattern.compile("jobs(?:\\.eu)?\\.lever\\.co/([A-Za-z0-9_-]+)"), m -> m.group(1)),
             new Rule("lever", Pattern.compile("api(?:\\.eu)?\\.lever\\.co/v0/postings/([A-Za-z0-9_-]+)"), m -> m.group(1)),
             // apply.workable.com/acme, apply.workable.com/api/v1/widget/accounts/acme

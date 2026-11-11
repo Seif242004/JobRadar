@@ -51,17 +51,40 @@ final class MailParser {
             } else if (part.isMimeType("message/rfc822")) {
                 collect((Part) part.getContent(), bodies, depth + 1);
             } else if (part.isMimeType("text/html") && bodies.html.isEmpty()) {
-                bodies.html = limit(part.getContent());
+                bodies.html = limit(text(part));
             } else if (part.isMimeType("text/plain") && bodies.text.isEmpty()) {
-                bodies.text = limit(part.getContent());
+                bodies.text = limit(text(part));
             }
         } catch (MessagingException | IOException | RuntimeException e) {
             // Skip this part: an unknown charset or a broken encoding must not lose the others.
         }
     }
 
-    private static String limit(Object content) {
-        String text = content instanceof String string ? string : "";
+    /**
+     * Decodes a text part. Alert mail often omits the charset on its parts, and JavaMail then reads UTF-8
+     * bytes as Latin-1 ("â" in place of a dash), so an undeclared charset is treated as UTF-8.
+     */
+    private static String text(Part part) throws MessagingException, IOException {
+        String charset = null;
+        try {
+            charset = new jakarta.mail.internet.ContentType(part.getContentType()).getParameter("charset");
+        } catch (jakarta.mail.internet.ParseException e) {
+            // fall through to the default
+        }
+        java.nio.charset.Charset decode = java.nio.charset.StandardCharsets.UTF_8;
+        if (charset != null) {
+            try {
+                decode = java.nio.charset.Charset.forName(charset.replace("\"", ""));
+            } catch (RuntimeException e) {
+                // unknown charset: keep UTF-8
+            }
+        }
+        try (java.io.InputStream in = part.getInputStream()) {
+            return new String(in.readAllBytes(), decode);
+        }
+    }
+
+    private static String limit(String text) {
         return text.length() > MAX_BODY_CHARS ? text.substring(0, MAX_BODY_CHARS) : text;
     }
 }

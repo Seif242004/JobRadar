@@ -17,8 +17,8 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 record GmailAlertProperties(
         @DefaultValue("true") boolean enabled,
         @DefaultValue("JobRadar") String label,
-        @DefaultValue("3") int lookbackDays,
-        @DefaultValue("50") int maxMessagesPerRun,
+        @DefaultValue("8") int lookbackDays,
+        @DefaultValue("300") int maxMessagesPerRun,
         @DefaultValue("") String clientId,
         @DefaultValue("") String clientSecret,
         @DefaultValue("https://oauth2.googleapis.com/token") String tokenUrl,

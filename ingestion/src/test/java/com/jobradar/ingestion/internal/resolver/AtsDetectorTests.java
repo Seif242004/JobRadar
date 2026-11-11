@@ -15,6 +15,7 @@ class AtsDetectorTests {
             https://job-boards.eu.greenhouse.io/acme                                  | greenhouse      | acme
             <script src="https://boards.greenhouse.io/embed/job_board/js?for=acme">    | greenhouse      | acme
             https://boards-api.greenhouse.io/v1/boards/acme/jobs                      | greenhouse      | acme
+            https://jobs.ashbyhq.com/thndr                                             | ashby          | thndr
             https://jobs.lever.co/Bosta                                               | lever           | Bosta
             <a href="https://jobs.lever.co/Bosta/002239d4/apply">                      | lever           | Bosta
             https://apply.workable.com/moneyfellows/                                  | workable        | moneyfellows
