@@ -50,4 +50,16 @@ class BulletBalancerTests {
         assertThat(extended).hasSize(12).doesNotHaveDuplicates();
         assertThat(extended.subList(2, extended.size())).containsExactly(2L, 3L, 4L, 6L, 7L, 8L, 9L, 10L, 11L, 12L);
     }
+
+    @Test
+    void everyJobIsKeptButOnlyTheMostRelevantProjectsAre() {
+        List<ProfileBullet> many = List.of(
+                b(1, "project", 30L), b(2, "project", 31L), b(3, "project", 32L), b(4, "project", 33L),
+                b(5, "project", 34L), b(6, "project", 35L),
+                b(7, "experience", 40L), b(8, "experience", 41L), b(9, "skill", null));
+        // The model liked the projects best, but jobs still come first and only four projects stay.
+        List<Long> balanced = BulletBalancer.balance(List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L), many);
+
+        assertThat(balanced).containsExactly(7L, 8L, 1L, 2L, 3L, 4L, 9L);
+    }
 }

@@ -213,7 +213,7 @@ class ApplyNowTests extends PostgresIntegrationTest {
         return jdbc.queryForObject(
                 """
                 INSERT INTO posting (source, source_id, title, location, description, apply_channel, apply_target, first_seen_at, content_hash)
-                VALUES ('fixture', ?, ?, 'Cairo, Egypt', 'backend', 'ats_form', 'https://example.com/j', ?, ?) RETURNING id
+                VALUES ('fixture', ?, ?, 'Cairo, Egypt', 'Backend role for fresh graduates', 'ats_form', 'https://example.com/j', ?, ?) RETURNING id
                 """,
                 Long.class, title, title, Timestamp.from(Instant.now().minus(age)), title);
     }

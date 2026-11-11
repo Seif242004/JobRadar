@@ -21,6 +21,9 @@ public final class BulletBalancer {
     static final int MAX_PER_EXPERIENCE = 3;
     static final int MAX_PER_PROJECT = 3;
 
+    /** Projects on one CV: the most relevant few, as on a hand-written CV; every job is kept. */
+    static final int MAX_PROJECTS = 4;
+
     private BulletBalancer() {}
 
     /**
@@ -57,10 +60,20 @@ public final class BulletBalancer {
             groups.computeIfAbsent(key, k -> new ArrayList<>()).add(id);
         }
 
+        // Jobs come first, then only the most relevant projects (groups are in relevance order),
+        // then skill rows. Within a pass this is also the order in which the page-fit step keeps
+        // bullets, so a project bullet is dropped before any job bullet.
+        List<Map.Entry<String, List<Long>>> ordered = new ArrayList<>();
+        groups.entrySet().stream().filter(g -> g.getKey().startsWith("experience:")).forEach(ordered::add);
+        groups.entrySet().stream().filter(g -> g.getKey().startsWith("project:")).limit(MAX_PROJECTS).forEach(ordered::add);
+        groups.entrySet().stream()
+                .filter(g -> !g.getKey().startsWith("experience:") && !g.getKey().startsWith("project:"))
+                .forEach(ordered::add);
+
         List<Long> result = new ArrayList<>();
         for (int pass = 0; ; pass++) {
             boolean added = false;
-            for (Map.Entry<String, List<Long>> group : groups.entrySet()) {
+            for (Map.Entry<String, List<Long>> group : ordered) {
                 int cap = group.getKey().startsWith("experience:") ? MAX_PER_EXPERIENCE
                         : group.getKey().startsWith("project:") ? MAX_PER_PROJECT : 1;
                 if (pass < cap && pass < group.getValue().size()) {

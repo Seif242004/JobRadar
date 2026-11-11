@@ -29,6 +29,9 @@ public final class EligibilityFilter {
 
     private static final Pattern INTERNSHIP = Pattern.compile("\\bintern(ship)?\\b|trainee|تدريب|متدرب");
 
+    /** Graduate programmes and junior roles: a full-time job aimed at new graduates. */
+    private static final Pattern GRADUATE = Pattern.compile("\\bgrad(uate)?s?\\b|\\bjunior\\b|\\bjr\\b|entry[- ]level|\\bprogram(me)?\\b");
+
     private static final Pattern WORKING_STUDENT =
             Pattern.compile("working student|werkstudent|student job|part[- ]time student");
 
@@ -39,6 +42,26 @@ public final class EligibilityFilter {
     /** "3+ years", "5 years of experience", "minimum 4 yrs". The first number is the lower bound asked for. */
     private static final Pattern YEARS = Pattern.compile(
             "(\\d{1,2})\\s*(?:\\+|plus)?\\s*(?:-\\s*\\d{1,2}\\s*)?(?:years?|yrs?)\\b");
+
+    /** Early-career wording in a title: internships, graduate and trainee programmes, junior roles, students. */
+    private static final Pattern EARLY_CAREER_TITLE = Pattern.compile(
+            "\\bintern(ship)?s?\\b|trainee|apprentice|\\bgrad(uate)?s?\\b|\\bjunior\\b|\\bjr\\b|entry[- ]level"
+                    + "|\\bfresh(er)?s?\\b|\\bstudents?\\b|working student|werkstudent|early career|new grad"
+                    + "|\\b(graduate|internship|trainee|rotational|talent|development|vois|summer|winter|campus) program(me)?\\b"
+                    + "|\\bprogram(me)?\\b.*\\b(graduate|intern|student)|تدريب|متدرب|حديث[يي] التخرج");
+
+    /** The same, as it appears in a description: only phrases that describe who the role is for. */
+    private static final Pattern EARLY_CAREER_TEXT = Pattern.compile(
+            "fresh(er)?s? graduates?|recent graduates?|new graduates?|graduate (program|role|position|scheme)"
+                    + "|entry[- ]level|\\bjunior\\b|\\binterns?\\b|internship|trainee|working student|werkstudent"
+                    + "|final[- ]year student|\\b0\\s*(?:-|to)\\s*[12]\\s*years?|no (prior )?experience (is )?(required|needed)"
+                    + "|currently (studying|enrolled)|حديث[يي] التخرج");
+
+    /** Roles outside software and tech that the generic title words ("developer", "engineer") let through. */
+    private static final Pattern NON_TECH_TITLE = Pattern.compile(
+            "\\b(sales|marketing|accountant|accounting|pharmac\\w*|recruit\\w*|talent acquisition|hr|human resources"
+                    + "|legal|lawyer|finance|financial|customer (service|support)|receptionist|driver|teacher|nurse"
+                    + "|procurement|supply chain|warehouse|operations manager|business development)\\b");
 
     private EligibilityFilter() {}
 
@@ -85,6 +108,14 @@ public final class EligibilityFilter {
             }
         }
 
+        // 3a. An entry-level profile needs a sign that the role is for early-career people: an
+        //     internship, graduate or junior wording in the title, or a phrase in the description.
+        //     Without one, plain "Software Engineer" postings are mid-level roles in disguise.
+        if (user.entryLevelOnly() && !EARLY_CAREER_TITLE.matcher(title).find()
+                && !EARLY_CAREER_TEXT.matcher(lower(posting.description())).find()) {
+            return Eligibility.rejected("No internship, graduate or junior signal in the posting");
+        }
+
         // 3b. Roles the user excluded, and roles that match none of the titles the user wants.
         for (String word : user.excludeKeywords()) {
             if (containsWord(title, word)) {
@@ -96,9 +127,15 @@ public final class EligibilityFilter {
             return Eligibility.rejected("Title matches none of your target roles");
         }
 
+        if (NON_TECH_TITLE.matcher(title).find()) {
+            return Eligibility.rejected("Not a software or tech role");
+        }
+
         // 4. Job type must be one the user wants.
         String jobType = jobType(title);
-        boolean wanted = user.jobTypes().stream().anyMatch(type -> type.equalsIgnoreCase(jobType));
+        // A graduate or junior role is a full-time job, so either wish covers it.
+        boolean wanted = user.jobTypes().stream().anyMatch(type -> type.equalsIgnoreCase(jobType)
+                || (jobType.equals("graduate") && type.equalsIgnoreCase("full-time")));
         if (!wanted) {
             return Eligibility.rejected("Job type " + jobType + " is not in the profile");
         }
@@ -111,7 +148,10 @@ public final class EligibilityFilter {
         if (WORKING_STUDENT.matcher(lowerTitle).find()) {
             return "working-student";
         }
-        return INTERNSHIP.matcher(lowerTitle).find() ? "internship" : "full-time";
+        if (INTERNSHIP.matcher(lowerTitle).find()) {
+            return "internship";
+        }
+        return GRADUATE.matcher(lowerTitle).find() ? "graduate" : "full-time";
     }
 
     /**
