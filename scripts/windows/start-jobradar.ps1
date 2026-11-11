@@ -73,7 +73,10 @@ function Start-App($module, $port) {
         -RedirectStandardOutput (Join-Path $logs "$module.log") -RedirectStandardError (Join-Path $logs "$module.err.log")
     Set-Content (Join-Path $logs "$module.pid") $p.Id
 }
+$env:SPRING_PROFILES_ACTIVE = "dashboard"   # read-only dashboard endpoints, same api; bound to this PC only
+$env:SERVER_ADDRESS = "127.0.0.1"
 Start-App "api" 18080
+Remove-Item Env:SPRING_PROFILES_ACTIVE, Env:SERVER_ADDRESS -ErrorAction SilentlyContinue
 Start-App "ingestion-worker" 18081
 Start-App "tailoring-worker" 18082
 Remove-Item Env:PORT -ErrorAction SilentlyContinue
