@@ -1,5 +1,10 @@
 # JobRadar
 
+[![CI](https://github.com/Seif242004/JobRadar/actions/workflows/ci.yml/badge.svg)](https://github.com/Seif242004/JobRadar/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Java 25](https://img.shields.io/badge/Java-25-orange)
+![Spring Boot 4](https://img.shields.io/badge/Spring%20Boot-4-6DB33F)
+
 An Egypt-first job-search copilot. It collects postings from official and public sources, scores them
 against your own CVs, and tells you what to apply to and when. **It never submits an application without
 your explicit approval.**
@@ -76,6 +81,24 @@ verified in tests.
 **Stack:** Java 25, Spring Boot 4, Spring Modulith, PostgreSQL + pgvector, Flyway, SQS and S3 (LocalStack
 locally), React + Vite, Terraform, GitHub Actions. Tests use Testcontainers and recorded fixtures; no test
 makes a live network call.
+
+## Design decisions
+
+- **Modular monolith, not microservices.** One codebase with Spring Modulith modules whose boundaries are
+  enforced by a test. Only the parts with a different runtime profile (ingestion polling, PDF rendering)
+  are separate deployables.
+- **Freshness over completeness.** A one-minute scheduler tick picks the sources that are due; new
+  postings go to a hot queue and are scored within minutes, older ones to a backlog queue.
+- **Cheap filters before expensive scoring.** Location, level and age rules run first, then vector
+  similarity in pgvector, and only the survivors reach the LLM rerank.
+- **The LLM never writes your CV.** Tailoring selects and orders bullet IDs that already exist in your
+  profile; a validator rejects anything that is not traceable to them.
+- **Compliance by construction.** Sites whose terms forbid automation are never fetched. Their alert
+  emails are read from your own mailbox through one narrow Gmail label.
+- **Provider-neutral AI.** Chat and embeddings go through one OpenAI-compatible interface, so the model
+  provider is a config change.
+- **Deterministic tests.** Connectors are tested against recorded fixtures and the database against
+  Testcontainers; no test touches the live network.
 
 ## Quick start
 
