@@ -110,4 +110,29 @@ class DashboardTests extends PostgresIntegrationTest {
 
         assertThat(response.statusCode()).isEqualTo(405);
     }
+
+    @Test
+    void preferencesAreSavedAndMarkedOnboarded() throws Exception {
+        jdbc.update("INSERT INTO profile (user_id) VALUES (?)", userId);
+        assertThat(get("/api/dashboard/preferences").path("onboarded").asBoolean()).isFalse();
+
+        String body = """
+                {"roles":["Backend"],"cities":["Cairo"],"remote":true,"jobTypes":["internship","full-time"],
+                 "entryLevelOnly":true,"maxYearsExperience":1,"titleKeywords":["backend","ai"],
+                 "excludeKeywords":["sales"],"onboarded":false}""";
+        HttpResponse<String> saved = http.send(
+                HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + "/api/dashboard/preferences"))
+                        .PUT(HttpRequest.BodyPublishers.ofString(body))
+                        .header("Content-Type", "application/json")
+                        .build(),
+                HttpResponse.BodyHandlers.ofString());
+        assertThat(saved.statusCode()).isEqualTo(200);
+
+        JsonNode prefs = get("/api/dashboard/preferences");
+        assertThat(prefs.path("onboarded").asBoolean()).isTrue();
+        assertThat(prefs.path("maxYearsExperience").asInt()).isEqualTo(1);
+        assertThat(prefs.path("titleKeywords")).hasSize(2);
+        assertThat(prefs.path("excludeKeywords").get(0).asString()).isEqualTo("sales");
+        assertThat(prefs.path("remote").asBoolean()).isTrue();
+    }
 }

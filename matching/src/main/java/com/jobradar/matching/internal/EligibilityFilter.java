@@ -2,8 +2,6 @@ package com.jobradar.matching.internal;
 
 import com.jobradar.profile.UserPreferences;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -34,8 +32,13 @@ public final class EligibilityFilter {
     private static final Pattern WORKING_STUDENT =
             Pattern.compile("working student|werkstudent|student job|part[- ]time student");
 
-    /** Until this long after graduation the user is treated as entry level. */
-    private static final int ENTRY_LEVEL_YEARS_AFTER_GRADUATION = 2;
+    /** Mid-level markers that an entry-level profile should not see: "Engineer II", "Mid-level", "experienced". */
+    private static final Pattern MID_LEVEL =
+            Pattern.compile("\\b(ii|iii|iv|mid[- ]?level|mid[- ]?senior|experienced|intermediate)\\b");
+
+    /** "3+ years", "5 years of experience", "minimum 4 yrs". The first number is the lower bound asked for. */
+    private static final Pattern YEARS = Pattern.compile(
+            "(\\d{1,2})\\s*(?:\\+|plus)?\\s*(?:-\\s*\\d{1,2}\\s*)?(?:years?|yrs?)\\b");
 
     private EligibilityFilter() {}
 
@@ -67,10 +70,30 @@ public final class EligibilityFilter {
             return Eligibility.rejected("Outside Egypt and not remote");
         }
 
-        // 3. Level: an entry-level user is not shown senior roles.
+        // 3. Level: an entry-level user is not shown senior, mid-level or experience-heavy roles.
         String title = lower(posting.title());
-        if (isEntryLevel(user, now) && SENIOR.matcher(title).find()) {
-            return Eligibility.rejected("Senior role for an entry-level profile");
+        if (user.entryLevelOnly()) {
+            if (SENIOR.matcher(title).find()) {
+                return Eligibility.rejected("Senior role for an entry-level profile");
+            }
+            if (MID_LEVEL.matcher(title).find()) {
+                return Eligibility.rejected("Mid-level role for an entry-level profile");
+            }
+            int years = yearsAsked(posting.description());
+            if (years > user.maxYearsExperience() && !INTERNSHIP.matcher(title).find()) {
+                return Eligibility.rejected("Asks for " + years + "+ years of experience");
+            }
+        }
+
+        // 3b. Roles the user excluded, and roles that match none of the titles the user wants.
+        for (String word : user.excludeKeywords()) {
+            if (containsWord(title, word)) {
+                return Eligibility.rejected("Title has excluded word \"" + word + "\"");
+            }
+        }
+        if (!user.titleKeywords().isEmpty()
+                && user.titleKeywords().stream().noneMatch(word -> containsWord(title, word))) {
+            return Eligibility.rejected("Title matches none of your target roles");
         }
 
         // 4. Job type must be one the user wants.
@@ -91,12 +114,39 @@ public final class EligibilityFilter {
         return INTERNSHIP.matcher(lowerTitle).find() ? "internship" : "full-time";
     }
 
-    private static boolean isEntryLevel(UserPreferences user, Instant now) {
-        if (user.graduationDate() == null) {
+    /**
+     * Smallest years-of-experience figure the description asks for, 0 when it names none. The
+     * minimum of all matches is used so "3+ years Java, 1 year Spring" counts as 1, which keeps the
+     * filter from rejecting a posting on a single demanding line.
+     */
+    static int yearsAsked(String description) {
+        if (description == null || description.isBlank()) {
+            return 0;
+        }
+        String text = description.toLowerCase(Locale.ROOT);
+        java.util.regex.Matcher matcher = YEARS.matcher(text);
+        int min = Integer.MAX_VALUE;
+        while (matcher.find()) {
+            // Only figures that talk about experience count; "10 years in business" is company copy.
+            // A "+" ("3+ years") or the word "experience" within 40 characters either side qualifies.
+            int from = Math.max(0, matcher.start() - 40);
+            int to = Math.min(text.length(), matcher.end() + 40);
+            if (matcher.group().contains("+") || text.substring(from, to).contains("experience")) {
+                min = Math.min(min, Integer.parseInt(matcher.group(1)));
+            }
+        }
+        return min == Integer.MAX_VALUE ? 0 : min;
+    }
+
+    /** Whole-word (or whole-phrase) match, so "ai" does not match "maintain" and "lead" not "leadership". */
+    static boolean containsWord(String lowerText, String word) {
+        String needle = lower(word).strip();
+        if (needle.isEmpty()) {
             return false;
         }
-        LocalDate today = LocalDate.ofInstant(now, ZoneOffset.UTC);
-        return today.isBefore(user.graduationDate().plusYears(ENTRY_LEVEL_YEARS_AFTER_GRADUATION));
+        return Pattern.compile("(?<![\\p{L}\\p{N}])" + Pattern.quote(needle) + "(?![\\p{L}\\p{N}])")
+                .matcher(lowerText)
+                .find();
     }
 
     private static boolean matchesAny(String lowerText, List<String> needles) {

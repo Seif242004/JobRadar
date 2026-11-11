@@ -36,6 +36,18 @@ public class MatchRepository {
                 .findFirst();
     }
 
+    /** Stored verdict per posting for one user. */
+    public java.util.Map<Long, Boolean> eligibilityByPosting(long userId) {
+        java.util.Map<Long, Boolean> map = new java.util.HashMap<>();
+        jdbc.query("SELECT posting_id, eligible FROM match WHERE user_id = ?",
+                rs -> { map.put(rs.getLong("posting_id"), rs.getBoolean("eligible")); }, userId);
+        return map;
+    }
+
+    public java.util.List<Long> allPostingIds() {
+        return jdbc.queryForList("SELECT id FROM posting ORDER BY id", Long.class);
+    }
+
     /** Idempotent: a redelivered queue message rewrites the same row. */
     public void upsert(
             long userId, long postingId, boolean eligible, Double fitScore, Double priority, Band band, String reasons) {
