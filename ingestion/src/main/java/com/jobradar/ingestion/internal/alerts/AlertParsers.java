@@ -8,12 +8,14 @@ import org.springframework.stereotype.Component;
 /**
  * Runs every board parser over an email. The board is recognised by the job links in the body,
  * not by the sender, so an alert forwarded from another address, or one whose sender is a mail
- * relay, is still understood. Wuzzuf, Bayt and LinkedIn are the supported boards.
+ * relay, is still understood. Supported: Wuzzuf, Bayt, LinkedIn, Indeed, Glassdoor, Forasna, and direct ATS links from company newsletters.
  */
 @Component
 class AlertParsers {
 
-    private final List<BoardParser> boards = List.of(new WuzzufParser(), new BaytParser(), new LinkedInParser());
+    private final List<BoardParser> boards = List.of(
+            new WuzzufParser(), new BaytParser(), new LinkedInParser(), new IndeedParser(), new GlassdoorParser(),
+            new ForasnaParser(), new AtsLinkParser());
 
     /** Result of one email. {@code skipped} counts job links that could not be turned into a posting. */
     record Parsed(List<RawPosting> postings, int skipped) {}
