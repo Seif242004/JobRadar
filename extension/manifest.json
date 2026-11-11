@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "JobRadar autofill",
+  "version": "0.1.0",
+  "description": "Fills the plain fields of Greenhouse and Workable application forms from your saved profile. Never submits, never uploads, never runs elsewhere.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://boards.greenhouse.io/*",
+    "https://job-boards.greenhouse.io/*",
+    "https://apply.workable.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://boards.greenhouse.io/*",
+        "https://job-boards.greenhouse.io/*",
+        "https://apply.workable.com/*"
+      ],
+      "js": ["src/fill.js", "src/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html"
+}
