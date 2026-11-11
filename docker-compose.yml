@@ -22,12 +22,10 @@ services:
     environment:
       SERVICES: sqs,s3,secretsmanager
       AWS_DEFAULT_REGION: eu-central-1
-      PERSISTENCE: "1"                   # keep the Gmail secret, queues and CV files across restarts
     ports:
       - "4566:4566"
     restart: unless-stopped
     volumes:
-      - localstack-data:/var/lib/localstack
       # Scripts in ready.d run once LocalStack is up; this one creates the queues and the bucket.
       - ./localstack/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh:ro
     healthcheck:
@@ -38,4 +36,3 @@ services:
 
 volumes:
   pgdata:
-  localstack-data:

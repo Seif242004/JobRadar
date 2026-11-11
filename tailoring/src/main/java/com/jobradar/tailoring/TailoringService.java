@@ -3,6 +3,7 @@ package com.jobradar.tailoring;
 import com.jobradar.tailoring.internal.AtsChecker;
 import com.jobradar.tailoring.internal.AtsReport;
 import com.jobradar.tailoring.internal.AtsScorer;
+import com.jobradar.tailoring.internal.BulletBalancer;
 import com.jobradar.tailoring.internal.CvSummary;
 import com.jobradar.tailoring.internal.NoInvention;
 import com.jobradar.tailoring.internal.SummaryPicker;
@@ -93,7 +94,10 @@ public class TailoringService {
                 })
                 .orElse(null);
 
-        // 3. Render; drop the lowest-ranked bullet until the CV is exactly one page.
+        // 3. Spread the bullets over the relevant entries, then render; drop the lowest-ranked
+        //    bullet until the CV is exactly one page.
+        ranked = BulletBalancer.balance(ranked, selectable);
+
         OnePageFitter.Fitted fitted = fitter.fit(data, ranked, summary);
 
         // 4. ATS check on the PDF as a parser reads it: keyword coverage plus structural checks.
