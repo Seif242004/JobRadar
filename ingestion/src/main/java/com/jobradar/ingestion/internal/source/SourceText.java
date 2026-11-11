@@ -56,7 +56,11 @@ public final class SourceText {
                 .replace("&quot;", "\"")
                 .replace("&#39;", "'")
                 .replace("&apos;", "'")
-                .replace("&nbsp;", " ");
+                .replace("&nbsp;", " ")
+                .replace("&middot;", "·")
+                .replace("&ndash;", "–")
+                .replace("&mdash;", "—")
+                .replace("&bull;", "•");
         Matcher numeric = NUMERIC_ENTITY.matcher(text);
         text = numeric.replaceAll(match -> {
             String code = match.group(1);

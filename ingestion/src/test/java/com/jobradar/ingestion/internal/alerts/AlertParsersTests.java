@@ -198,4 +198,35 @@ class AlertParsersTests {
         assertThat(odoo.location()).isEqualTo("Cairo, Egypt");
         assertThat(odoo.applyTarget()).isEqualTo("https://wuzzuf.net/jobs/p/ek1fr7iZI8ja-Odoo-Implementation-Specialist-Cairo-Egypt");
     }
+
+    @Test
+    void realLinkedInHtmlSplitsCompanyAndLocationOnTheMiddot() {
+        List<RawPosting> postings = parsers.parse(Emails.load("linkedin-html-real.eml")).postings();
+
+        assertThat(postings).hasSize(4);
+        RawPosting first = byId(postings, "linkedin:4489479446");
+        assertThat(first.title()).isEqualTo("Jr. Data Engineer");
+        assertThat(first.companyName()).isEqualTo("Mona Trading LLC");
+        assertThat(first.location()).isEqualTo("Cairo, Egypt (Hybrid)");
+        RawPosting remote = byId(postings, "linkedin:4489186059");
+        assertThat(remote.title()).isEqualTo("Mid-level Backend Engineer - Node.js & NestJS - Remote - Egypt");
+        assertThat(remote.companyName()).isEqualTo("FullStack");
+        assertThat(remote.location()).isEqualTo("Cairo (Remote)");
+        assertThat(remote.remotePolicy()).isEqualTo("remote");
+        assertThat(byId(postings, "linkedin:4487451704").companyName()).isEqualTo("AlifBee");
+    }
+
+    @Test
+    void linkedInPremiumAndConnectionLinesAreNotLocations() {
+        String text = String.join("\n",
+                "Talent Acquisition Intern", "Money Fellows", "Cairo, Egypt", "12 company alumni",
+                "View job: https://www.linkedin.com/comm/jobs/view/4400000001/", "", "-----", "",
+                "HR Assistant", "Injazflow", "Cairo", "1 connection", "Job search smarter with Premium",
+                "View job: https://www.linkedin.com/comm/jobs/view/4400000002/");
+
+        List<RawPosting> postings = parsers.parse(new AlertEmail("m", Emails.RECEIVED, "", text)).postings();
+
+        assertThat(byId(postings, "linkedin:4400000001").location()).isEqualTo("Cairo, Egypt");
+        assertThat(byId(postings, "linkedin:4400000002").location()).isEqualTo("Cairo");
+    }
 }

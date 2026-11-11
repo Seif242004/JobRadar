@@ -48,3 +48,7 @@ inline CSS is dropped. Job titles, companies, locations and link paths are uncha
 | `wuzzuf-real.eml` | Wuzzuf "recommended jobs" email, HTML. Links are wrapped in an AWS SES click tracker that carries the destination in the **path** (`awstrack.me/L0/{percent-encoded url}/1/{token}`); the company line is "Company - City, Country - Posted N days ago". Shortened to one job. |
 
 No Bayt alert email was found in the mailbox, so `bayt-alert.eml` above is still synthetic.
+
+`gmail/linkedin-html-real.eml`: the HTML part of a real LinkedIn alert (same mailbox and sanitising as the
+other `*-real.eml` files), cut to the first four jobs. Each card is a title link followed by
+"Company &middot; Location" and a badge such as "Easy Apply" or "Actively recruiting".
