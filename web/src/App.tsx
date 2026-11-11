@@ -201,6 +201,7 @@ function AddPosting({ onAdded }: { onAdded: (id: number) => void }) {
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
+  const [location, setLocation] = useState("");
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -210,7 +211,7 @@ function AddPosting({ onAdded }: { onAdded: (id: number) => void }) {
     setBusy(true);
     setError(null);
     try {
-      const { id } = await addPosting({ url, title, company, text });
+      const { id } = await addPosting({ url, title, company, location, text });
       onAdded(id);
     } catch (err) {
       setError((err as Error).message);
@@ -227,6 +228,7 @@ function AddPosting({ onAdded }: { onAdded: (id: number) => void }) {
       <label>Posting text <textarea rows={8} value={text} onChange={(e) => setText(e.target.value)} /></label>
       <label>Title (optional) <input value={title} onChange={(e) => setTitle(e.target.value)} /></label>
       <label>Company (optional) <input value={company} onChange={(e) => setCompany(e.target.value)} /></label>
+      <label>Location (optional) <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Cairo, Egypt" /></label>
       {error && <p className="error" role="alert">{error}</p>}
       <button className="primary" disabled={busy || (!url.trim() && text.trim().length < 40)}>{busy ? "Adding…" : "Add and score"}</button>
     </form>

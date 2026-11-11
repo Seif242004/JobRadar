@@ -64,13 +64,17 @@ final class AlertExtractor {
             }
             String[] companyAndPlace = splitCompany(candidate.company);
             String location = cleanLocation(candidate.location != null ? candidate.location : companyAndPlace[1]);
+            if (location == null) {
+                // The alert itself was an Egypt search, so a role it lists without a place is an Egypt role.
+                location = "Egypt (alert search)";
+            }
             postings.add(new RawPosting(
                     SOURCE,
                     board.board() + ":" + entry.getKey(),
                     companyAndPlace[0],
                     candidate.title,
                     location,
-                    location != null && location.toLowerCase(Locale.ROOT).contains("remote") ? "remote" : null,
+                    location.toLowerCase(Locale.ROOT).contains("remote") ? "remote" : null,
                     null,
                     null,
                     // Applying happens on the board itself, by the user. Never automated.

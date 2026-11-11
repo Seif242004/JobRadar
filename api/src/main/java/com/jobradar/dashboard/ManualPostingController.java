@@ -27,7 +27,7 @@ class ManualPostingController {
     static final int MIN_TEXT = 40;
     static final int MAX_TEXT = 20_000;
 
-    record NewPosting(String url, String title, String company, String text) {}
+    record NewPosting(String url, String title, String company, String location, String text) {}
 
     record TextBody(String text) {}
 
@@ -59,13 +59,15 @@ class ManualPostingController {
         String hash = sha(company + "|" + title);
         List<Long> ids = jdbc.queryForList(
                 """
-                INSERT INTO posting (company_id, source, source_id, title, description, apply_channel, apply_target,
+                INSERT INTO posting (company_id, source, source_id, title, location, description, apply_channel, apply_target,
                                      first_seen_at, content_hash, intake_pending)
-                VALUES (?, 'manual', ?, ?, ?, ?, ?, now(), ?, true)
+                VALUES (?, 'manual', ?, ?, ?, ?, ?, ?, now(), ?, true)
                 ON CONFLICT (source, source_id) DO NOTHING
                 RETURNING id
                 """,
-                Long.class, companyId, sourceId, title, text.isEmpty() ? null : text,
+                Long.class, companyId, sourceId, title,
+                body.location() == null || body.location().isBlank() ? null : body.location().strip(),
+                text.isEmpty() ? null : text,
                 url.isEmpty() ? null : "platform", url.isEmpty() ? null : url, hash);
         if (ids.isEmpty()) {
             Long existing = jdbc.queryForObject(
@@ -106,10 +108,24 @@ class ManualPostingController {
         for (String line : text.split("\\R")) {
             if (!line.isBlank()) {
                 String t = line.strip();
-                return t.length() > 120 ? t.substring(0, 120) : t;
+                if (t.length() <= 90) {
+                    return t;
+                }
+                // A long first line is body text: cut at a sentence or a word boundary.
+                int cut = t.lastIndexOf(' ', 80);
+                return t.substring(0, cut > 20 ? cut : 80) + "…";
             }
         }
-        return url.isEmpty() ? "Untitled posting" : "Posting from " + java.net.URI.create(url).getHost();
+        return url.isEmpty() ? "Untitled posting" : "Posting from " + hostOf(url);
+    }
+
+    private static String hostOf(String url) {
+        try {
+            String host = java.net.URI.create(url).getHost();
+            return host == null ? url : host;
+        } catch (IllegalArgumentException e) {
+            return url;
+        }
     }
 
     private static String sha(String value) {

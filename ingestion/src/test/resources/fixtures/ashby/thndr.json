@@ -1,0 +1,77 @@
+{
+ "jobs": [
+  {
+   "id": "706a3396-c21e-4803-8648-f6e590e41b08",
+   "title": "Senior DevOps/Infrastructure Engineer",
+   "department": "Tech",
+   "team": "Tech",
+   "employmentType": "FullTime",
+   "location": "Cairo Office",
+   "secondaryLocations": [],
+   "publishedAt": "2026-11-08T13:59:29.107+00:00",
+   "isListed": true,
+   "isRemote": true,
+   "workplaceType": "Hybrid",
+   "address": {
+    "postalAddress": {
+     "addressRegion": "",
+     "addressCountry": "Egypt",
+     "addressLocality": "Cairo"
+    }
+   },
+   "jobUrl": "https://jobs.ashbyhq.com/thndr/706a3396-c21e-4803-8648-f6e590e41b08",
+   "applyUrl": "https://jobs.ashbyhq.com/thndr/706a3396-c21e-4803-8648-f6e590e41b08/application",
+   "descriptionHtml": "<h1><strong>About the Role</strong></h1><p style=\"min-height:1.5em\">As a <strong>Senior DevOps/Infrastructure Engineer at Thndr, you'll be part of our fast-growing fintech team</strong>. We are looking for someone who can bring deep expertise and hands-on experience in <strong>cloud infrastructure, containerization, networking, and DevOps best practices</strong>. The ideal candidate will be a strategic thinker, capable of <strong>designing, implementing, and guiding a robust DevOps and infrastructure roadmap</strong> across both cloud and on-premise environments. You will play a critical role in building <strong>scalable, resilient, and secure systems</strong> that support our mission-critical financial applications.</p><div style=\"min-height:1.2em;margin-top:0px;margin-bottom:0px\">\u00a0</div><h1><strong>What You'll Do</strong></h1><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Architect, implement, and maintain <strong>scalable, secure, and highly available infrastructure</strong> across AWS and on-premise environments.</p></li><li><p style=\"min-height:1.5em\">Lead containerization and orchestration strategy using <strong>Docker</strong> and <strong>Kubernetes</strong>, ensuring deployment, scaling, and security best practices.</p></li><li><p style=\"min-height:1.5em\">Design and manage complex <strong>networking solutions</strong>, including VPCs, subnets, routing, firewalls, VPNs, load balancers, <strong>PrivateLinks, Direct Connect, and AWS Secure VPN setup</strong",
+   "descriptionPlain": "ABOUT THE ROLE\n\nAs a Senior DevOps/Infrastructure Engineer at Thndr, you'll be part of our fast-growing fintech team. We are looking for someone who can bring deep expertise and hands-on experience in cloud infrastructure, containerization, networking, and DevOps best practices. The ideal candidate will be a strategic thinker, capable of designing, implementing, and guiding a robust DevOps and infrastructure roadmap across both cloud and on-premise environments. You will play a critical role in building scalable, resilient, and secure systems that support our mission-critical financial applications.\n\n\u00a0\n\n\nWHAT YOU'LL DO\n\n - Architect, implement, and maintain scalable, secure, and highly available infrastructure across AWS and on-premise environments.\n\n - Lead containerization and orchestration strategy using Docker and Kubernetes, ensuring deployment, scaling, and security best practices.\n\n - Design and manage complex networking solutions, including VPCs, subnets, routing, firewalls, VPNs, load balancers, PrivateLinks, Direct Connect, and AWS Secure VPN setup, as well as hybrid cloud connectivity.\n\n - Build and maintain CI/CD pipelines for applications and infrastructure, including automated testing and deployment.\n\n - Develop and maintain infrastructure-as-code for scalable, multi-region infrastructures using multilevel Terraform and Terragrunt, ensuring modularity, version control, and automation.\n\n - Implement monitoring, observability, and alerting for all infrastructure c"
+  },
+  {
+   "id": "463fccf3-46f7-4aae-b3d0-8646689e6427",
+   "title": "Senior Cyber Security Engineer / DevSecOps",
+   "department": "Tech",
+   "team": "Cyber Security",
+   "employmentType": "FullTime",
+   "location": "Cairo Office",
+   "secondaryLocations": [],
+   "publishedAt": "2026-11-08T14:13:01.710+00:00",
+   "isListed": true,
+   "isRemote": true,
+   "workplaceType": "Hybrid",
+   "address": {
+    "postalAddress": {
+     "addressRegion": "",
+     "addressCountry": "Egypt",
+     "addressLocality": "Cairo"
+    }
+   },
+   "jobUrl": "https://jobs.ashbyhq.com/thndr/463fccf3-46f7-4aae-b3d0-8646689e6427",
+   "applyUrl": "https://jobs.ashbyhq.com/thndr/463fccf3-46f7-4aae-b3d0-8646689e6427/application",
+   "descriptionHtml": "<h1><strong>About The Role</strong></h1><p style=\"min-height:1.5em\">This Senior Cyber Security Engineer / DevSecOps role is a highly collaborative position designed for a security professional who can seamlessly bridge the gap between offensive exploitation and defensive engineering. Instead of sitting in a silo, you will be deeply embedded within the product, engineering, and infrastructure teams to champion security architecture from the ground up.</p><div style=\"min-height:1.2em;margin-top:0px;margin-bottom:0px\">\u00a0</div><h1><strong>What You'll Do</strong></h1><p style=\"min-height:1.5em\">\u2022 Work closely with the product and engineering teams to review new features and suggest new features that improve security.</p><p style=\"min-height:1.5em\">\u2022 Drive S-SDLC in our cycles and review security acceptance criteria and threat modeling.</p><p style=\"min-height:1.5em\">\u2022 Guide and train the team to cover security checks and security best practices.</p><p style=\"min-height:1.5em\">\u2022 Perform pre-deployment and post-deployment security penetration tests.</p><p style=\"min-height:1.5em\">\u2022 Plan and execute regular web, mobile, and cloud security assessments and pen tests.</p><p style=\"min-height:1.5em\">\u2022 Work closely with the Infrastructure teams to identify security issues through red teaming activities.</p><p style=\"min-height:1.5em\">\u2022 Define, implement, and monitor infrastructure security measures.</p><p style=\"min-height:1.5em\">\u2022 Contribute to the security roadmap &amp; backlog.</p><p st",
+   "descriptionPlain": "ABOUT THE ROLE\n\nThis Senior Cyber Security Engineer / DevSecOps role is a highly collaborative position designed for a security professional who can seamlessly bridge the gap between offensive exploitation and defensive engineering. Instead of sitting in a silo, you will be deeply embedded within the product, engineering, and infrastructure teams to champion security architecture from the ground up.\n\n\u00a0\n\n\nWHAT YOU'LL DO\n\n\u2022 Work closely with the product and engineering teams to review new features and suggest new features that improve security.\n\n\u2022 Drive S-SDLC in our cycles and review security acceptance criteria and threat modeling.\n\n\u2022 Guide and train the team to cover security checks and security best practices.\n\n\u2022 Perform pre-deployment and post-deployment security penetration tests.\n\n\u2022 Plan and execute regular web, mobile, and cloud security assessments and pen tests.\n\n\u2022 Work closely with the Infrastructure teams to identify security issues through red teaming activities.\n\n\u2022 Define, implement, and monitor infrastructure security measures.\n\n\u2022 Contribute to the security roadmap & backlog.\n\n\u2022 Assess security tools and integrate tools as needed.\n\n\u2022 Incident Response & Research.\n\n\u2022 Follow new security news, trends, tools, and incidents and drive needed changes.\n\n\u2022 Support in managing our Bug-bounty program and security channels.\n\n\u2022 Conduct vulnerability research against company assets.\n\n\u2022 Work on understanding and improving our security logging and monitoring solutions.\n\n\u2022 Coord"
+  },
+  {
+   "id": "6a0f02ee-35be-4386-8711-220a3351bcb7",
+   "title": "Head of Brokerage - KSA",
+   "department": "Brokerage",
+   "team": "Brokerage",
+   "employmentType": "FullTime",
+   "location": "Riyadh Office",
+   "secondaryLocations": [],
+   "publishedAt": "2026-10-12T21:35:54.116+00:00",
+   "isListed": true,
+   "isRemote": false,
+   "workplaceType": "OnSite",
+   "address": {
+    "postalAddress": {
+     "addressRegion": "KSA",
+     "addressCountry": "Saudi Arabia",
+     "addressLocality": "Riyadh"
+    }
+   },
+   "jobUrl": "https://jobs.ashbyhq.com/thndr/6a0f02ee-35be-4386-8711-220a3351bcb7",
+   "applyUrl": "https://jobs.ashbyhq.com/thndr/6a0f02ee-35be-4386-8711-220a3351bcb7/application",
+   "descriptionHtml": "<h1><strong>About The Role</strong></h1><p style=\"min-height:1.5em\">We are looking for a Head of Brokerage in Saudi. This person will build and manage Thndr\u2019s</p><p style=\"min-height:1.5em\">brokerage capabilities in Saudi, and will be registered with the Capital Market Authority (CMA)</p><p style=\"min-height:1.5em\">as a senior executive of Thndr KSA.</p><p style=\"min-height:1.5em\"></p><h1><strong>What You'll Do</strong></h1><p style=\"min-height:1.5em\"><strong>Brokerage</strong></p><p style=\"min-height:1.5em\">\u2022 Design and lead Thndr\u2019s core brokerage function in KSA, from client onboarding to order</p><p style=\"min-height:1.5em\">execution and settlement.</p><p style=\"min-height:1.5em\">\u2022 Set up dealing and order-handling processes that meet CMA conduct-of-business and best-</p><p style=\"min-height:1.5em\">execution requirements.</p><p style=\"min-height:1.5em\">\u2022 Own day-to-day brokerage operations and resolve problematic developments and situations</p><p style=\"min-height:1.5em\">quickly.</p><p style=\"min-height:1.5em\">\u2022 Work with compliance on trade surveillance, market-conduct controls and client protection.</p><p style=\"min-height:1.5em\">Market and regulators</p><p style=\"min-height:1.5em\">\u2022 Manage Thndr\u2019s relationship with the Saudi Exchange (Tadawul) and support the relationship</p><p style=\"min-height:1.5em\">with the CMA alongside compliance.</p><p style=\"min-height:1.5em\">\u2022 Collect and act on insights about innovative brokerage solutions that can be introduced to the</p><p s",
+   "descriptionPlain": "ABOUT THE ROLE\n\nWe are looking for a Head of Brokerage in Saudi. This person will build and manage Thndr\u2019s\n\nbrokerage capabilities in Saudi, and will be registered with the Capital Market Authority (CMA)\n\nas a senior executive of Thndr KSA.\n\n\n\n\nWHAT YOU'LL DO\n\nBrokerage\n\n\u2022 Design and lead Thndr\u2019s core brokerage function in KSA, from client onboarding to order\n\nexecution and settlement.\n\n\u2022 Set up dealing and order-handling processes that meet CMA conduct-of-business and best-\n\nexecution requirements.\n\n\u2022 Own day-to-day brokerage operations and resolve problematic developments and situations\n\nquickly.\n\n\u2022 Work with compliance on trade surveillance, market-conduct controls and client protection.\n\nMarket and regulators\n\n\u2022 Manage Thndr\u2019s relationship with the Saudi Exchange (Tadawul) and support the relationship\n\nwith the CMA alongside compliance.\n\n\u2022 Collect and act on insights about innovative brokerage solutions that can be introduced to the\n\nSaudi market.\n\n\u2022 Understand market practice and regulation and their impact on Thndr.\n\nStrategy and product\n\n\u2022 Work with Thndr\u2019s leadership to shape and implement the brokerage strategy for KSA.\n\n\u2022 Partner with the product team to improve brokerage services and the client experience.\n\n\u2022 Own the brokerage budget and business plan.\n\n\n\n\nWHAT YOU'LL NEED\n\nExperience\n\n\u2022 8+ years in securities brokerage, including at least 5 years in KSA at a CMA-licensed\n\nbrokerage or Tadawul member firm.\n\n\u2022 At least 3 years in a senior or team-leading role within"
+  }
+ ],
+ "apiVersion": "1"
+}

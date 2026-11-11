@@ -36,6 +36,17 @@ class EligibilityFilterTests {
     }
 
     @Test
+    void postingWithoutLocationIsPlacedByItsText() {
+        PostingView pasted = new PostingView(
+                1L, "Backend Intern", null, null, "3-month internship in Cairo, Egypt. Open to students.", null, null, NOW);
+        PostingView unknown = new PostingView(
+                1L, "Backend Intern", null, null, "Join our team. Open to students.", null, null, NOW);
+
+        assertThat(EligibilityFilter.check(pasted, STUDENT, NOW).eligible()).isTrue();
+        assertThat(EligibilityFilter.check(unknown, STUDENT, NOW).eligible()).isFalse();
+    }
+
+    @Test
     void postingsAbroadThatAreNotRemoteAreRejected() {
         Eligibility result = check("Backend Engineer", "Berlin, Germany", "onsite");
 
