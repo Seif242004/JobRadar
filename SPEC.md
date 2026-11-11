@@ -106,7 +106,7 @@ queue when age < 2 h, otherwise on the backlog queue. Failed parses go to the DL
 - Age = now − min(`posted_at`, `first_seen_at`). A posting with no `posted_at` is fresh only on
   its first sighting.
 - Priority = fit × 0.5^(age_hours / 6).
-- Bands: Hot (< 2 h, fit >= 80), Warm (2–24 h, batched every 3 h), Backlog (> 24 h, never pushed),
+- Bands: Hot (< 2 h, fit >= 80), Warm (2 h–7 days, batched every 3 h), Backlog (> 7 days, never pushed),
   Deadline (exempt from decay until 3 days before the closing date, then pushed once).
 - Dedupe key: apply URL, and a hash of company + title + location (`content_hash`).
 

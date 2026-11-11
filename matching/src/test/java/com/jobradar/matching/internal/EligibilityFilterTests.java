@@ -195,4 +195,16 @@ class EligibilityFilterTests {
         assertThat(result.eligible()).isFalse();
         assertThat(result.reason()).isEqualTo("Not a software or tech role");
     }
+
+    @Test
+    void postingsOlderThanTheAgeLimitAreRejectedUsingTheirOwnDateFirst() {
+        Instant old = NOW.minus(Duration.ofDays(8));
+        PostingView seenOld = new PostingView(1L, "Backend Intern", "Cairo", null, "Open to fresh graduates.", null, null, old);
+        PostingView postedOld = new PostingView(1L, "Backend Intern", "Cairo", null, "Open to fresh graduates.", null, old, NOW);
+        PostingView postedRecently = new PostingView(1L, "Backend Intern", "Cairo", null, "Open to fresh graduates.", null, NOW.minus(Duration.ofDays(2)), old);
+
+        assertThat(EligibilityFilter.check(seenOld, STUDENT, NOW).reason()).isEqualTo("Older than 7 days");
+        assertThat(EligibilityFilter.check(postedOld, STUDENT, NOW).eligible()).isFalse();
+        assertThat(EligibilityFilter.check(postedRecently, STUDENT, NOW).eligible()).isTrue();
+    }
 }

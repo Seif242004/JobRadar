@@ -20,4 +20,6 @@ public record AlertPosting(
         Instant deadline,
         String reasons,
         Double fitScore,
-        Instant freshSince) {}
+        Instant freshSince,
+        double pushMinFit,
+        double digestMinFit) {}

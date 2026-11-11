@@ -22,6 +22,7 @@ export interface MatchRow {
   applyTarget: string | null;
   firstSeenAt: string;
   cvReady: boolean;
+  levels: string[];
 }
 
 export interface ApplicationRow {
@@ -35,6 +36,9 @@ export interface Preferences {
   jobTypes: string[];
   entryLevelOnly: boolean;
   maxYearsExperience: number;
+  maxAgeDays: number;
+  pushMinFit: number;
+  digestMinFit: number;
   titleKeywords: string[];
   excludeKeywords: string[];
   onboarded: boolean;

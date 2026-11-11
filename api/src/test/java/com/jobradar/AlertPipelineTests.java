@@ -110,7 +110,7 @@ class AlertPipelineTests extends PostgresIntegrationTest {
     void warmPostingsArriveInOneBatchAndBacklogIsNeverPushed() {
         long warmA = posting("Backend Engineer", "Cairo", Duration.ofHours(3), null);
         long warmB = posting("Data Engineer", "Remote", Duration.ofHours(20), null);
-        long backlog = posting("QA Engineer", "Cairo", Duration.ofHours(30), null);
+        long backlog = posting("QA Engineer", "Cairo", Duration.ofDays(8), null);
         for (long id : new long[] {warmA, warmB, backlog}) {
             matcher.match(id);
         }
@@ -123,7 +123,7 @@ class AlertPipelineTests extends PostgresIntegrationTest {
         ArgumentCaptor<String> text = ArgumentCaptor.forClass(String.class);
         verify(telegram, times(1)).sendMessage(eq(CHAT_ID), text.capture(), isNull(), isNull());
         assertThat(text.getValue())
-                .contains("New matches in the last 24 hours (2)", "Backend Engineer", "Data Engineer")
+                .contains("New matches in the past week (2)", "Backend Engineer", "Data Engineer")
                 .doesNotContain("QA Engineer");
         // Newest first while no fit score exists.
         assertThat(text.getValue().indexOf("Backend Engineer")).isLessThan(text.getValue().indexOf("Data Engineer"));

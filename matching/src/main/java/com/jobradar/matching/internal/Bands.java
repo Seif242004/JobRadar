@@ -8,7 +8,7 @@ import java.time.Instant;
 public final class Bands {
 
     static final Duration HOT_WINDOW = Duration.ofHours(2);
-    static final Duration WARM_WINDOW = Duration.ofHours(24);
+    static final Duration WARM_WINDOW = Duration.ofDays(7);
     static final double HOT_MIN_FIT = 80.0;
     static final double HALF_LIFE_HOURS = 6.0;
 

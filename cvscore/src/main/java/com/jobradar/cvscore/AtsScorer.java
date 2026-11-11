@@ -31,7 +31,13 @@ public final class AtsScorer {
             "if", "its", "other", "work", "working", "team", "teams", "role", "job", "experience", "years",
             "year", "strong", "good", "ability", "skills", "knowledge", "including", "etc", "must", "plus",
             "join", "looking", "company", "candidate", "candidates", "responsibilities", "requirements",
-            "required", "preferred", "using", "use", "new", "well", "across", "within", "also", "was");
+            "required", "preferred", "using", "use", "new", "well", "across", "within", "also", "was",
+            // Generic filler that said nothing about skills in real postings.
+            "only", "based", "bonus", "borrow", "status", "ensure", "help", "make", "need", "want", "like",
+            "get", "just", "any", "etc.", "per", "one", "may", "should", "would", "could", "being", "than",
+            "then", "when", "where", "which", "while", "both", "each", "every", "many", "most", "some",
+            "very", "high", "great", "love", "day", "time", "part", "full", "free", "open", "real", "best",
+            "ideal", "opportunity", "opportunities", "environment", "responsible", "ownership", "impact");
 
     private AtsScorer() {}
 
@@ -48,7 +54,24 @@ public final class AtsScorer {
     /** Posting keywords that the CV text does not contain, most important first. */
     public static List<String> missing(String postingTitle, String postingDescription, String cvText) {
         Set<String> cvTokens = new LinkedHashSet<>(tokens(cvText));
-        return keywords(postingTitle, postingDescription).stream().filter(k -> !cvTokens.contains(k)).toList();
+        // Technical terms first: those are what a reader can actually add to a CV.
+        return keywords(postingTitle, postingDescription).stream()
+                .filter(k -> !cvTokens.contains(k))
+                .sorted(java.util.Comparator.comparing((String k) -> !isTechnical(k)))
+                .toList();
+    }
+
+    private static final Set<String> TECH = Set.of(
+            "java", "python", "javascript", "typescript", "react", "node", "node.js", "spring", "sql", "postgresql",
+            "mysql", "mongodb", "redis", "docker", "kubernetes", "aws", "azure", "gcp", "linux", "git", "api", "rest",
+            "graphql", "c++", "c#", ".net", "golang", "go", "rust", "php", "laravel", "django", "flask", "fastapi",
+            "angular", "vue", "next.js", "tailwind", "html", "css", "ci/cd", "devops", "ml", "ai", "llm", "nlp",
+            "pytorch", "tensorflow", "pandas", "numpy", "opengl", "unity", "unreal", "roblox", "luau", "kafka",
+            "rabbitmq", "microservices", "firebase", "supabase", "n8n", "convex", "terraform", "jenkins", "agile",
+            "scrum", "testing", "selenium", "figma", "android", "kotlin", "swift", "flutter");
+
+    private static boolean isTechnical(String keyword) {
+        return TECH.contains(keyword) || keyword.matches(".*[+#].*");
     }
 
     /** Number of keywords taken from the posting; the denominator of the score. */

@@ -119,7 +119,7 @@ class DashboardTests extends PostgresIntegrationTest {
         String body = """
                 {"roles":["Backend"],"cities":["Cairo"],"remote":true,"jobTypes":["internship","full-time"],
                  "entryLevelOnly":true,"maxYearsExperience":1,"titleKeywords":["backend","ai"],
-                 "excludeKeywords":["sales"],"onboarded":false}""";
+                 "excludeKeywords":["sales"],"maxAgeDays":3,"pushMinFit":80,"digestMinFit":50,"onboarded":false}""";
         HttpResponse<String> saved = http.send(
                 HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + "/api/dashboard/preferences"))
                         .PUT(HttpRequest.BodyPublishers.ofString(body))
@@ -131,6 +131,8 @@ class DashboardTests extends PostgresIntegrationTest {
         JsonNode prefs = get("/api/dashboard/preferences");
         assertThat(prefs.path("onboarded").asBoolean()).isTrue();
         assertThat(prefs.path("maxYearsExperience").asInt()).isEqualTo(1);
+        assertThat(prefs.path("maxAgeDays").asInt()).isEqualTo(3);
+        assertThat(prefs.path("pushMinFit").asInt()).isEqualTo(80);
         assertThat(prefs.path("titleKeywords")).hasSize(2);
         assertThat(prefs.path("excludeKeywords").get(0).asString()).isEqualTo("sales");
         assertThat(prefs.path("remote").asBoolean()).isTrue();

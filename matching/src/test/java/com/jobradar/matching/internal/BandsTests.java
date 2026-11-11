@@ -29,7 +29,7 @@ class BandsTests {
     @Test
     void warmIsTwoTo24HoursAndBacklogIsOlder() {
         assertThat(Bands.classify(Duration.ofHours(23), 90.0, null)).isEqualTo(Band.WARM);
-        assertThat(Bands.classify(Duration.ofHours(24), 90.0, null)).isEqualTo(Band.BACKLOG);
+        assertThat(Bands.classify(Duration.ofDays(7), 90.0, null)).isEqualTo(Band.BACKLOG);
     }
 
     @Test

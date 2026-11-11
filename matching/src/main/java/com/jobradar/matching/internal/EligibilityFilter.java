@@ -71,6 +71,13 @@ public final class EligibilityFilter {
             return Eligibility.rejected("Deadline has passed");
         }
 
+        // 1a. Not older than the user's age limit; the posting's own date when the source gives one.
+        Instant dated = posting.postedAt() != null ? posting.postedAt() : posting.firstSeenAt();
+        if (user.maxAgeDays() > 0 && dated != null
+                && dated.isBefore(now.minus(java.time.Duration.ofDays(user.maxAgeDays())))) {
+            return Eligibility.rejected("Older than " + user.maxAgeDays() + " days");
+        }
+
         // 2. Egypt, or remote and open to Egypt.
         String location = lower(posting.location());
         String remotePolicy = lower(posting.remotePolicy());

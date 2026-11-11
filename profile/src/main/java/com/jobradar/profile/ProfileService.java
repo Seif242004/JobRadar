@@ -17,7 +17,7 @@ public class ProfileService {
     private static final String SELECT =
             """
             SELECT u.id, u.telegram_chat_id, p.roles, p.cities, p.remote, p.job_types, p.graduation_date,
-                   p.entry_level_only, p.max_years_experience, p.title_keywords, p.exclude_keywords
+                   p.entry_level_only, p.max_years_experience, p.title_keywords, p.exclude_keywords, p.max_age_days, p.push_min_fit, p.digest_min_fit
             FROM app_user u JOIN profile p ON p.user_id = u.id
             """;
 
@@ -49,12 +49,12 @@ public class ProfileService {
                 """
                 UPDATE profile SET roles = ?::text[], cities = ?::text[], remote = ?, job_types = ?::text[],
                     entry_level_only = ?, max_years_experience = ?, title_keywords = ?::text[],
-                    exclude_keywords = ?::text[], onboarded = TRUE
+                    exclude_keywords = ?::text[], max_age_days = ?, push_min_fit = ?, digest_min_fit = ?, onboarded = TRUE
                 WHERE user_id = ?
                 """,
                 literal(prefs.roles()), literal(prefs.cities()), prefs.remote(), literal(prefs.jobTypes()),
                 prefs.entryLevelOnly(), prefs.maxYearsExperience(), literal(prefs.titleKeywords()),
-                literal(prefs.excludeKeywords()), userId);
+                literal(prefs.excludeKeywords()), prefs.maxAgeDays(), prefs.pushMinFit(), prefs.digestMinFit(), userId);
     }
 
     /** The preferences a user may edit; everything else on the profile is fixed by the seed. */
@@ -66,7 +66,10 @@ public class ProfileService {
             boolean entryLevelOnly,
             int maxYearsExperience,
             List<String> titleKeywords,
-            List<String> excludeKeywords) {}
+            List<String> excludeKeywords,
+            int maxAgeDays,
+            int pushMinFit,
+            int digestMinFit) {}
 
     /** A Postgres array literal; every element is quoted so commas and braces in it are harmless. */
     private static String literal(List<String> values) {
@@ -99,7 +102,10 @@ public class ProfileService {
                 rs.getBoolean("entry_level_only"),
                 rs.getInt("max_years_experience"),
                 strings(rs.getArray("title_keywords")),
-                strings(rs.getArray("exclude_keywords")));
+                strings(rs.getArray("exclude_keywords")),
+                rs.getInt("max_age_days"),
+                rs.getInt("push_min_fit"),
+                rs.getInt("digest_min_fit"));
     }
 
     private static List<String> strings(Array array) throws SQLException {

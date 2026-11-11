@@ -137,13 +137,25 @@ function SignIn({ onDone }: { onDone: () => void }) {
 // ------------------------------------------------------------------------------ matches
 
 function Matches({ rows, onOpen }: { rows: MatchRow[]; onOpen: (id: number) => void }) {
-  const [filter, setFilter] = useState<"all" | "hot" | "cv">("all");
-  const shown = rows.filter((m) => (filter === "hot" ? m.band === "hot" : filter === "cv" ? m.cvReady : true));
+  const [filter, setFilter] = useState<string>("all");
+  const [sort, setSort] = useState<"new" | "fit">("new");
+  // "all", "hot", "cv", or one of the posting levels (student, non-graduate, fresh-grad, junior).
+  const shown = [...rows].sort((a, b) =>
+    sort === "fit" ? (b.fit ?? -1) - (a.fit ?? -1) : Date.parse(b.firstSeenAt) - Date.parse(a.firstSeenAt),
+  ).filter((m) =>
+    filter === "all" ? true : filter === "hot" ? m.band === "hot" : filter === "cv" ? m.cvReady : m.levels.includes(filter));
   return (
     <section>
       <div className="chips" role="group" aria-label="Filter">
-        {([["all", "All"], ["hot", "Hot"], ["cv", "CV ready"]] as const).map(([id, label]) => (
+        {([["all", "All"], ["hot", "Hot"], ["cv", "CV ready"], ["student", "Student"], ["non-graduate", "Non-graduate"], ["fresh-grad", "Fresh grad"], ["junior", "Junior"]] as const).map(([id, label]) => (
           <button key={id} className={`chip ${filter === id ? "on" : ""}`} aria-pressed={filter === id} onClick={() => setFilter(id)}>
+            {label}
+          </button>
+        ))}
+      </div>
+      <div className="chips" role="group" aria-label="Sort">
+        {([["new", "Newest first"], ["fit", "Best fit first"]] as const).map(([id, label]) => (
+          <button key={id} className={`chip ${sort === id ? "on" : ""}`} aria-pressed={sort === id} onClick={() => setSort(id)}>
             {label}
           </button>
         ))}
@@ -167,6 +179,7 @@ function Matches({ rows, onOpen }: { rows: MatchRow[]; onOpen: (id: number) => v
                 <span className="row small">
                   <span className={`tag ${m.band}`}>{m.band}</span>
                   {m.cvReady && <span className="tag cv">CV ready</span>}
+                  {m.levels.map((l) => <span key={l} className="tag">{l}</span>)}
                   <span className="muted">{ago(m.firstSeenAt)}</span>
                 </span>
               </button>
@@ -306,7 +319,7 @@ function Applications({ rows }: { rows: ApplicationRow[] }) {
 function PreferenceForm({ initial, submitLabel, onSubmit }: { initial: Preferences | null; submitLabel: string; onSubmit: (p: Preferences) => Promise<void> }) {
   const start = initial ?? {
     roles: [], cities: ["Cairo"], remote: true, jobTypes: ["internship", "full-time"], entryLevelOnly: true,
-    maxYearsExperience: 2, titleKeywords: [], excludeKeywords: DEFAULT_EXCLUDES, onboarded: false,
+    maxYearsExperience: 2, maxAgeDays: 7, pushMinFit: 75, digestMinFit: 40, titleKeywords: [], excludeKeywords: DEFAULT_EXCLUDES, onboarded: false,
   };
   const [presets, setPresets] = useState<string[]>(presetIdsFromRoles(start.roles));
   const [extraKeywords, setExtraKeywords] = useState(() => {
@@ -318,6 +331,9 @@ function PreferenceForm({ initial, submitLabel, onSubmit }: { initial: Preferenc
   const [jobTypes, setJobTypes] = useState(start.jobTypes);
   const [entry, setEntry] = useState(start.entryLevelOnly);
   const [years, setYears] = useState(start.maxYearsExperience);
+  const [ageDays, setAgeDays] = useState(start.maxAgeDays ?? 7);
+  const [pushFit, setPushFit] = useState(start.pushMinFit ?? 75);
+  const [digestFit, setDigestFit] = useState(start.digestMinFit ?? 40);
   const [excludes, setExcludes] = useState(start.excludeKeywords.join(", "));
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -338,6 +354,9 @@ function PreferenceForm({ initial, submitLabel, onSubmit }: { initial: Preferenc
         jobTypes,
         entryLevelOnly: entry,
         maxYearsExperience: years,
+        maxAgeDays: ageDays,
+        pushMinFit: pushFit,
+        digestMinFit: digestFit,
         titleKeywords: keywords,
         excludeKeywords: splitList(excludes),
         onboarded: true,
@@ -377,6 +396,27 @@ function PreferenceForm({ initial, submitLabel, onSubmit }: { initial: Preferenc
             <input id="years" type="range" min={0} max={5} value={years} onChange={(e) => setYears(Number(e.target.value))} />
           </>
         )}
+      </fieldset>
+
+      <fieldset>
+        <legend>How old</legend>
+        <label htmlFor="age">Hide postings older than</label>
+        <select id="age" value={ageDays} onChange={(e) => setAgeDays(Number(e.target.value))}>
+          <option value={1}>1 day</option>
+          <option value={3}>3 days</option>
+          <option value={7}>1 week</option>
+          <option value={14}>2 weeks</option>
+          <option value={30}>1 month</option>
+          <option value={0}>No limit</option>
+        </select>
+      </fieldset>
+
+      <fieldset>
+        <legend>Notifications</legend>
+        <label htmlFor="push">Push at once when a new posting scores at least <b>{pushFit}</b></label>
+        <input id="push" type="range" min={30} max={100} step={5} value={pushFit} onChange={(e) => setPushFit(Number(e.target.value))} />
+        <label htmlFor="digest">Daily digest (18:00) includes postings scoring at least <b>{digestFit}</b></label>
+        <input id="digest" type="range" min={0} max={100} step={5} value={digestFit} onChange={(e) => setDigestFit(Number(e.target.value))} />
       </fieldset>
 
       <fieldset>

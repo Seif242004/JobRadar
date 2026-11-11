@@ -31,7 +31,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * SPEC.md D7: the Apply-now push needs fit 85+, a posting under 1 hour old and a ready CV. The
+ * Apply-now push: fit at or above the user threshold (default 75), a posting under 24 hours old and a ready CV. The
  * CV itself comes from the tailoring-worker; here its result is a {@code cv_version} row.
  */
 class ApplyNowTests extends PostgresIntegrationTest {
@@ -110,8 +110,8 @@ class ApplyNowTests extends PostgresIntegrationTest {
     }
 
     @Test
-    void aFitBelow85IsNotPushedEvenWithACv() {
-        long[] ids = postingWithCv(Duration.ofMinutes(20), 84);
+    void aFitBelowTheThresholdIsNotPushedEvenWithACv() {
+        long[] ids = postingWithCv(Duration.ofMinutes(20), 74);
 
         assertThat(alerts.onCvReady(userId, ids[0], ids[1], 50)).isFalse();
 
@@ -119,8 +119,8 @@ class ApplyNowTests extends PostgresIntegrationTest {
     }
 
     @Test
-    void aPostingOlderThanOneHourIsNotPushedEvenWithACv() {
-        long[] ids = postingWithCv(Duration.ofMinutes(75), 95);
+    void aPostingOlderThanADayIsNotPushedEvenWithACv() {
+        long[] ids = postingWithCv(Duration.ofHours(26), 95);
 
         assertThat(alerts.onCvReady(userId, ids[0], ids[1], 50)).isFalse();
 
@@ -171,7 +171,7 @@ class ApplyNowTests extends PostgresIntegrationTest {
         jdbc.update("INSERT INTO bullet (user_id, section, text) VALUES (?, 'experience', 'Built backend services')", userId);
         long hot = insertPosting("Backend Engineer", Duration.ofMinutes(10));
         long warm = insertPosting("Backend Developer", Duration.ofHours(5));
-        long backlog = insertPosting("Backend Engineering Intern", Duration.ofHours(40));
+        long backlog = insertPosting("Backend Engineering Intern", Duration.ofDays(8));
 
         for (long id : new long[] {hot, warm, backlog}) {
             matcher.match(id);
