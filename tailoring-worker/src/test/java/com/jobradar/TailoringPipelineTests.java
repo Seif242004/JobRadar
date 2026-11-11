@@ -203,8 +203,16 @@ class TailoringPipelineTests {
         List<Long> stored = storedBulletIds(ready);
         assertThat(stored).isNotEmpty().isSubsetOf(confirmedBulletIds).doesNotHaveDuplicates();
         assertThat(stored).hasSizeLessThan(confirmedBulletIds.size());
-        // Trimming drops from the end, so the stored list is a prefix of the model's order.
-        assertThat(stored).isEqualTo(confirmedBulletIds.subList(0, stored.size()));
+        // The balancer spreads the model's picks over every entry; trimming then drops from the end,
+        // so the stored list is a prefix of the balanced order.
+        List<com.jobradar.tailoring.internal.ProfileBullet> all = jdbc.query(
+                "SELECT id, section, text, entry_id FROM bullet WHERE user_id = ? ORDER BY id",
+                (rs, i) -> new com.jobradar.tailoring.internal.ProfileBullet(
+                        rs.getLong("id"), rs.getString("section"), rs.getString("text"), false,
+                        rs.getObject("entry_id") == null ? null : rs.getLong("entry_id")),
+                userId);
+        List<Long> balanced = com.jobradar.tailoring.internal.BulletBalancer.balance(confirmedBulletIds, all);
+        assertThat(stored).isEqualTo(balanced.subList(0, stored.size()));
     }
 
     @Test
