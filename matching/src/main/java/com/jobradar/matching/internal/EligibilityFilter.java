@@ -63,6 +63,14 @@ public final class EligibilityFilter {
                     + "|legal|lawyer|finance|financial|customer (service|support)|receptionist|driver|teacher|nurse"
                     + "|procurement|supply chain|warehouse|operations manager|business development)\\b");
 
+    /** Words that make a title tech even next to a non-tech word ("Marketing & Mobile Flutter Development"). */
+    private static final Pattern STRONG_TECH_TITLE = Pattern.compile(
+            "\\b(software|flutter|mobile|android|ios|backend|back-end|frontend|front-end|full[- ]?stack|python|java|react"
+                    + "|data|ai|ml|machine learning|devops|cloud|qa|embedded|game|unity|unreal|web)\\b");
+
+    /** Below this many characters a description is a snippet that cannot show the level a role is for. */
+    private static final int THIN_DESCRIPTION = 600;
+
     private EligibilityFilter() {}
 
     public static Eligibility check(PostingView posting, UserPreferences user, Instant now) {
@@ -118,9 +126,16 @@ public final class EligibilityFilter {
         // 3a. An entry-level profile needs a sign that the role is for early-career people: an
         //     internship, graduate or junior wording in the title, or a phrase in the description.
         //     Without one, plain "Software Engineer" postings are mid-level roles in disguise.
+        //     A snippet-length description cannot show the level, so such a posting is kept and
+        //     marked; the full text is fetched later and the posting is judged again.
+        String description = lower(posting.description());
+        boolean levelUnknown = false;
         if (user.entryLevelOnly() && !EARLY_CAREER_TITLE.matcher(title).find()
-                && !EARLY_CAREER_TEXT.matcher(lower(posting.description())).find()) {
-            return Eligibility.rejected("No internship, graduate or junior signal in the posting");
+                && !EARLY_CAREER_TEXT.matcher(description).find()) {
+            if (description.length() >= THIN_DESCRIPTION) {
+                return Eligibility.rejected("No internship, graduate or junior signal in the posting");
+            }
+            levelUnknown = true;
         }
 
         // 3b. Roles the user excluded, and roles that match none of the titles the user wants.
@@ -134,7 +149,7 @@ public final class EligibilityFilter {
             return Eligibility.rejected("Title matches none of your target roles");
         }
 
-        if (NON_TECH_TITLE.matcher(title).find()) {
+        if (NON_TECH_TITLE.matcher(title).find() && !STRONG_TECH_TITLE.matcher(title).find()) {
             return Eligibility.rejected("Not a software or tech role");
         }
 
@@ -147,7 +162,7 @@ public final class EligibilityFilter {
             return Eligibility.rejected("Job type " + jobType + " is not in the profile");
         }
 
-        return Eligibility.accepted(where + ", " + jobType);
+        return Eligibility.accepted(where + ", " + jobType + (levelUnknown ? " (level not stated)" : ""));
     }
 
     /** Job type is read from the title only; descriptions mention "intern" in unrelated ways. */
