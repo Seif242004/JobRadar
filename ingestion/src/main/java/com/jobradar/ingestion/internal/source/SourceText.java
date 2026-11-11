@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import tools.jackson.databind.JsonNode;
 
 /** Small parsing helpers shared by the connectors. */
-final class SourceText {
+public final class SourceText {
 
     private static final Pattern BLOCK_END = Pattern.compile("(?i)<br\\s*/?>|</(p|div|li|ul|ol|h[1-6]|tr)>");
     private static final Pattern TAG = Pattern.compile("<[^>]+>");
@@ -20,7 +20,7 @@ final class SourceText {
     private SourceText() {}
 
     /** Text of a JSON field, or null when it is missing, JSON null or blank. */
-    static String text(JsonNode node, String field) {
+    public static String text(JsonNode node, String field) {
         JsonNode value = node.path(field);
         if (value.isMissingNode() || value.isNull()) {
             return null;
@@ -33,7 +33,7 @@ final class SourceText {
      * HTML to plain text: block ends become line breaks, tags are dropped, entities decoded and
      * whitespace collapsed. Good enough for matching and embeddings; not a renderer.
      */
-    static String plain(String html) {
+    public static String plain(String html) {
         if (html == null) {
             return null;
         }
@@ -47,7 +47,7 @@ final class SourceText {
     }
 
     /** Decodes the entities that occur in posting HTML: the named basics and numeric ones. */
-    static String unescape(String value) {
+    public static String unescape(String value) {
         if (value == null || value.indexOf('&') < 0) {
             return value;
         }
@@ -74,7 +74,7 @@ final class SourceText {
      * UTC), or a plain date (start of day, UTC). Anything else is null: a wrong posted_at would
      * put a posting in the wrong freshness band, so an unreadable one is treated as absent.
      */
-    static Instant instant(String value) {
+    public static Instant instant(String value) {
         if (value == null || value.isBlank()) {
             return null;
         }
@@ -97,7 +97,7 @@ final class SourceText {
     }
 
     /** Joins the non-blank parts with {@code separator}; null when none is left. */
-    static String join(String separator, String... parts) {
+    public static String join(String separator, String... parts) {
         StringBuilder out = new StringBuilder();
         for (String part : parts) {
             if (part != null && !part.isBlank()) {

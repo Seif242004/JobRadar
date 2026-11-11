@@ -32,6 +32,17 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>sqs</artifactId>
         </dependency>
+        <!-- Gmail refresh tokens of the users live in Secrets Manager (app_user.gmail_token_ref). -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>secretsmanager</artifactId>
+        </dependency>
+        <!-- Parses the RFC 822 message the Gmail API returns for an alert email. -->
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-mail</artifactId>
+            <version>${angus-mail.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

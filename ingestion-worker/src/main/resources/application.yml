@@ -17,6 +17,13 @@ jobradar:
       # Runs the connectors and the careers resolver in this process (SPEC.md D6: ATS sources
       # every 15 min; Remotive at most 4 calls a day). Set to false to run no source at all.
       enabled: ${JOBRADAR_SCHEDULING_ENABLED:true}
+    gmail:
+      # The one Gmail label whose messages are read (a Gmail filter applies it to Wuzzuf, Bayt and
+      # LinkedIn alert emails). Same OAuth client as the apply flow.
+      enabled: ${JOBRADAR_GMAIL_ALERTS_ENABLED:true}
+      label: ${JOBRADAR_GMAIL_ALERT_LABEL:JobRadar}
+      client-id: ${JOBRADAR_GOOGLE_CLIENT_ID:}
+      client-secret: ${JOBRADAR_GOOGLE_CLIENT_SECRET:}
     workable:
       # One search request per location and run.
       locations: ${JOBRADAR_WORKABLE_LOCATIONS:Egypt}
