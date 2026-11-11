@@ -21,7 +21,7 @@ import tools.jackson.databind.JsonNode;
  * Workable company widget: the public job list every Workable careers page loads.
  * {@code GET https://apply.workable.com/api/v1/widget/accounts/{token}?details=true}
  *
- * <p>Response shape as documented by public integrations (not by Workable itself):
+ * <p>Response shape, verified against live boards on 2026-11-11:
  * {@code {name, description, jobs: [{title, shortcode, shortlink, url, department, city, state,
  * country, telecommuting, published_on, description}]}}. One request returns the whole board.
  * A posting that is open in several countries comes back once per location with the same
