@@ -3,7 +3,7 @@ package com.jobradar.ingestion.internal;
 import java.time.Duration;
 import java.time.Instant;
 
-/** Freshness rules of docs/PLAN.md, "Freshness first", as far as ingestion needs them. */
+/** Freshness rules of docs/RESEARCH.md, "Freshness first", as far as ingestion needs them. */
 public final class PostingAge {
 
     /** Postings younger than this go to the hot queue. */

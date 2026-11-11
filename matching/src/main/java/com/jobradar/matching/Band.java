@@ -2,7 +2,7 @@ package com.jobradar.matching;
 
 import java.util.Locale;
 
-/** Freshness bands of docs/PLAN.md, "Freshness first". Stored lower-case in {@code match.band}. */
+/** Freshness bands of docs/RESEARCH.md, "Freshness first". Stored lower-case in {@code match.band}. */
 public enum Band {
     /** Under 2 hours old (and fit 80+ once fit scores exist): instant "Apply now" push. */
     HOT,

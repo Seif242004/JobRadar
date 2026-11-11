@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
- * Hard filters of Flow 2 (docs/PLAN.md): deadline not passed, Egypt or remote-from-Egypt, level,
+ * Hard filters of Flow 2 (docs/RESEARCH.md): deadline not passed, Egypt or remote-from-Egypt, level,
  * job type. They are deterministic keyword rules on purpose: cheap, explainable, and run before
  * any embedding or LLM call. Whether the role itself suits the user is the fit score's job.
  */

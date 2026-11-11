@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Careers resolver of docs/PLAN.md, "Company watchlist": checks each watchlist company's careers
+ * Careers resolver of docs/RESEARCH.md, "Company watchlist": checks each watchlist company's careers
  * page once, detects the ATS and stores {@code ats_type} and {@code board_token}. A page with no
  * known ATS is a custom site and is marked {@code email-alerts}.
  *

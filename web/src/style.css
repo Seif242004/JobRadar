@@ -96,3 +96,5 @@ details { margin-top: 16px; } summary { min-height: 44px; display: flex; align-i
 .add, .paste { display: grid; gap: 10px; max-width: 640px; }
 .add label, .paste label { display: grid; gap: 4px; }
 .add textarea, .paste textarea, .add input { width: 100%; font: inherit; }
+
+a:not(.button) { color: var(--accent); }

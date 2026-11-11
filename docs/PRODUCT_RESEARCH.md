@@ -16,7 +16,7 @@ thin. Nothing here is scraped, and no product was logged into.
 | **GenZawy** | Student-built Gen Z career guidance app (Al-Ahram Canadian University) | Short guided onboarding for people with no experience |
 | **TalentsNexus, MisuJob** | AI recruitment and job-search platforms listing Cairo roles | Little detail found |
 | **LyRise** | Matches North African engineers with remote and international AI roles | Remote-first listing for engineers |
-| **"Talk with Raya"** | **Not found.** Searches return Raya Holding (a listed Egyptian group) and its careers site, not a consumer app. Needs a link from Seif | Unknown |
+| **"Talk with Raya"** | **Not found.** Searches return Raya Holding (a listed Egyptian group) and its careers site, not a consumer app. Needs a link to confirm | Unknown |
 
 Not found at all: Jobzella, Tanqeeb, Jobiano, Hirelogics (no usable results).
 

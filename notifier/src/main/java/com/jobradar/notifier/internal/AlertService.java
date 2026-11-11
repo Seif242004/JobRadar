@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
- * Alerts by freshness band (docs/PLAN.md, "Freshness first"):
+ * Alerts by freshness band (docs/RESEARCH.md, "Freshness first"):
  *
  * <ul>
  *   <li>New (under 24 hours) with fit at or above the user's push threshold: pushed when its CV is ready. Hot without a

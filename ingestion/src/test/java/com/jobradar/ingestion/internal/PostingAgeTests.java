@@ -6,7 +6,7 @@ import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 
-/** Age and hot-queue rules from docs/PLAN.md, "Freshness first". */
+/** Age and hot-queue rules from docs/RESEARCH.md, "Freshness first". */
 class PostingAgeTests {
 
     private static final Instant NOW = Instant.parse("2026-11-10T12:00:00Z");

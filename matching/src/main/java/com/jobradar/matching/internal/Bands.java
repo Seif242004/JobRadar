@@ -4,7 +4,7 @@ import com.jobradar.matching.Band;
 import java.time.Duration;
 import java.time.Instant;
 
-/** Band and priority rules of docs/PLAN.md, "Freshness first". */
+/** Band and priority rules of docs/RESEARCH.md, "Freshness first". */
 public final class Bands {
 
     static final Duration HOT_WINDOW = Duration.ofHours(2);
