@@ -1,32 +1,362 @@
 [
-  {"name": "Valeo Egypt", "careersUrl": "https://www.valeo.com/en/find-a-job-or-internship/"},
-  {"name": "Siemens (EDA and Digital Industries Software)", "careersUrl": "https://jobs.siemens.com/careers"},
-  {"name": "Microsoft Egypt", "careersUrl": "https://jobs.careers.microsoft.com/global/en/search"},
-  {"name": "IBM Egypt", "careersUrl": "https://www.ibm.com/careers/search"},
-  {"name": "Dell Technologies Egypt", "careersUrl": "https://jobs.dell.com/"},
-  {"name": "Synopsys Egypt", "careersUrl": "https://careers.synopsys.com/"},
-  {"name": "_VOIS Egypt (Vodafone)", "careersUrl": "https://careers.vodafone.com/vois/"},
-  {"name": "Instabug", "careersUrl": "https://www.instabug.com/careers"},
-  {"name": "Paymob", "careersUrl": "https://paymob.com/en/careers"},
-  {"name": "MNT-Halan", "careersUrl": "https://mnt-halan.com/careers"},
-  {"name": "Breadfast", "careersUrl": "https://breadfast.com/careers"},
-  {"name": "Thndr", "careersUrl": "https://thndr.app/careers"},
-  {"name": "Khazna", "careersUrl": "https://www.khazna.app/careers"},
-  {"name": "Blnk", "careersUrl": "https://www.blnk.ai/careers"},
-  {"name": "Telda", "careersUrl": "https://www.telda.app/careers"},
-  {"name": "MoneyFellows", "careersUrl": "https://apply.workable.com/moneyfellows/"},
-  {"name": "Bosta", "careersUrl": "https://jobs.lever.co/Bosta"},
-  {"name": "Nawy", "careersUrl": "https://www.nawy.com/careers"},
-  {"name": "Vezeeta", "careersUrl": "https://www.vezeeta.com/en/careers"},
-  {"name": "Sylndr", "careersUrl": "https://sylndr.com/careers"},
-  {"name": "elmenus", "careersUrl": "https://www.elmenus.com/careers"},
-  {"name": "Rology", "careersUrl": "https://rology.health/careers"},
-  {"name": "Fawry", "careersUrl": "https://fawry.com/careers/"},
-  {"name": "Sumerge", "careersUrl": "https://www.sumerge.com/careers/"},
-  {"name": "ITWorx", "careersUrl": "https://www.itworx.com/careers/"},
-  {"name": "Giza Systems", "careersUrl": "https://gizasystems.com/careers"},
-  {"name": "Link Development", "careersUrl": "https://linkdevelopment.com/careers"},
-  {"name": "Raya Information Technology", "careersUrl": "https://www.rayait.com/careers"},
-  {"name": "Brightskies", "careersUrl": "https://brightskiesinc.com/careers"},
-  {"name": "Robusta", "careersUrl": "https://robustastudio.com/careers"}
+  {
+    "name": "Valeo Egypt",
+    "careersUrl": "https://www.valeo.com/en/find-a-job-or-internship/"
+  },
+  {
+    "name": "Siemens (EDA and Digital Industries Software)",
+    "careersUrl": "https://jobs.siemens.com/careers"
+  },
+  {
+    "name": "Microsoft Egypt",
+    "careersUrl": "https://jobs.careers.microsoft.com/global/en/search"
+  },
+  {
+    "name": "IBM Egypt",
+    "careersUrl": "https://www.ibm.com/careers/search"
+  },
+  {
+    "name": "Dell Technologies Egypt",
+    "careersUrl": "https://jobs.dell.com/"
+  },
+  {
+    "name": "Synopsys Egypt",
+    "careersUrl": "https://careers.synopsys.com/"
+  },
+  {
+    "name": "_VOIS Egypt (Vodafone)",
+    "careersUrl": "https://careers.vodafone.com/vois/"
+  },
+  {
+    "name": "Instabug",
+    "careersUrl": "https://www.instabug.com/careers"
+  },
+  {
+    "name": "Paymob",
+    "careersUrl": "https://paymob.com/en/careers"
+  },
+  {
+    "name": "MNT-Halan",
+    "careersUrl": "https://mnt-halan.com/careers"
+  },
+  {
+    "name": "Breadfast",
+    "careersUrl": "https://breadfast.com/careers"
+  },
+  {
+    "name": "Thndr",
+    "careersUrl": "https://thndr.app/careers"
+  },
+  {
+    "name": "Khazna",
+    "careersUrl": "https://www.khazna.app/careers"
+  },
+  {
+    "name": "Blnk",
+    "careersUrl": "https://www.blnk.ai/careers"
+  },
+  {
+    "name": "Telda",
+    "careersUrl": "https://www.telda.app/careers"
+  },
+  {
+    "name": "MoneyFellows",
+    "careersUrl": "https://apply.workable.com/moneyfellows/"
+  },
+  {
+    "name": "Bosta",
+    "careersUrl": "https://jobs.lever.co/Bosta"
+  },
+  {
+    "name": "Nawy",
+    "careersUrl": "https://www.nawy.com/careers"
+  },
+  {
+    "name": "Vezeeta",
+    "careersUrl": "https://www.vezeeta.com/en/careers"
+  },
+  {
+    "name": "Sylndr",
+    "careersUrl": "https://sylndr.com/careers"
+  },
+  {
+    "name": "elmenus",
+    "careersUrl": "https://www.elmenus.com/careers"
+  },
+  {
+    "name": "Rology",
+    "careersUrl": "https://rology.health/careers"
+  },
+  {
+    "name": "Fawry",
+    "careersUrl": "https://fawry.com/careers/"
+  },
+  {
+    "name": "Sumerge",
+    "careersUrl": "https://www.sumerge.com/careers/"
+  },
+  {
+    "name": "ITWorx",
+    "careersUrl": "https://www.itworx.com/careers/"
+  },
+  {
+    "name": "Giza Systems",
+    "careersUrl": "https://gizasystems.com/careers"
+  },
+  {
+    "name": "Link Development",
+    "careersUrl": "https://linkdevelopment.com/careers"
+  },
+  {
+    "name": "Raya Information Technology",
+    "careersUrl": "https://www.rayait.com/careers"
+  },
+  {
+    "name": "Brightskies",
+    "careersUrl": "https://brightskiesinc.com/careers"
+  },
+  {
+    "name": "Robusta",
+    "careersUrl": "https://robustastudio.com/careers"
+  },
+  {
+    "name": "e& Egypt (Etisalat)",
+    "careersUrl": "https://www.eand.com/en/index.html"
+  },
+  {
+    "name": "Vodafone Egypt",
+    "careersUrl": "https://web.vodafone.com.eg/en/careers"
+  },
+  {
+    "name": "Orange Egypt",
+    "careersUrl": "https://www.orange.eg/en/careers"
+  },
+  {
+    "name": "Telecom Egypt (WE)",
+    "careersUrl": "https://www.te.eg/wps/portal/te/Personal/Careers"
+  },
+  {
+    "name": "Huawei Egypt",
+    "careersUrl": "https://career.huawei.com/reccampportal/portal5/campus-recruitment.html"
+  },
+  {
+    "name": "Oracle Egypt",
+    "careersUrl": "https://careers.oracle.com/jobs/"
+  },
+  {
+    "name": "Cisco Egypt",
+    "careersUrl": "https://jobs.cisco.com/"
+  },
+  {
+    "name": "Amazon Egypt",
+    "careersUrl": "https://www.amazon.jobs/en/locations/cairo-egypt"
+  },
+  {
+    "name": "Google",
+    "careersUrl": "https://www.google.com/about/careers/applications/"
+  },
+  {
+    "name": "SAP Egypt",
+    "careersUrl": "https://jobs.sap.com/"
+  },
+  {
+    "name": "Intel",
+    "careersUrl": "https://jobs.intel.com/"
+  },
+  {
+    "name": "Nokia Egypt",
+    "careersUrl": "https://www.nokia.com/about-us/careers/"
+  },
+  {
+    "name": "Ericsson Egypt",
+    "careersUrl": "https://jobs.ericsson.com/"
+  },
+  {
+    "name": "Schneider Electric Egypt",
+    "careersUrl": "https://www.se.com/ww/en/about-us/careers/"
+  },
+  {
+    "name": "ABB Egypt",
+    "careersUrl": "https://careers.abb/"
+  },
+  {
+    "name": "Bosch Egypt",
+    "careersUrl": "https://www.bosch.com/careers/"
+  },
+  {
+    "name": "HPE Egypt",
+    "careersUrl": "https://careers.hpe.com/"
+  },
+  {
+    "name": "Accenture Egypt",
+    "careersUrl": "https://www.accenture.com/eg-en/careers"
+  },
+  {
+    "name": "Capgemini Egypt",
+    "careersUrl": "https://www.capgemini.com/eg-en/careers/"
+  },
+  {
+    "name": "Cognizant Egypt",
+    "careersUrl": "https://careers.cognizant.com/"
+  },
+  {
+    "name": "EPAM Egypt",
+    "careersUrl": "https://careers.epam.com/"
+  },
+  {
+    "name": "Luxoft Egypt",
+    "careersUrl": "https://career.luxoft.com/"
+  },
+  {
+    "name": "Teleperformance Egypt",
+    "careersUrl": "https://jobs.teleperformance.com/"
+  },
+  {
+    "name": "Concentrix Egypt",
+    "careersUrl": "https://careers.concentrix.com/"
+  },
+  {
+    "name": "Sutherland Egypt",
+    "careersUrl": "https://www.sutherlandglobal.com/careers"
+  },
+  {
+    "name": "TTEC Egypt",
+    "careersUrl": "https://jobs.ttec.com/"
+  },
+  {
+    "name": "Foundever Egypt",
+    "careersUrl": "https://foundever.com/careers/"
+  },
+  {
+    "name": "Commercial International Bank (CIB)",
+    "careersUrl": "https://www.cibeg.com/en/careers"
+  },
+  {
+    "name": "National Bank of Egypt",
+    "careersUrl": "https://www.nbe.com.eg/NBE/E/#/EN/Careers"
+  },
+  {
+    "name": "Banque Misr",
+    "careersUrl": "https://www.banquemisr.com/en/careers"
+  },
+  {
+    "name": "QNB Egypt",
+    "careersUrl": "https://www.qnb.com/sites/qnb/qnbegypt/page/en/encareers.html"
+  },
+  {
+    "name": "Emirates NBD Egypt",
+    "careersUrl": "https://www.emiratesnbd.com.eg/en/careers"
+  },
+  {
+    "name": "Swvl",
+    "careersUrl": "https://www.swvl.com/careers"
+  },
+  {
+    "name": "valU",
+    "careersUrl": "https://valu.com.eg/careers"
+  },
+  {
+    "name": "Dubizzle Egypt",
+    "careersUrl": "https://www.dubizzle.com.eg/careers/"
+  },
+  {
+    "name": "Jumia Egypt",
+    "careersUrl": "https://group.jumia.com/careers"
+  },
+  {
+    "name": "Noon",
+    "careersUrl": "https://www.noon.com/careers/"
+  },
+  {
+    "name": "Talabat Egypt",
+    "careersUrl": "https://www.talabat.com/careers"
+  },
+  {
+    "name": "Opensooq",
+    "careersUrl": "https://om.opensooq.com/en/careers"
+  },
+  {
+    "name": "Orascom Construction",
+    "careersUrl": "https://www.orascom.com/careers/"
+  },
+  {
+    "name": "Mentor, a Siemens business (Cairo)",
+    "careersUrl": "https://jobs.siemens.com/careers?location=Cairo"
+  },
+  {
+    "name": "Si-Vision",
+    "careersUrl": "https://www.si-vision.com/careers"
+  },
+  {
+    "name": "Xceed",
+    "careersUrl": "https://www.xceedcc.com/careers"
+  },
+  {
+    "name": "Information Technology Institute (ITI)",
+    "careersUrl": "https://iti.gov.eg/"
+  },
+  {
+    "name": "Digital Egypt Pioneers Initiative (DEPI)",
+    "careersUrl": "https://depi.gov.eg/"
+  },
+  {
+    "name": "Orange Digital Center Egypt",
+    "careersUrl": "https://orangedigitalcenters.com/country/EG/home"
+  },
+  {
+    "name": "Sprints",
+    "careersUrl": "https://sprints.ai/"
+  },
+  {
+    "name": "Mastercard Egypt",
+    "careersUrl": "https://careers.mastercard.com/"
+  },
+  {
+    "name": "Visa Egypt",
+    "careersUrl": "https://usa.visa.com/careers.html"
+  },
+  {
+    "name": "PwC Middle East (Egypt)",
+    "careersUrl": "https://www.pwc.com/m1/en/careers.html"
+  },
+  {
+    "name": "Deloitte Egypt",
+    "careersUrl": "https://www.deloitte.com/middle-east/en/careers.html"
+  },
+  {
+    "name": "KPMG Egypt",
+    "careersUrl": "https://kpmg.com/eg/en/home/careers.html"
+  },
+  {
+    "name": "EY Egypt",
+    "careersUrl": "https://www.ey.com/en_eg/careers"
+  },
+  {
+    "name": "Unilever Egypt",
+    "careersUrl": "https://careers.unilever.com/"
+  },
+  {
+    "name": "P&G Egypt",
+    "careersUrl": "https://www.pgcareers.com/"
+  },
+  {
+    "name": "Aramex Egypt",
+    "careersUrl": "https://www.aramex.com/us/en/careers"
+  },
+  {
+    "name": "Majid Al Futtaim Egypt",
+    "careersUrl": "https://careers.majidalfuttaim.com/"
+  },
+  {
+    "name": "Careem Egypt",
+    "careersUrl": "https://www.careem.com/en-ae/careers/"
+  },
+  {
+    "name": "Uber Egypt",
+    "careersUrl": "https://www.uber.com/global/en/careers/"
+  },
+  {
+    "name": "ITIDA (Digital Egypt programs)",
+    "careersUrl": "https://www.itida.gov.eg/"
+  }
 ]

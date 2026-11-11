@@ -173,11 +173,11 @@ class SourceIngestionTests {
         http.responses.put("https://www.instabug.com/robots.txt", new FetchResponse(404, "", null));
         http.responses.put("https://www.instabug.com/careers", FetchResponse.ok("<h1>Careers</h1><a href=\"/careers/1\">Backend</a>"));
 
-        assertThat(seeder.seed()).isEqualTo(30);
+        assertThat(seeder.seed()).isEqualTo(90);
         seeder.seed(); // idempotent
         int resolved = resolver.resolvePending();
 
-        assertThat(jdbc.queryForObject("SELECT count(*) FROM company", Long.class)).isEqualTo(30);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM company", Long.class)).isEqualTo(90);
         assertThat(resolved).isEqualTo(3);
         assertThat(jdbc.queryForMap("SELECT ats_type, board_token FROM company WHERE name = 'Bosta'"))
                 .containsEntry("ats_type", "lever")
@@ -192,7 +192,7 @@ class SourceIngestionTests {
         // Pages that could not be read stay unresolved and are retried on the next pass.
         assertThat(jdbc.queryForObject(
                         "SELECT count(*) FROM company WHERE ats_type IS NULL AND last_resolved_at IS NULL", Long.class))
-                .isEqualTo(27);
+                .isEqualTo(87);
 
         // Resolved companies are not fetched again before the 30 day re-check.
         http.requested.clear();
@@ -220,7 +220,7 @@ class SourceIngestionTests {
                         """,
                         Long.class))
                 .isEqualTo(3);
-        assertThat(jdbc.queryForObject("SELECT count(*) FROM company", Long.class)).isEqualTo(30);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM company", Long.class)).isEqualTo(90);
 
         clock.now = clock.now.plus(Duration.ofMinutes(15));
         IngestionResult second = ingestion.run(connector("lever"));
