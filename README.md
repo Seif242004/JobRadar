@@ -56,6 +56,39 @@ Health endpoints: api `:8080/actuator/health`, ingestion-worker `:8081`, tailori
 
 Local queues: `jobradar-hot`, `jobradar-backlog`, `jobradar-dlq`. Local bucket: `jobradar-local`.
 
+## Daily use (Windows)
+
+**Start:** double-click `start-jobradar.bat` (or run it from a terminal). It starts Docker, the database, the
+api, the two workers and the dashboard, then opens the dashboard in Edge at http://127.0.0.1:5173. The first run
+builds the project and can take several minutes. **Stop:** `stop-jobradar.bat` (add `all` to stop the database too;
+your data is kept). **Start at sign-in:** `powershell -File scripts\windows\autostart.ps1` (add `-Off` to undo).
+Keep the PC on: the sources poll every 15 minutes and Gmail alerts every 5.
+
+**Notifications (free, through ntfy):**
+1. Install the **ntfy** app on your phone (or open https://ntfy.sh in a browser).
+2. Subscribe to the topic stored as `JOBRADAR_NTFY_TOPIC` in `.env`. The topic name is the only secret, so do not
+   share it. (`<topic>-taps` is used by the buttons; do not subscribe to it.)
+3. You get two kinds of message:
+   - **Apply now**: a fresh, well-fitting posting with a tailored one-page CV ready. Buttons:
+     **Approve & send** (sends the application from your Gmail, only after this tap; needs the Gmail send
+     permission), **Skip** (records that you passed on it), **Later** (records "later"; there is no reminder yet). Postings that apply on a
+     website show **I applied** instead and open the posting; you apply on the site yourself.
+   - **New matches** digests of the day's other good postings, with links.
+   Nothing is ever submitted without your tap.
+
+**Where to see things:** the dashboard shows the summary, your best matches with their fit score and reasons, and
+your applications. Tailored CVs are stored as PDFs in the local bucket `jobradar-local` (under `cv/<user id>/<posting id>/`);
+the Apply now message links to the one for that posting.
+
+**Alerts from Wuzzuf, Bayt and LinkedIn:** turn on job alerts on each site with your Gmail address. In Gmail, a filter
+must apply the label `JobRadar` to those senders (it only adds the label; nothing is archived, hidden or forwarded).
+To add Bayt, edit that filter (Settings > Filters and blocked addresses > edit) and add the Bayt sender address to
+its From line, for example `jobalerts-noreply@linkedin.com OR wuzzuf.net OR bayt.com`. The reader looks only at
+messages carrying that label.
+
+**If something looks wrong:** read the files in `logs\` (one per app). If the dashboard is empty, wait a few minutes
+after starting: the first source poll and the matching need time.
+
 ## Run locally (no AWS, no cost)
 
 Everything runs on one machine: Postgres with pgvector and LocalStack (SQS, S3, Secrets Manager)

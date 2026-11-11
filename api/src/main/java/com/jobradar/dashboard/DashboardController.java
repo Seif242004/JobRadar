@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Nothing here writes, sends or approves anything; applying stays in Telegram.
  */
 @RestController
-@Profile("local-dashboard")
+@Profile({"local-dashboard", "dashboard"})
 @RequestMapping("/api/dashboard")
 class DashboardController {
 

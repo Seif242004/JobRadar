@@ -27,3 +27,4 @@ dist/
 # Profile seed files hold personal data: only the example is committed.
 seed/*
 !seed/profile.example.json
+logs/

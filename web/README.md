@@ -13,3 +13,6 @@ Decision recorded in SPEC.md (M4): local only, no load balancer, no invite flow.
 
 The `/api/dashboard/*` endpoints exist only under the `local-dashboard` profile; the deployed api
 does not expose them.
+
+On Windows, `start-jobradar.bat` runs the api with the `dashboard` profile: the same endpoints as `local-dashboard`,
+but the matching and notifier listeners stay on, and the api is bound to 127.0.0.1 through `SERVER_ADDRESS`.
