@@ -178,7 +178,11 @@ class SourceIngestionTests {
         int resolved = resolver.resolvePending();
 
         assertThat(jdbc.queryForObject("SELECT count(*) FROM company", Long.class)).isEqualTo(90);
-        assertThat(resolved).isEqualTo(3);
+        // Bosta, MoneyFellows, Instabug and Thndr (an Ashby URL, resolved without reading a page).
+        assertThat(resolved).isEqualTo(4);
+        assertThat(jdbc.queryForMap("SELECT ats_type, board_token FROM company WHERE name = 'Thndr'"))
+                .containsEntry("ats_type", "ashby")
+                .containsEntry("board_token", "thndr");
         assertThat(jdbc.queryForMap("SELECT ats_type, board_token FROM company WHERE name = 'Bosta'"))
                 .containsEntry("ats_type", "lever")
                 .containsEntry("board_token", "Bosta");
@@ -192,7 +196,7 @@ class SourceIngestionTests {
         // Pages that could not be read stay unresolved and are retried on the next pass.
         assertThat(jdbc.queryForObject(
                         "SELECT count(*) FROM company WHERE ats_type IS NULL AND last_resolved_at IS NULL", Long.class))
-                .isEqualTo(87);
+                .isEqualTo(86);
 
         // Resolved companies are not fetched again before the 30 day re-check.
         http.requested.clear();
