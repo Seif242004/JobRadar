@@ -180,14 +180,14 @@ class AlertPipelineTests extends PostgresIntegrationTest {
 
     @Test
     void topPicksPushTheBestOldMatchesOnceAndMoveOnToTheNextOnes() {
-        // Old postings are Backlog: no alert covers them, so only the top-picks run can announce them.
+        // Within the 7-day window but not yet announced: the top-picks run pushes the best of them.
         long[] ids = new long[7];
         for (int i = 0; i < ids.length; i++) {
-            ids[i] = posting("Backend Engineer " + i, "Cairo", Duration.ofDays(3 + i), null);
+            ids[i] = posting("Backend Engineer " + i, "Cairo", Duration.ofHours(3 + i), null);
             matcher.match(ids[i]);
             jdbc.update("UPDATE match SET fit_score = ?, priority = ? WHERE posting_id = ?", 90 - i, 90 - i, ids[i]);
         }
-        long weak = posting("Backend Engineer weak", "Cairo", Duration.ofDays(9), null);
+        long weak = posting("Backend Engineer weak", "Cairo", Duration.ofHours(12), null);
         matcher.match(weak);
         jdbc.update("UPDATE match SET fit_score = 40, priority = 40 WHERE posting_id = ?", weak);
         verify(telegram, never()).sendMessage(anyLong(), any(), any(), any());

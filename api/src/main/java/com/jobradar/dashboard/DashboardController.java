@@ -130,10 +130,10 @@ class DashboardController {
                         FROM match m
                         JOIN posting p ON p.id = m.posting_id
                         LEFT JOIN company c ON c.id = p.company_id
-                        JOIN profile pr ON pr.user_id = m.user_id
+                        LEFT JOIN profile pr ON pr.user_id = m.user_id
                         WHERE m.user_id = ? AND m.eligible
-                          AND (pr.max_age_days = 0
-                               OR COALESCE(p.posted_at, p.first_seen_at) >= now() - make_interval(days => pr.max_age_days))
+                          AND (COALESCE(pr.max_age_days, 7) = 0
+                               OR COALESCE(p.posted_at, p.first_seen_at) >= now() - make_interval(days => COALESCE(pr.max_age_days, 7)))
                         ORDER BY COALESCE(p.posted_at, p.first_seen_at) DESC, m.fit_score DESC NULLS LAST
                         LIMIT ?
                         """,

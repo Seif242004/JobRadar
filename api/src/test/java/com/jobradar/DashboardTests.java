@@ -63,9 +63,11 @@ class DashboardTests extends PostgresIntegrationTest {
     }
 
     @Test
-    void matchesAreEligibleOnlyAndBestFirstWithCvFlag() throws Exception {
+    void matchesAreEligibleOnlyAndNewestFirstWithCvFlag() throws Exception {
         long best = posting("Best", 92, 90, true);
-        posting("Middle", 70, 60, true);
+        long middle = posting("Middle", 70, 60, true);
+        // The list is chronological: the older posting comes second whatever its score.
+        jdbc.update("UPDATE posting SET first_seen_at = now() - INTERVAL '1 hour' WHERE id = ?", middle);
         posting("Rejected", 99, 99, false);
         jdbc.update("INSERT INTO cv_version (user_id, posting_id, bullet_ids, pdf_s3_key) VALUES (?, ?, '{1}', 'k')", userId, best);
 
