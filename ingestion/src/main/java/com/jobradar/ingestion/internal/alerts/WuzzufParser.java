@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 /**
  * Wuzzuf alert emails. Only the email is read: the job page is never requested.
  * Job links look like {@code https://wuzzuf.net/jobs/p/{id}-{title-company-city-country}}.
- * Unverified against a real email (see fixtures/README.md).
+ * Checked against a real email (see fixtures/README.md).
  */
 final class WuzzufParser implements BoardParser {
 

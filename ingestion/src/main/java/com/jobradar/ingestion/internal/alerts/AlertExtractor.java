@@ -24,7 +24,7 @@ final class AlertExtractor {
 
     /** Link text and lines that are buttons or decoration, not job data. */
     private static final Pattern NOISE = Pattern.compile(
-            "(?i)^(view( job| jobs| details)?|see( all)?( jobs| job| details)?|apply( now)?|easy apply|quick apply|"
+            "(?i)^(apply with .*|this company is .*|view( job| jobs| details)?|see( all)?( jobs| job| details)?|apply( now)?|easy apply|quick apply|"
                     + "learn more|unsubscribe|manage.*|actively (recruiting|hiring)|be an early applicant|promoted|new|"
                     + "\\d+ (new )?(jobs?|applicants?).*|\\d+ (minute|hour|day|week)s? ago|posted .*|view job:?.*|"
                     + "https?://.*|[\u2022\u00b7|\\-\u2013\u2014]+)$");
@@ -217,13 +217,13 @@ final class AlertExtractor {
                 for (int j = i - 1; j >= 0 && above.size() < LOOK_AHEAD_LINES; j--) {
                     String line = clean(lines[j]);
                     if (line == null) {
-                        if (!above.isEmpty()) {
-                            break; // blank line ends the block
-                        }
-                        continue;
+                        continue; // a blank line can sit between location and the "actively hiring" lines
                     }
-                    if (isNoise(line) || line.matches("^[-=_*#\\s]{3,}$")) {
-                        break;
+                    if (line.matches("^[-=_*#\\s]{3,}$") || line.contains("://")) {
+                        break; // separator, or the previous job's link: this job's block starts after it
+                    }
+                    if (isNoise(line)) {
+                        continue; // "Apply with resume & profile", "This company is actively hiring"
                     }
                     above.add(0, line);
                 }
@@ -260,7 +260,7 @@ final class AlertExtractor {
         String company = null;
         String location = null;
         if (!following.isEmpty()) {
-            String first = following.get(0);
+            String first = following.get(0).replaceAll("(?i)\\s+[·|•–—-]\\s+posted\\b.*$", "");
             String[] split = SEPARATOR.split(first, 2);
             if (split.length == 2) {
                 company = clean(split[0]);
@@ -271,6 +271,9 @@ final class AlertExtractor {
                     location = following.get(1);
                 }
             }
+        }
+        if (location != null) {
+            location = clean(location.replaceAll("(?i)\\s+[·|•–—-]\\s+posted\\b.*$", ""));
         }
         candidate.offer(title, company, location);
     }

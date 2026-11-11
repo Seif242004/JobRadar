@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  * posting is applied to by the user on LinkedIn itself (apply channel {@code platform}).
  * Job links are {@code linkedin.com/comm/jobs/view/{id}}, {@code linkedin.com/jobs/view/{id}} or
  * a jobs page carrying {@code currentJobId={id}}; all become {@code https://www.linkedin.com/jobs/view/{id}}.
- * Unverified against a real email (see fixtures/README.md).
+ * Checked against a real email (see fixtures/README.md).
  */
 final class LinkedInParser implements BoardParser {
 

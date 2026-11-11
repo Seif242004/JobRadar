@@ -164,4 +164,38 @@ class AlertParsersTests {
 
         assertThat(parsers.parse(new AlertEmail("m", Emails.RECEIVED, html, "")).postings()).isEmpty();
     }
+
+    // ------------------------------------------- real emails (recorded from a mailbox)
+
+    @Test
+    void realLinkedInAlertIsReadFromItsPlainTextBlocks() {
+        List<RawPosting> postings = parsers.parse(Emails.load("linkedin-real.eml")).postings();
+
+        assertThat(postings).hasSize(4);
+        RawPosting first = byId(postings, "linkedin:4489479446");
+        assertThat(first.title()).isEqualTo("Jr. Data Engineer");
+        assertThat(first.companyName()).isEqualTo("Mona Trading LLC");
+        assertThat(first.location()).isEqualTo("Cairo, Egypt");
+        assertThat(first.applyTarget()).isEqualTo("https://www.linkedin.com/jobs/view/4489479446");
+        assertThat(first.applyChannel()).isEqualTo("platform");
+        RawPosting django = byId(postings, "linkedin:4487451704");
+        assertThat(django.title()).isEqualTo("Arabic-speaking Django developer");
+        assertThat(django.companyName()).isEqualTo("AlifBee");
+        assertThat(django.location()).isEqualTo("Egypt");
+        // Two posts with the same title are two different jobs.
+        assertThat(byId(postings, "linkedin:4489186059").location()).isEqualTo("Cairo");
+        assertThat(byId(postings, "linkedin:4489175017").location()).isEqualTo("Egypt");
+    }
+
+    @Test
+    void realWuzzufAlertUnwrapsThePathEncodedAwsTracker() {
+        List<RawPosting> postings = parsers.parse(Emails.load("wuzzuf-real.eml")).postings();
+
+        assertThat(postings).hasSize(1);
+        RawPosting odoo = byId(postings, "wuzzuf:ek1fr7iZI8ja");
+        assertThat(odoo.title()).isEqualTo("Odoo Implementation Specialist");
+        assertThat(odoo.companyName()).isEqualTo("Confidential");
+        assertThat(odoo.location()).isEqualTo("Cairo, Egypt");
+        assertThat(odoo.applyTarget()).isEqualTo("https://wuzzuf.net/jobs/p/ek1fr7iZI8ja-Odoo-Implementation-Specialist-Cairo-Egypt");
+    }
 }

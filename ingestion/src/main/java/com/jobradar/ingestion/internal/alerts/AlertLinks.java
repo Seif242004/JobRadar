@@ -72,7 +72,18 @@ final class AlertLinks {
         return candidates;
     }
 
+    /** A destination percent-encoded into the path, as AWS SES click tracking does: {@code /L0/https:%2F%2Fhost%2Fpath/1/token}. */
+    private static final Pattern PATH_TARGET = Pattern.compile("/(https?(?::|%3[Aa])(?:%2[Ff]){2}[^/?#]*)");
+
     private static String embeddedTarget(String url) {
+        Matcher inPath = PATH_TARGET.matcher(url);
+        if (inPath.find()) {
+            try {
+                return URLDecoder.decode(inPath.group(1), StandardCharsets.UTF_8).strip();
+            } catch (IllegalArgumentException e) {
+                // Malformed percent-encoding: fall through to the query-string check.
+            }
+        }
         String query;
         try {
             query = new URI(url).getRawQuery();
