@@ -142,3 +142,8 @@ export const confirmSummary = (id: number, confirmed: boolean) =>
 
 /** Sends the access token once; the api answers with a cookie so later requests need nothing. */
 export const signIn = (token: string) => call<Summary | null>(`summary?token=${encodeURIComponent(token)}`);
+
+export const addPosting = (p: { url: string; title: string; company: string; text: string }) =>
+  call<{ id: number; duplicate: boolean }>("postings", json("POST", p));
+export const pasteDescription = (id: number, text: string) =>
+  call<{ id: number }>(`postings/${id}/description`, json("POST", { text }));
