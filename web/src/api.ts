@@ -82,6 +82,7 @@ export interface PostingDetail {
   baseScores: BaseScore[];
   thin: boolean;
   enrichStatus: string | null;
+  sourceUrl: string | null;
 }
 
 export interface BaseCv { id: number; label: string; filename: string }

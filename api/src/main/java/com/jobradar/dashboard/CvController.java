@@ -43,7 +43,7 @@ class CvController {
     record PostingDetail(
             long postingId, String title, String company, String location, String description, String band,
             Double fit, String reasons, String applyChannel, String applyTarget, CvInfo cv,
-            List<BaseCvs.Score> baseScores, boolean thin, String enrichStatus) {}
+            List<BaseCvs.Score> baseScores, boolean thin, String enrichStatus, String sourceUrl) {}
 
     record SummaryRow(long id, String label, String text, boolean confirmed, List<String> focus) {}
 
@@ -84,7 +84,7 @@ class CvController {
         return jdbc.query(
                         """
                         SELECT p.id, p.title, c.name AS company, p.location, p.description, p.apply_channel, p.apply_target,
-                               m.band, m.fit_score, m.reasons, p.enrich_status
+                               m.band, m.fit_score, m.reasons, p.enrich_status, p.source_url
                         FROM posting p
                         LEFT JOIN company c ON c.id = p.company_id
                         LEFT JOIN match m ON m.posting_id = p.id AND m.user_id = ?
@@ -97,14 +97,14 @@ class CvController {
                                 rs.getString("reasons"), rs.getString("apply_channel"), rs.getString("apply_target"),
                                 cv(user.get(), id), List.of(),
                                 rs.getString("description") == null || rs.getString("description").length() < 600,
-                                rs.getString("enrich_status")),
+                                rs.getString("enrich_status"), rs.getString("source_url")),
                         user.get(), id)
                 .stream()
                 .findFirst()
                 .map(d -> new PostingDetail(
                         d.postingId(), d.title(), d.company(), d.location(), d.description(), d.band(), d.fit(),
                         d.reasons(), d.applyChannel(), d.applyTarget(), d.cv(),
-                        baseCvs.score(user.get(), d.title(), d.description()), d.thin(), d.enrichStatus()))
+                        baseCvs.score(user.get(), d.title(), d.description()), d.thin(), d.enrichStatus(), d.sourceUrl()))
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

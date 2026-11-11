@@ -42,19 +42,30 @@ public class PostingRepository {
         Long companyId = raw.companyName() == null || raw.companyName().isBlank()
                 ? null
                 : companyId(raw.companyName().strip());
+        // A Google Form or contact e-mail in the text beats a generic platform link; keep the link as source_url.
+        String channel = raw.applyChannel();
+        String sourceUrl = null;
+        if (channel == null || "platform".equals(channel) || "ats_form".equals(channel)) {
+            var detected = com.jobradar.ingestion.internal.enrich.ApplyMethodDetector.detect(raw.description());
+            if (detected.isPresent()) {
+                sourceUrl = applyTarget;
+                channel = detected.get().channel();
+                applyTarget = detected.get().target();
+            }
+        }
         List<Long> ids = jdbc.queryForList(
                 """
                 INSERT INTO posting (company_id, source, source_id, title, location, remote_policy, language,
                                      description, apply_channel, apply_target, deadline, posted_at,
-                                     first_seen_at, content_hash)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                     first_seen_at, content_hash, source_url)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT (source, source_id) DO NOTHING
                 RETURNING id
                 """,
                 Long.class,
                 companyId, raw.source(), raw.sourceId(), raw.title(), raw.location(), raw.remotePolicy(),
-                raw.language(), raw.description(), raw.applyChannel(), applyTarget,
-                timestamp(raw.deadline()), timestamp(raw.postedAt()), timestamp(firstSeenAt), contentHash);
+                raw.language(), raw.description(), channel, applyTarget,
+                timestamp(raw.deadline()), timestamp(raw.postedAt()), timestamp(firstSeenAt), contentHash, sourceUrl);
         return ids.isEmpty() ? OptionalLong.empty() : OptionalLong.of(ids.get(0));
     }
 
