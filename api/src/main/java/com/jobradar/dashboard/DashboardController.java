@@ -1,6 +1,6 @@
 package com.jobradar.dashboard;
 
-import com.jobradar.matching.internal.PostingMatcher;
+import com.jobradar.matching.MatchingApi;
 import com.jobradar.profile.ProfileService;
 import com.jobradar.profile.UserPreferences;
 import com.jobradar.tracker.TrackedApplication;
@@ -63,9 +63,9 @@ class DashboardController {
     private final JdbcTemplate jdbc;
     private final TrackerService tracker;
     private final ProfileService profiles;
-    private final PostingMatcher matcher;
+    private final MatchingApi matcher;
 
-    DashboardController(JdbcTemplate jdbc, TrackerService tracker, ProfileService profiles, PostingMatcher matcher) {
+    DashboardController(JdbcTemplate jdbc, TrackerService tracker, ProfileService profiles, MatchingApi matcher) {
         this.jdbc = jdbc;
         this.tracker = tracker;
         this.profiles = profiles;

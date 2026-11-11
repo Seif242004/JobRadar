@@ -2,6 +2,7 @@ package com.jobradar.matching.internal;
 
 import com.jobradar.matching.Band;
 import com.jobradar.matching.MatchScored;
+import com.jobradar.matching.MatchingApi;
 import com.jobradar.profile.ProfileService;
 import com.jobradar.profile.UserPreferences;
 import java.time.Clock;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Component;
  * depends on age alone (SPEC.md D8).
  */
 @Component
-public class PostingMatcher {
+public class PostingMatcher implements MatchingApi {
 
     private static final Logger log = LoggerFactory.getLogger(PostingMatcher.class);
 
@@ -84,6 +85,7 @@ public class PostingMatcher {
     }
 
     /** Asks tailoring for a (new) CV of this posting, on the backlog queue. */
+    @Override
     public void requestTailor(long userId, long postingId) {
         tailorRequests.publish(userId, postingId, false);
     }
@@ -95,6 +97,7 @@ public class PostingMatcher {
      *
      * @return how many postings changed verdict
      */
+    @Override
     public int rematch(long userId) {
         Optional<UserPreferences> user = profiles.findPreferences(userId);
         if (user.isEmpty()) {

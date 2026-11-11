@@ -1,6 +1,6 @@
 package com.jobradar.dashboard;
 
-import com.jobradar.matching.internal.PostingMatcher;
+import com.jobradar.matching.MatchingApi;
 import com.jobradar.notifier.CvLinkSigner;
 import java.util.List;
 import java.util.Map;
@@ -51,11 +51,11 @@ class CvController {
     private final S3Client s3;
     private final JsonMapper json;
     private final CvLinkSigner signer;
-    private final PostingMatcher matcher;
+    private final MatchingApi matcher;
     private final String bucket;
 
     CvController(
-            JdbcTemplate jdbc, S3Client s3, JsonMapper json, CvLinkSigner signer, PostingMatcher matcher,
+            JdbcTemplate jdbc, S3Client s3, JsonMapper json, CvLinkSigner signer, MatchingApi matcher,
             @Value("${jobradar.notifier.cv-bucket}") String bucket) {
         this.jdbc = jdbc;
         this.s3 = s3;
