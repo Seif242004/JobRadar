@@ -30,11 +30,13 @@ These rules are enforced in code and reviewed on every change to ingestion or ap
 | Path | Contents |
 | --- | --- |
 | `profile/`, `ingestion/`, `matching/`, `tailoring/`, `apply/`, `notifier/`, `tracker/` | Spring Modulith modules, one Maven module each (`com.jobradar.<module>`) |
+| `llm/` | Shared library: provider-neutral `LlmClient` and `EmbeddingClient` over an OpenAI-compatible HTTP API, with model fallback and a daily call cap |
 | `api/` | Deployable: profile, matching, apply, notifier, tracker; owns the Flyway migrations |
 | `ingestion-worker/` | Deployable: ingestion |
 | `tailoring-worker/` | Deployable: tailoring |
 | `infra/` | Terraform: VPC, RDS PostgreSQL, S3, ECR, GitHub OIDC deploy role, budget alarm |
-| `web/` | React dashboard (M4) |
+| `web/` | Local read-only React dashboard (M4) |
+| `scripts/` | `gmail_authorize.py`: one-time Gmail consent (scope `gmail.send` only) that prints the refresh-token secret to store |
 | `localstack/` | Init script that creates the local SQS queues and S3 bucket |
 
 ## Requirements

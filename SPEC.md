@@ -13,7 +13,7 @@ the rest"). All of them are configuration, so any can be changed later without a
 | --- | --- | --- |
 | D1 | LLM provider (rerank + tailor) | Same as fitcrew: NVIDIA Build, OpenAI-compatible endpoint `https://integrate.api.nvidia.com/v1`, default model `openai/gpt-oss-20b`, with an ordered fallback list when a model ID is retired (404). Config: `JOBRADAR_AI_BASE_URL`, `JOBRADAR_AI_MODEL`, `JOBRADAR_AI_KEY`. Called over plain HTTP behind `LlmClient`; no provider SDK |
 | D2 | Monthly LLM budget cap | 0 USD: free endpoints only. The cap is enforced as a daily call limit (default 200 calls/day); when reached, rerank and tailoring stop and matching falls back to embedding score only |
-| D3 | Embedding model and dimension | `baai/bge-m3` on the same NVIDIA endpoint (`/v1/embeddings`), multilingual (Arabic + English), **`vector(1024)`**. Availability on the free account is checked with Seif's key before the V1 migration is merged; behind `EmbeddingClient` |
+| D3 | Embedding model and dimension | **Changed 2026-11-10:** `baai/bge-m3` is not in NVIDIA Build's `GET /v1/models` list. Default is now `nvidia/llama-3.2-nv-embedqa-1b-v1` (multilingual, Matryoshka output sizes) requested with `dimensions=1024` and `input_type=passage`, so **`vector(1024)`** and the V1 schema stay as they are. Not yet verified with a real key: if the endpoint rejects `dimensions`, pick another model in `JOBRADAR_AI_EMBEDDING_MODEL`; a model with a different size needs a migration. Behind `EmbeddingClient` |
 | D4 | PDF renderer | Typst |
 | D5 | AWS region | eu-central-1 |
 | D6 | ATS poll interval | 15 min |
@@ -33,7 +33,7 @@ the rest"). All of them are configuration, so any can be changed later without a
 - Master profile stored as `bullet` rows with IDs, imported from a git-ignored JSON seed file
   (`jobradar.profile.seed-file`); idempotent, IDs stable across re-imports.
 - `docker-compose.yml`: Postgres + pgvector, LocalStack (SQS hot queue, backlog queue, DLQ; S3).
-- Terraform in `infra/`: VPC, RDS PostgreSQL, S3, ECR. `plan` only from tooling; Seif runs `apply`.
+- Terraform in `infra/`: VPC, RDS PostgreSQL, S3, ECR, SQS queues + DLQ, Secrets Manager shells, ECS Fargate services (no load balancer, no NAT). `plan` only from tooling; Seif runs `apply`.
 - GitHub Actions: build and test on push; deploy with OIDC (no long-lived AWS keys).
 - Committed config from the plan: `CLAUDE.md`, `.claude/settings.json`, `.githooks/commit-msg`,
   the two skills, the `compliance-reviewer` agent, README with the 7 guardrails.
@@ -59,12 +59,21 @@ the rest"). All of them are configuration, so any can be changed later without a
 ### M3 Apply
 - Gmail push on one label; parsers for Wuzzuf, Bayt and LinkedIn alert emails.
 - Email apply on Approve (sent from the user's Gmail); tracker; follow-up reminders (7–10 days).
+- Implemented in the api: the Apply-now alert carries Approve / "I applied" / Skip / Later
+  buttons; taps are fetched by long polling (no public endpoint). Only the Approve tap of the
+  linked user (private chat id = Telegram user id) calls `ApplyService.approve`, which sends the
+  tailored CV from the user's Gmail (`gmail.send`, refresh token in Secrets Manager under
+  `app_user.gmail_token_ref`), once per posting, within `daily_apply_cap`. Postings that take no
+  email are applied to by the user, who taps "I applied". Follow-up reminders with a drafted
+  message come after 8 days. Parsing the user's Gmail label for alert emails is a separate step.
 - **Verify:** one real application sent end to end from a Telegram tap, with an `application` row
   and `follow_up_at` set.
 
 ### M4 Extras (cut first if time is tight)
 - Brave Search for public LinkedIn posts; ATS autofill extension for Workable and Greenhouse;
   weekly digest; React dashboard; invite flow.
+- **Decision (Seif):** the dashboard is local only: read-only, single user, no login, served on
+  127.0.0.1 under the `local-dashboard` profile. No load balancer and no invite flow.
 - **Verify:** the weekly digest shows replies by source and by CV version.
 
 ## 3. Module interfaces
@@ -76,10 +85,19 @@ Names are binding; signatures are finalized when each milestone starts.
 | `profile` | `ProfileService`: preferences and bullets by `user_id`; one-click delete of all user data | matching, tailoring, apply |
 | `ingestion` | `SourceConnector { fetch() -> List<RawPosting> }`, one per source, each with its own schedule and rate limit; `Normalizer`; `Deduper`; publishes `PostingIngested` | matching (via SQS) |
 | `matching` | Consumes `PostingIngested`; writes `match` (eligible, fit_score, priority, band, reasons); publishes `MatchScored` | tailoring, notifier |
-| `tailoring` | Consumes `MatchScored` for Hot/Warm; `LlmClient` and `EmbeddingClient` (interfaces, fakes in tests); `TailoringValidator`; `PdfRenderer`; writes `cv_version`; publishes `CvReady` | notifier, apply |
+| `tailoring` | Runs in the tailoring-worker. Consumes `TailorRequested` from `jobradar-tailor-hot` / `jobradar-tailor-backlog` (published by `matching` for eligible Hot matches, and for Warm matches with fit >= 60; never for Backlog); `LlmClient` (bullet IDs only); `TailoringValidator`; `PdfRenderer` (Typst); writes `cv_version` and the PDF under `cv/` in S3; publishes `CvReady` to `jobradar-cv-ready` | notifier, apply |
 | `notifier` | `NotificationChannel` (Telegram first, email for digests); emits `UserAction` (Approve, Skip, Later) | apply, tracker |
 | `apply` | `ApplyChannel` per channel; runs only on an Approve `UserAction`; enforces `daily_apply_cap`; writes `application` | tracker |
 | `tracker` | Application status, follow-up timers, response rates by source and CV version | notifier, api |
+
+**Shared library `llm`:** matching (api) and tailoring (worker) run in different deployables and
+both call the model, so `LlmClient`, `EmbeddingClient` and their OpenAI-compatible HTTP
+implementation live in an eighth Maven module, `llm`, that both depend on.
+
+**Fit score:** mean cosine similarity of the posting to the user's 5 nearest bullets (pgvector),
+mapped linearly from [0.30, 0.70] to [0, 100]. Postings with an embedding fit of 55 or more are
+reranked by the LLM, which returns the final fit and a one-line reason. Bullets tagged `verify`
+are ignored. Without embeddings there is no fit and the band depends on age alone.
 
 **Queue messages (SQS, JSON):** `PostingIngested { postingId, firstSeenAt, postedAt? }` on the hot
 queue when age < 2 h, otherwise on the backlog queue. Failed parses go to the DLQ.

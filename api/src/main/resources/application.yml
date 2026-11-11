@@ -8,6 +8,13 @@ spring:
     password: ${JOBRADAR_DB_PASSWORD:jobradar}
   flyway:
     enabled: true
+  task:
+    scheduling:
+      pool:
+        # The hot and backlog queue polls must never wait on each other or on the alert jobs.
+        # Four of these run long polls (two posting queues, CV-ready, Telegram taps); the rest
+        # is left for the alert and follow-up jobs.
+        size: 8
 
 server:
   port: ${PORT:8080}
@@ -19,6 +26,43 @@ management:
         include: health
 
 jobradar:
+  ai:
+    # OpenAI-compatible endpoint (SPEC.md D1 to D3). An empty key disables rerank and embeddings.
+    base-url: ${JOBRADAR_AI_BASE_URL:https://integrate.api.nvidia.com/v1}
+    key: ${JOBRADAR_AI_KEY:}
+    model: ${JOBRADAR_AI_MODEL:openai/gpt-oss-20b}
+    embedding-model: ${JOBRADAR_AI_EMBEDDING_MODEL:nvidia/llama-3.2-nv-embedqa-1b-v1}
+    daily-call-cap: ${JOBRADAR_AI_DAILY_CALL_CAP:200}
+  aws:
+    region: ${AWS_REGION:eu-central-1}
+    # Set only for LocalStack (http://localhost:4566); empty means the real AWS endpoints.
+    endpoint: ${JOBRADAR_AWS_ENDPOINT:}
+  matching:
+    listener:
+      enabled: ${JOBRADAR_QUEUE_LISTENER_ENABLED:true}
+    queues:
+      hot-url: ${JOBRADAR_SQS_HOT_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-hot}
+      backlog-url: ${JOBRADAR_SQS_BACKLOG_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-backlog}
+      tailor-hot-url: ${JOBRADAR_SQS_TAILOR_HOT_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-tailor-hot}
+      tailor-backlog-url: ${JOBRADAR_SQS_TAILOR_BACKLOG_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-tailor-backlog}
+  notifier:
+    listener:
+      enabled: ${JOBRADAR_QUEUE_LISTENER_ENABLED:true}
+    cv-bucket: ${JOBRADAR_S3_BUCKET:jobradar-local}
+    # How long the CV link in an Apply-now alert stays valid.
+    cv-link-ttl: ${JOBRADAR_CV_LINK_TTL:12h}
+    queues:
+      cv-ready-url: ${JOBRADAR_SQS_CV_READY_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-cv-ready}
+  apply:
+    follow-up-days: ${JOBRADAR_FOLLOW_UP_DAYS:8}
+    cv-bucket: ${JOBRADAR_S3_BUCKET:jobradar-local}
+  google:
+    # OAuth client of the Google Cloud project; users' refresh tokens live in Secrets Manager.
+    client-id: ${JOBRADAR_GOOGLE_CLIENT_ID:}
+    client-secret: ${JOBRADAR_GOOGLE_CLIENT_SECRET:}
+  telegram:
+    # Bot token from @BotFather; empty disables sending (alerts are logged instead).
+    bot-token: ${JOBRADAR_TELEGRAM_BOT_TOKEN:}
   profile:
     # Optional path to a profile seed file (see seed/profile.example.json). Imported on startup;
     # safe to re-run. Empty means no import.

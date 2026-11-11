@@ -1,0 +1,81 @@
+package com.jobradar.tailoring.internal;
+
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * ATS keyword score: the share of the posting's keywords that appear in the CV, 0 to 100.
+ *
+ * <p>Keywords are taken from the posting alone, never from the profile, so terms the candidate
+ * lacks lower the score instead of disappearing from it. A keyword is every non-stopword in the
+ * title, plus every non-stopword that occurs at least twice in the description, capped at
+ * {@link #MAX_KEYWORDS} by frequency.
+ */
+public final class AtsScorer {
+
+    static final int MAX_KEYWORDS = 30;
+
+    /** Letters and digits, keeping the characters of names like C++, C#, .NET and Node.js. */
+    private static final Pattern TOKEN = Pattern.compile("[\\p{L}\\p{N}][\\p{L}\\p{N}+#.]*");
+
+    private static final Set<String> STOPWORDS = Set.of(
+            "a", "an", "and", "are", "as", "at", "be", "by", "for", "from", "has", "have", "in", "is", "it",
+            "of", "on", "or", "our", "that", "the", "their", "this", "to", "we", "will", "with", "you", "your",
+            "who", "what", "can", "all", "about", "into", "more", "such", "they", "them", "us", "not", "but",
+            "if", "its", "other", "work", "working", "team", "teams", "role", "job", "experience", "years",
+            "year", "strong", "good", "ability", "skills", "knowledge", "including", "etc", "must", "plus",
+            "join", "looking", "company", "candidate", "candidates", "responsibilities", "requirements",
+            "required", "preferred", "using", "use", "new", "well", "across", "within", "also", "was");
+
+    private AtsScorer() {}
+
+    public static double score(String postingTitle, String postingDescription, String cvText) {
+        Set<String> keywords = keywords(postingTitle, postingDescription);
+        if (keywords.isEmpty()) {
+            return 0.0;
+        }
+        Set<String> cvTokens = new LinkedHashSet<>(tokens(cvText));
+        long covered = keywords.stream().filter(cvTokens::contains).count();
+        return Math.round(covered * 1000.0 / keywords.size()) / 10.0;
+    }
+
+    static Set<String> keywords(String title, String description) {
+        Set<String> keywords = new LinkedHashSet<>(tokens(title));
+        Map<String, Integer> counts = new HashMap<>();
+        for (String token : tokens(description)) {
+            counts.merge(token, 1, Integer::sum);
+        }
+        counts.entrySet().stream()
+                .filter(entry -> entry.getValue() >= 2)
+                // Most frequent first; ties alphabetically, so the result is deterministic.
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
+                .map(Map.Entry::getKey)
+                .takeWhile(token -> keywords.size() < MAX_KEYWORDS)
+                .forEach(keywords::add);
+        return keywords;
+    }
+
+    /** Lower-case tokens without stopwords, single characters or pure numbers. */
+    static List<String> tokens(String text) {
+        if (text == null) {
+            return List.of();
+        }
+        Matcher matcher = TOKEN.matcher(text.toLowerCase(Locale.ROOT));
+        List<String> tokens = new java.util.ArrayList<>();
+        while (matcher.find()) {
+            // A trailing dot is sentence punctuation, not part of a name like "node.js".
+            String token = matcher.group().replaceAll("\\.+$", "");
+            boolean keep = token.length() > 1 || token.equals("c");
+            if (keep && !STOPWORDS.contains(token) && !token.matches("[\\d.]+")) {
+                tokens.add(token);
+            }
+        }
+        return tokens;
+    }
+}

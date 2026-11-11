@@ -22,3 +22,13 @@ output "data_bucket" {
   description = "S3 bucket for raw postings and generated PDFs."
   value       = aws_s3_bucket.data.bucket
 }
+
+output "queue_urls" {
+  description = "SQS queue URLs by name."
+  value       = { for key, queue in aws_sqs_queue.work : key => queue.url }
+}
+
+output "secret_names" {
+  description = "Secrets that need a value set by hand (see secrets.tf)."
+  value       = [aws_secretsmanager_secret.ai_key.name, aws_secretsmanager_secret.telegram_bot_token.name]
+}

@@ -16,5 +16,11 @@ printf '{"RedrivePolicy":"%s"}' "$(printf '%s' "$REDRIVE" | sed 's/"/\\"/g')" > 
 awslocal sqs create-queue --queue-name jobradar-hot     --attributes file:///tmp/queue-attrs.json
 awslocal sqs create-queue --queue-name jobradar-backlog --attributes file:///tmp/queue-attrs.json
 
+# Tailoring (Flow 3): requests from matching, results to the notifier. Hot requests are
+# the ones for postings that qualify for an Apply-now push.
+awslocal sqs create-queue --queue-name jobradar-tailor-hot     --attributes file:///tmp/queue-attrs.json
+awslocal sqs create-queue --queue-name jobradar-tailor-backlog --attributes file:///tmp/queue-attrs.json
+awslocal sqs create-queue --queue-name jobradar-cv-ready       --attributes file:///tmp/queue-attrs.json
+
 # One bucket; raw postings under raw/, generated PDFs under cv/.
 awslocal s3 mb s3://jobradar-local

@@ -21,10 +21,13 @@
         <java.version>25</java.version>
         <spring-modulith.version>2.1.2</spring-modulith.version>
         <aws-sdk.version>2.57.12</aws-sdk.version>
+        <pdfbox.version>3.0.8</pdfbox.version>
+        <angus-mail.version>2.0.3</angus-mail.version>
     </properties>
 
-    <!-- Seven Spring Modulith modules (one Maven module each), then the three deployables. -->
+    <!-- The shared LLM client library, the seven Spring Modulith modules, then the three deployables. -->
     <modules>
+        <module>llm</module>
         <module>profile</module>
         <module>ingestion</module>
         <module>matching</module>
@@ -52,6 +55,11 @@
                 <version>${aws-sdk.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.jobradar</groupId>
+                <artifactId>llm</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.jobradar</groupId>

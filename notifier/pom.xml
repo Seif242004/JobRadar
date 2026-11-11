@@ -19,5 +19,39 @@
             <groupId>org.springframework.modulith</groupId>
             <artifactId>spring-modulith-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.jobradar</groupId>
+            <artifactId>matching</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jobradar</groupId>
+            <artifactId>apply</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jobradar</groupId>
+            <artifactId>tracker</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sqs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jackson</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
