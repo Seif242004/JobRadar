@@ -92,7 +92,7 @@ class AlertParsersTests {
 
         assertThat(data.title()).isEqualTo("Data Engineer");
         assertThat(data.companyName()).isEqualTo("MNT-Halan");
-        assertThat(data.location()).isNull();
+        assertThat(data.location()).isEqualTo("Egypt (alert search)");
     }
 
     // ------------------------------------------------------------------ Bayt

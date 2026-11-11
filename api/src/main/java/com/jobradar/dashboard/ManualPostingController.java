@@ -108,10 +108,24 @@ class ManualPostingController {
         for (String line : text.split("\\R")) {
             if (!line.isBlank()) {
                 String t = line.strip();
-                return t.length() > 120 ? t.substring(0, 120) : t;
+                if (t.length() <= 90) {
+                    return t;
+                }
+                // A long first line is body text: cut at a sentence or a word boundary.
+                int cut = t.lastIndexOf(' ', 80);
+                return t.substring(0, cut > 20 ? cut : 80) + "…";
             }
         }
-        return url.isEmpty() ? "Untitled posting" : "Posting from " + java.net.URI.create(url).getHost();
+        return url.isEmpty() ? "Untitled posting" : "Posting from " + hostOf(url);
+    }
+
+    private static String hostOf(String url) {
+        try {
+            String host = java.net.URI.create(url).getHost();
+            return host == null ? url : host;
+        } catch (IllegalArgumentException e) {
+            return url;
+        }
     }
 
     private static String sha(String value) {

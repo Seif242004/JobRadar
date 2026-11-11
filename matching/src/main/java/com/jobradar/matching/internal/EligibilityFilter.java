@@ -15,7 +15,7 @@ public final class EligibilityFilter {
 
     /** Egypt and its main employment hubs, in English and Arabic. */
     private static final Pattern EGYPT = Pattern.compile(
-            "egypt|cairo|giza|alexandria|maadi|heliopolis|nasr city|zamalek|sheikh zayed|smart village"
+            "egypt|cairo|giza|alexandria|maadi|heliopolis|nasr city|zamalek|sheikh zayed|sheikh zaid|shaikh zayed|smart village"
                     + "|6th of october|october city|new capital|mansoura|مصر|القاهرة|الجيزة|الإسكندرية|الاسكندرية");
 
     private static final Pattern REMOTE = Pattern.compile("remote|work from home|wfh|anywhere|worldwide|عن بعد|عن بُعد");
