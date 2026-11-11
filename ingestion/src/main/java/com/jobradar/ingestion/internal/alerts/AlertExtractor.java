@@ -24,7 +24,7 @@ final class AlertExtractor {
 
     /** Link text and lines that are buttons or decoration, not job data. */
     private static final Pattern NOISE = Pattern.compile(
-            "(?i)^(apply with .*|this company is .*|view( job| jobs| details)?|see( all)?( jobs| job| details)?|apply( now)?|easy apply|quick apply|"
+            "(?i)^(apply with .*|this company is .*|job search smarter.*|\\d+ (company |school )?(alumni|connections?).*|1 connection.*|view( job| jobs| details)?|see( all)?( jobs| job| details)?|apply( now)?|easy apply|quick apply|"
                     + "learn more|unsubscribe|manage.*|actively (recruiting|hiring)|be an early applicant|promoted|new|"
                     + "\\d+ (new )?(jobs?|applicants?).*|\\d+ (minute|hour|day|week)s? ago|posted .*|view job:?.*|"
                     + "https?://.*|[\u2022\u00b7|\\-\u2013\u2014]+)$");
