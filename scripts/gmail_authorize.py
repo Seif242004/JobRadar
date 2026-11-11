@@ -11,7 +11,14 @@ Usage:
   shred -u /tmp/gmail-secret.json
   psql ... -c "UPDATE app_user SET gmail_token_ref = 'jobradar/gmail/<user id>' WHERE id = <user id>"
 
-The only scope requested is gmail.send, the narrowest one that lets the app send an application.
+Scopes requested (narrowest that work for each job):
+  gmail.send      send an application from the user's address (apply flow)
+  gmail.readonly  read the one alert label for Wuzzuf, Bayt and LinkedIn alert emails (ingestion).
+                  Google has no narrower scope that returns message bodies and none limited to one
+                  label; the app enforces the one-label limit itself and never modifies the mailbox.
+
+Pass --send-only to grant just gmail.send (the alert reader then has nothing to read), or
+--read-only to grant just gmail.readonly. Granting a new scope needs a fresh run of this script.
 """
 import http.server
 import json
@@ -22,9 +29,19 @@ import urllib.parse
 import urllib.request
 import webbrowser
 
-SCOPE = "https://www.googleapis.com/auth/gmail.send"
+SEND_SCOPE = "https://www.googleapis.com/auth/gmail.send"
+READ_SCOPE = "https://www.googleapis.com/auth/gmail.readonly"
 AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 TOKEN_URL = "https://oauth2.googleapis.com/token"
+
+
+def scopes(argv: list) -> str:
+    """Space-separated scope string for the requested mode."""
+    if "--send-only" in argv:
+        return SEND_SCOPE
+    if "--read-only" in argv:
+        return READ_SCOPE
+    return SEND_SCOPE + " " + READ_SCOPE
 
 
 def main() -> int:
@@ -55,7 +72,7 @@ def main() -> int:
         "client_id": client_id,
         "redirect_uri": redirect,
         "response_type": "code",
-        "scope": SCOPE,
+        "scope": scopes(sys.argv[1:]),
         "access_type": "offline",  # needed to receive a refresh token
         "prompt": "consent",
         "state": state,
