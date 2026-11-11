@@ -1,21 +1,26 @@
 package com.jobradar.dashboard;
 
+import com.jobradar.matching.internal.PostingMatcher;
+import com.jobradar.profile.ProfileService;
+import com.jobradar.profile.UserPreferences;
 import com.jobradar.tracker.TrackedApplication;
 import com.jobradar.tracker.TrackerService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Single-user, read-only views for the local dashboard. The user is the first row of
- * {@code app_user}: the local dashboard has no login because it only listens on 127.0.0.1.
- * Nothing here writes, sends or approves anything; applying stays in Telegram.
+ * Single-user views for the dashboard. The user is the first row of {@code app_user}.
+ * The only write is the search preferences; nothing here sends or approves an application.
  */
 @RestController
 @Profile({"local-dashboard", "dashboard"})
@@ -44,12 +49,49 @@ class DashboardController {
             Instant firstSeenAt,
             boolean cvReady) {}
 
+    record PreferencesView(
+            List<String> roles,
+            List<String> cities,
+            boolean remote,
+            List<String> jobTypes,
+            boolean entryLevelOnly,
+            int maxYearsExperience,
+            List<String> titleKeywords,
+            List<String> excludeKeywords,
+            boolean onboarded) {}
+
     private final JdbcTemplate jdbc;
     private final TrackerService tracker;
+    private final ProfileService profiles;
+    private final PostingMatcher matcher;
 
-    DashboardController(JdbcTemplate jdbc, TrackerService tracker) {
+    DashboardController(JdbcTemplate jdbc, TrackerService tracker, ProfileService profiles, PostingMatcher matcher) {
         this.jdbc = jdbc;
         this.tracker = tracker;
+        this.profiles = profiles;
+        this.matcher = matcher;
+    }
+
+    @GetMapping("/preferences")
+    Optional<PreferencesView> preferences() {
+        return userId().flatMap(id -> profiles.findPreferences(id).map(p -> view(p, profiles.isOnboarded(id))));
+    }
+
+    /** Saves the preferences, then re-filters the stored postings in the background. */
+    @PutMapping("/preferences")
+    PreferencesView savePreferences(@RequestBody PreferencesView body) {
+        long id = userId().orElseThrow(() -> new IllegalStateException("No user yet"));
+        int years = Math.max(0, Math.min(body.maxYearsExperience(), 20));
+        profiles.savePreferences(id, new ProfileService.EditablePreferences(
+                body.roles(), body.cities(), body.remote(), body.jobTypes(), body.entryLevelOnly(), years,
+                body.titleKeywords(), body.excludeKeywords()));
+        CompletableFuture.runAsync(() -> matcher.rematch(id));
+        return view(profiles.findPreferences(id).orElseThrow(), true);
+    }
+
+    private static PreferencesView view(UserPreferences p, boolean onboarded) {
+        return new PreferencesView(p.roles(), p.cities(), p.remote(), p.jobTypes(), p.entryLevelOnly(),
+                p.maxYearsExperience(), p.titleKeywords(), p.excludeKeywords(), onboarded);
     }
 
     private Optional<Long> userId() {

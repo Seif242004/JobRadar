@@ -64,18 +64,55 @@ public class PostingMatcher {
         Duration age = Bands.age(posting.postedAt(), posting.firstSeenAt(), now);
 
         for (UserPreferences user : profiles.findAllPreferences()) {
-            Eligibility eligibility = EligibilityFilter.check(posting, user, now);
-            // The hard filters run first: an ineligible posting costs no embedding or LLM call.
-            Optional<Fit> fit = eligibility.eligible() ? fitScorer.score(posting, user.userId()) : Optional.empty();
-            Double fitScore = fit.map(Fit::score).orElse(null);
-            Double priority = fit.map(f -> Bands.priority(f.score(), age)).orElse(null);
-            Band band = Bands.classify(age, fitScore, posting.deadline());
-            String reasons = eligibility.reason() + fit.map(f -> "; " + f.reason()).orElse("");
-            matches.upsert(user.userId(), postingId, eligibility.eligible(), fitScore, priority, band, reasons);
-            requestCv(user.userId(), postingId, eligibility.eligible(), fitScore, band);
-            events.publishEvent(new MatchScored(user.userId(), postingId, eligibility.eligible(), band, fitScore));
+            matchFor(posting, user, now, age);
         }
         return true;
+    }
+
+    private void matchFor(PostingView posting, UserPreferences user, Instant now, Duration age) {
+        long postingId = posting.id();
+        Eligibility eligibility = EligibilityFilter.check(posting, user, now);
+        // The hard filters run first: an ineligible posting costs no embedding or LLM call.
+        Optional<Fit> fit = eligibility.eligible() ? fitScorer.score(posting, user.userId()) : Optional.empty();
+        Double fitScore = fit.map(Fit::score).orElse(null);
+        Double priority = fit.map(f -> Bands.priority(f.score(), age)).orElse(null);
+        Band band = Bands.classify(age, fitScore, posting.deadline());
+        String reasons = eligibility.reason() + fit.map(f -> "; " + f.reason()).orElse("");
+        matches.upsert(user.userId(), postingId, eligibility.eligible(), fitScore, priority, band, reasons);
+        requestCv(user.userId(), postingId, eligibility.eligible(), fitScore, band);
+        events.publishEvent(new MatchScored(user.userId(), postingId, eligibility.eligible(), band, fitScore));
+    }
+
+    /**
+     * Re-runs the hard filters of one user over every stored posting after the user changed
+     * preferences. A posting whose verdict did not change is left alone, so only newly eligible
+     * postings cost an embedding call. Safe to repeat.
+     *
+     * @return how many postings changed verdict
+     */
+    public int rematch(long userId) {
+        Optional<UserPreferences> user = profiles.findPreferences(userId);
+        if (user.isEmpty()) {
+            return 0;
+        }
+        Instant now = clock.instant();
+        java.util.Map<Long, Boolean> previous = matches.eligibilityByPosting(userId);
+        int changed = 0;
+        for (long postingId : matches.allPostingIds()) {
+            Optional<PostingView> posting = matches.findPosting(postingId);
+            if (posting.isEmpty()) {
+                continue;
+            }
+            boolean eligible = EligibilityFilter.check(posting.get(), user.get(), now).eligible();
+            if (previous.containsKey(postingId) && previous.get(postingId) == eligible) {
+                continue;
+            }
+            Duration age = Bands.age(posting.get().postedAt(), posting.get().firstSeenAt(), now);
+            matchFor(posting.get(), user.get(), now, age);
+            changed++;
+        }
+        log.info("Rematched user {}: {} postings changed verdict", userId, changed);
+        return changed;
     }
 
     /**

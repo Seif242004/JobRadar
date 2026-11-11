@@ -16,7 +16,8 @@ public class ProfileService {
 
     private static final String SELECT =
             """
-            SELECT u.id, u.telegram_chat_id, p.roles, p.cities, p.remote, p.job_types, p.graduation_date
+            SELECT u.id, u.telegram_chat_id, p.roles, p.cities, p.remote, p.job_types, p.graduation_date,
+                   p.entry_level_only, p.max_years_experience, p.title_keywords, p.exclude_keywords
             FROM app_user u JOIN profile p ON p.user_id = u.id
             """;
 
@@ -37,6 +38,52 @@ public class ProfileService {
         return jdbc.query(SELECT + " WHERE u.id = ?", MAPPER, userId).stream().findFirst();
     }
 
+    /** Whether the user has confirmed the preferences once; the dashboard shows onboarding until then. */
+    public boolean isOnboarded(long userId) {
+        return Boolean.TRUE.equals(jdbc.queryForObject("SELECT onboarded FROM profile WHERE user_id = ?", Boolean.class, userId));
+    }
+
+    /** Replaces the editable search preferences and marks the user as onboarded. */
+    public void savePreferences(long userId, EditablePreferences prefs) {
+        jdbc.update(
+                """
+                UPDATE profile SET roles = ?::text[], cities = ?::text[], remote = ?, job_types = ?::text[],
+                    entry_level_only = ?, max_years_experience = ?, title_keywords = ?::text[],
+                    exclude_keywords = ?::text[], onboarded = TRUE
+                WHERE user_id = ?
+                """,
+                literal(prefs.roles()), literal(prefs.cities()), prefs.remote(), literal(prefs.jobTypes()),
+                prefs.entryLevelOnly(), prefs.maxYearsExperience(), literal(prefs.titleKeywords()),
+                literal(prefs.excludeKeywords()), userId);
+    }
+
+    /** The preferences a user may edit; everything else on the profile is fixed by the seed. */
+    public record EditablePreferences(
+            List<String> roles,
+            List<String> cities,
+            boolean remote,
+            List<String> jobTypes,
+            boolean entryLevelOnly,
+            int maxYearsExperience,
+            List<String> titleKeywords,
+            List<String> excludeKeywords) {}
+
+    /** A Postgres array literal; every element is quoted so commas and braces in it are harmless. */
+    private static String literal(List<String> values) {
+        StringBuilder sb = new StringBuilder("{");
+        for (String value : values) {
+            String clean = value == null ? "" : value.strip();
+            if (clean.isEmpty()) {
+                continue;
+            }
+            if (sb.length() > 1) {
+                sb.append(',');
+            }
+            sb.append('"').append(clean.replace("\\", "\\\\").replace("\"", "\\\"")).append('"');
+        }
+        return sb.append('}').toString();
+    }
+
     private static UserPreferences map(ResultSet rs, int rowNum) throws SQLException {
         long chatId = rs.getLong("telegram_chat_id");
         Long telegramChatId = rs.wasNull() ? null : chatId;
@@ -48,7 +95,11 @@ public class ProfileService {
                 strings(rs.getArray("cities")),
                 rs.getBoolean("remote"),
                 strings(rs.getArray("job_types")),
-                graduation == null ? null : graduation.toLocalDate());
+                graduation == null ? null : graduation.toLocalDate(),
+                rs.getBoolean("entry_level_only"),
+                rs.getInt("max_years_experience"),
+                strings(rs.getArray("title_keywords")),
+                strings(rs.getArray("exclude_keywords")));
     }
 
     private static List<String> strings(Array array) throws SQLException {
