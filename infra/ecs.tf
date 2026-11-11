@@ -58,6 +58,8 @@ locals {
       { name = "JOBRADAR_SQS_BACKLOG_URL", value = local.queue_urls["backlog"] },
       # Connectors poll on their own schedules inside this one task.
       { name = "JOBRADAR_INGESTION_SCHEDULING_ENABLED", value = "true" },
+      # Gmail alert reader (the user's own label, read-only).
+      { name = "JOBRADAR_GOOGLE_CLIENT_ID", value = var.google_client_id },
     ]
     tailoring-worker = [
       { name = "JOBRADAR_SQS_TAILOR_HOT_URL", value = local.queue_urls["tailor-hot"] },
@@ -67,7 +69,7 @@ locals {
   }
   service_secrets = {
     api              = [local.db_password_secret, local.ai_key_secret, { name = "JOBRADAR_TELEGRAM_BOT_TOKEN", valueFrom = aws_secretsmanager_secret.telegram_bot_token.arn }, { name = "JOBRADAR_GOOGLE_CLIENT_SECRET", valueFrom = aws_secretsmanager_secret.google_client_secret.arn }]
-    ingestion-worker = [local.db_password_secret]
+    ingestion-worker = [local.db_password_secret, { name = "JOBRADAR_GOOGLE_CLIENT_SECRET", valueFrom = aws_secretsmanager_secret.google_client_secret.arn }]
     tailoring-worker = [local.db_password_secret, local.ai_key_secret]
   }
 }
@@ -148,6 +150,8 @@ locals {
     ingestion-worker = [
       { actions = ["sqs:SendMessage"], resources = [for key in ["hot", "backlog"] : aws_sqs_queue.work[key].arn] },
       { actions = ["s3:PutObject"], resources = ["${aws_s3_bucket.data.arn}/raw/*"] },
+      # Users' Gmail refresh tokens, to read the alert label.
+      { actions = ["secretsmanager:GetSecretValue"], resources = ["arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:${var.name}/gmail/*"] },
     ]
     tailoring-worker = [
       { actions = local.consume, resources = [for key in ["tailor-hot", "tailor-backlog"] : aws_sqs_queue.work[key].arn] },
