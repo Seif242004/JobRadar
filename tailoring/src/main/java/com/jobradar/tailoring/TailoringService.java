@@ -2,7 +2,7 @@ package com.jobradar.tailoring;
 
 import com.jobradar.tailoring.internal.AtsChecker;
 import com.jobradar.tailoring.internal.AtsReport;
-import com.jobradar.tailoring.internal.AtsScorer;
+import com.jobradar.cvscore.AtsScorer;
 import com.jobradar.tailoring.internal.BulletBalancer;
 import com.jobradar.tailoring.internal.CvSummary;
 import com.jobradar.tailoring.internal.NoInvention;

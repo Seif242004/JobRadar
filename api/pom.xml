@@ -20,6 +20,10 @@
         </dependency>
         <dependency>
             <groupId>com.jobradar</groupId>
+            <artifactId>cvscore</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jobradar</groupId>
             <artifactId>matching</artifactId>
         </dependency>
         <dependency>

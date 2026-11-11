@@ -15,6 +15,10 @@ import {
   fetchSummaries,
   fetchSummary,
   rebuildCv,
+  fetchBaseCvs,
+  deleteBaseCv,
+  uploadBaseCv,
+  type BaseCv,
   savePreferences,
   signIn,
 } from "./api";
@@ -212,6 +216,25 @@ function PostingSheet({ id, onClose }: { id: number; onClose: () => void }) {
             </div>
             <p className="muted small">You submit applications yourself; JobRadar never sends one without your approval.</p>
 
+            {posting.baseScores.length > 0 && (
+              <div className="ats">
+                <h3>Your CVs against this posting</h3>
+                <ul className="list">
+                  {posting.baseScores.map((b, i) => (
+                    <li key={b.cvId} className="card">
+                      <span className="row">
+                        <b>{b.label}{i === 0 && posting.baseScores.length > 1 ? " (best)" : ""}</b>
+                        <span className={`fit ${b.ats >= 70 ? "hi" : b.ats >= 50 ? "mid" : ""}`}>{Math.round(b.ats)}% ATS</span>
+                      </span>
+                      <a href={`/api/dashboard/base-cvs/${b.cvId}/file`} target="_blank" rel="noreferrer">Open this CV</a>
+                      {b.missing.length > 0 && <span className="muted small">Missing keywords: {b.missing.join(", ")}</span>}
+                    </li>
+                  ))}
+                </ul>
+                <p className="muted small">Your own CVs are used as they are. Tailoring below is optional.</p>
+              </div>
+            )}
+
             {posting.cv ? (
               <div className="ats">
                 <h3>ATS check <span className={`fit ${posting.cv.atsScore >= 70 ? "hi" : posting.cv.atsScore >= 50 ? "mid" : ""}`}>{Math.round(posting.cv.atsScore)}%</span></h3>
@@ -403,8 +426,49 @@ function Onboarding({ initial, onDone }: { initial: Preferences | null; onDone: 
 function Settings({ prefs, onSaved }: { prefs: Preferences; onSaved: () => void }) {
   const [summaries, setSummaries] = useState<SummaryRow[]>([]);
   useEffect(() => { fetchSummaries().then(setSummaries).catch(() => setSummaries([])); }, []);
+  const [cvs, setCvs] = useState<BaseCv[]>([]);
+  const [cvError, setCvError] = useState<string | null>(null);
+  const loadCvs = useCallback(() => fetchBaseCvs().then(setCvs).catch(() => setCvs([])), []);
+  useEffect(() => { loadCvs(); }, [loadCvs]);
   return (
     <section>
+      <h2>Your CVs</h2>
+      <p className="muted small">
+        Upload your finished PDFs. They are stored unchanged and every posting is scored against them.
+      </p>
+      <ul className="list">
+        {cvs.map((c) => (
+          <li key={c.id} className="card">
+            <span className="row"><b>{c.label}</b><span className="muted small">{c.filename}</span></span>
+            <a href={`/api/dashboard/base-cvs/${c.id}/file`} target="_blank" rel="noreferrer">Open</a>
+            <button onClick={async () => { await deleteBaseCv(c.id); loadCvs(); }}>Remove</button>
+          </li>
+        ))}
+        {cvs.length === 0 && <li className="empty">No CV uploaded yet.</li>}
+      </ul>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const form = e.currentTarget;
+          const label = (form.elements.namedItem("label") as HTMLInputElement).value;
+          const file = (form.elements.namedItem("file") as HTMLInputElement).files?.[0];
+          if (!file) return;
+          try {
+            setCvError(null);
+            await uploadBaseCv(label, file);
+            form.reset();
+            loadCvs();
+          } catch (err) {
+            setCvError((err as Error).message);
+          }
+        }}
+      >
+        <label>Name <input name="label" required placeholder="Backend" /></label>
+        <label>PDF <input name="file" type="file" accept="application/pdf" required /></label>
+        <button type="submit">Upload CV</button>
+        {cvError && <p className="error">{cvError}</p>}
+      </form>
+
       <h2>Search preferences</h2>
       <PreferenceForm initial={prefs} submitLabel="Save preferences" onSubmit={async (p) => { await savePreferences(p); onSaved(); }} />
 

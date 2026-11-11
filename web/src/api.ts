@@ -74,7 +74,11 @@ export interface PostingDetail {
   applyChannel: string | null;
   applyTarget: string | null;
   cv: CvInfo | null;
+  baseScores: BaseScore[];
 }
+
+export interface BaseCv { id: number; label: string; filename: string }
+export interface BaseScore { cvId: number; label: string; ats: number; keywords: number; missing: string[] }
 
 export interface SummaryRow {
   id: number;
@@ -116,6 +120,14 @@ export const fetchPreferences = () => call<Preferences | null>("preferences");
 export const savePreferences = (p: Preferences) => call<Preferences>("preferences", json("PUT", p));
 export const fetchPosting = (id: number) => call<PostingDetail>(`postings/${id}`);
 export const rebuildCv = (id: number) => call<{ status: string }>(`postings/${id}/cv/rebuild`, { method: "POST" });
+export const fetchBaseCvs = () => call<BaseCv[]>("base-cvs");
+export const deleteBaseCv = (id: number) => call<null>(`base-cvs/${id}`, { method: "DELETE" });
+export const uploadBaseCv = (label: string, file: File) => {
+  const form = new FormData();
+  form.append("label", label);
+  form.append("file", file);
+  return call<BaseCv>("base-cvs", { method: "POST", body: form });
+};
 export const fetchSummaries = () => call<SummaryRow[]>("summaries");
 export const confirmSummary = (id: number, confirmed: boolean) =>
   call<null>(`summaries/${id}/confirm`, json("POST", { confirmed }));

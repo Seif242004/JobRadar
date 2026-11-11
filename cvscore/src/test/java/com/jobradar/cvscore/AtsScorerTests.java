@@ -1,4 +1,4 @@
-package com.jobradar.tailoring.internal;
+package com.jobradar.cvscore;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

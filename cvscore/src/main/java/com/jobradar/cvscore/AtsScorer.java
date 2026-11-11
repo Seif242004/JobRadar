@@ -1,4 +1,4 @@
-package com.jobradar.tailoring.internal;
+package com.jobradar.cvscore;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  */
 public final class AtsScorer {
 
-    static final int MAX_KEYWORDS = 30;
+    public static final int MAX_KEYWORDS = 30;
 
     /** Letters and digits, keeping the characters of names like C++, C#, .NET and Node.js. */
     private static final Pattern TOKEN = Pattern.compile("[\\p{L}\\p{N}][\\p{L}\\p{N}+#.]*");
@@ -45,7 +45,18 @@ public final class AtsScorer {
         return Math.round(covered * 1000.0 / keywords.size()) / 10.0;
     }
 
-    static Set<String> keywords(String title, String description) {
+    /** Posting keywords that the CV text does not contain, most important first. */
+    public static List<String> missing(String postingTitle, String postingDescription, String cvText) {
+        Set<String> cvTokens = new LinkedHashSet<>(tokens(cvText));
+        return keywords(postingTitle, postingDescription).stream().filter(k -> !cvTokens.contains(k)).toList();
+    }
+
+    /** Number of keywords taken from the posting; the denominator of the score. */
+    public static int keywordCount(String postingTitle, String postingDescription) {
+        return keywords(postingTitle, postingDescription).size();
+    }
+
+    public static Set<String> keywords(String title, String description) {
         Set<String> keywords = new LinkedHashSet<>(tokens(title));
         Map<String, Integer> counts = new HashMap<>();
         for (String token : tokens(description)) {
@@ -62,7 +73,7 @@ public final class AtsScorer {
     }
 
     /** Lower-case tokens without stopwords, single characters or pure numbers. */
-    static List<String> tokens(String text) {
+    public static List<String> tokens(String text) {
         if (text == null) {
             return List.of();
         }

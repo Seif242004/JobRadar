@@ -29,6 +29,7 @@
     <modules>
         <module>llm</module>
         <module>profile</module>
+        <module>cvscore</module>
         <module>ingestion</module>
         <module>matching</module>
         <module>tailoring</module>
@@ -74,6 +75,11 @@
             <dependency>
                 <groupId>com.jobradar</groupId>
                 <artifactId>matching</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jobradar</groupId>
+                <artifactId>cvscore</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
