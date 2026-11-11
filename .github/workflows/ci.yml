@@ -24,8 +24,11 @@ jobs:
       # The tailoring-worker tests render real PDFs: they need the Typst CLI and the CV font.
       - name: Install Typst and fonts
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq fonts-crosextra-carlito
+          # The runner's apt mirrors are sometimes unreachable. Carlito is only a nicety: without it
+          # Typst falls back to its bundled Libertinus Serif, so a failed install must not fail the build.
+          sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=20 update -qq || true
+          sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=20 install -y -qq fonts-crosextra-carlito \
+            || echo "::warning::Carlito not installed; the CV tests run with the fallback font"
           curl -fsSL https://github.com/typst/typst/releases/download/v0.15.1/typst-x86_64-unknown-linux-musl.tar.xz \
             | tar -xJ --strip-components=1 -C /tmp typst-x86_64-unknown-linux-musl/typst
           sudo install /tmp/typst /usr/local/bin/typst
