@@ -89,7 +89,9 @@ public class OpenAiCompatibleClient implements LlmClient, EmbeddingClient {
         body.put("model", properties.embeddingModel());
         body.put("input", texts);
         body.put("encoding_format", "float");
-        body.put("dimensions", properties.embeddingDimensions());
+        if (properties.embeddingDimensions() > 0) {
+            body.put("dimensions", properties.embeddingDimensions());
+        }
         if (!properties.embeddingInputType().isBlank()) {
             body.put("input_type", properties.embeddingInputType());
         }
@@ -101,13 +103,24 @@ public class OpenAiCompatibleClient implements LlmClient, EmbeddingClient {
         float[][] vectors = new float[texts.size()][];
         for (JsonNode item : data) {
             JsonNode values = item.path("embedding");
-            if (values.size() != DIMENSIONS) {
+            boolean truncate = properties.embeddingTruncate() && values.size() > DIMENSIONS;
+            if (values.size() != DIMENSIONS && !truncate) {
                 throw new LlmUnavailableException("Embedding model returned " + values.size()
                         + " dimensions, the schema expects " + DIMENSIONS);
             }
             float[] vector = new float[DIMENSIONS];
             for (int i = 0; i < DIMENSIONS; i++) {
                 vector[i] = (float) values.get(i).asDouble();
+            }
+            if (truncate) {
+                double norm = 0;
+                for (float v : vector) {
+                    norm += (double) v * v;
+                }
+                norm = Math.sqrt(norm);
+                for (int i = 0; i < DIMENSIONS && norm > 0; i++) {
+                    vector[i] = (float) (vector[i] / norm);
+                }
             }
             vectors[item.path("index").asInt()] = vector;
         }

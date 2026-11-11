@@ -53,7 +53,7 @@ class OpenAiCompatibleClientTests {
     private OpenAiCompatibleClient client(String key, int dailyCap, Clock clock) {
         AiProperties properties = new AiProperties(
                 "http://127.0.0.1:" + server.getAddress().getPort() + "/v1/",
-                key, "primary-model", List.of("backup-model"), "embed-model", 1024, "passage", dailyCap, Duration.ofSeconds(5));
+                key, "primary-model", List.of("backup-model"), "embed-model", 1024, "passage", false, dailyCap, Duration.ofSeconds(5));
         return new OpenAiCompatibleClient(properties, JsonMapper.builder().build(), clock);
     }
 
@@ -144,6 +144,26 @@ class OpenAiCompatibleClientTests {
         assertThatThrownBy(() -> client("secret", 10, Clock.systemUTC()).embed(List.of("text")))
                 .isInstanceOf(LlmUnavailableException.class)
                 .hasMessageContaining("3 dimensions, the schema expects 1024");
+    }
+
+    @Test
+    void aLargerEmbeddingIsCutToTheSchemaSizeAndRenormalisedWhenTruncationIsOn() {
+        String wide = "[" + "0.5,".repeat(2047) + "0.5]";
+        responder = body -> new Object[] {200, "{" + '"' + "data" + '"' + ":[{" + '"' + "index" + '"' + ":0," + '"' + "embedding" + '"' + ":" + wide + "}]}"};
+        AiProperties properties = new AiProperties(
+                "http://127.0.0.1:" + server.getAddress().getPort() + "/v1/",
+                "secret", "m", List.of(), "wide-model", 0, "passage", true, 10, Duration.ofSeconds(5));
+
+        float[] vector = new OpenAiCompatibleClient(properties, JsonMapper.builder().build(), Clock.systemUTC())
+                .embed(List.of("text")).get(0);
+
+        assertThat(vector).hasSize(EmbeddingClient.DIMENSIONS);
+        double norm = 0;
+        for (float v : vector) {
+            norm += (double) v * v;
+        }
+        assertThat(Math.sqrt(norm)).isCloseTo(1.0, org.assertj.core.data.Offset.offset(1e-5));
+        assertThat(requestBodies.get(requestBodies.size() - 1)).doesNotContain("dimensions");
     }
 
     private static String vector(double value) {
