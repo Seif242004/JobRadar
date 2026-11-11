@@ -232,7 +232,9 @@ function PostingSheet({ id, onClose }: { id: number; onClose: () => void }) {
             <div className="actions">
               {posting.cv && <a className="button primary" href={posting.cv.pdfUrl} target="_blank" rel="noreferrer">Open tailored CV</a>}
               {apply && <a className="button" href={apply} target="_blank" rel="noreferrer noopener">Open posting</a>}
+              {apply && posting.applyChannel === "google_form" && <span className="muted">Applies through a Google Form</span>}
               {!apply && posting.applyTarget && <span className="muted">Apply by e-mail: {posting.applyTarget}</span>}
+              {posting.sourceUrl && <a className="button" href={posting.sourceUrl} target="_blank" rel="noreferrer noopener">Open original posting</a>}
             </div>
             <p className="muted small">You submit applications yourself; JobRadar never sends one without your approval.</p>
 

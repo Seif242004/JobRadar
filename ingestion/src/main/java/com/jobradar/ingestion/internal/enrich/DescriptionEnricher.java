@@ -106,6 +106,11 @@ public class DescriptionEnricher {
             jdbc.update(
                     "UPDATE posting SET description = ?, embedding = NULL, enriched_at = ?, enrich_status = 'full' WHERE id = ?",
                     text.length() > 20000 ? text.substring(0, 20000) : text, Timestamp.from(clock.instant()), candidate.id());
+            // The full page may name a Google Form or an e-mail address; keep the page link as source_url.
+            ApplyMethodDetector.detect(text).ifPresent(m -> jdbc.update(
+                    "UPDATE posting SET source_url = apply_target, apply_channel = ?, apply_target = ? WHERE id = ? AND source_url IS NULL"
+                            + " AND (apply_channel IS NULL OR apply_channel IN ('platform', 'ats_form'))",
+                    m.channel(), m.target(), candidate.id()));
             Instant seen = candidate.firstSeenAt();
             PostingQueue queue = PostingAge.isHot(candidate.postedAt(), seen, clock.instant()) ? PostingQueue.HOT : PostingQueue.BACKLOG;
             publisher.publish(new PostingIngested(candidate.id(), seen, candidate.postedAt()), queue);
