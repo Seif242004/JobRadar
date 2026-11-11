@@ -7,6 +7,7 @@ import com.jobradar.ingestion.internal.resolver.CareersResolver;
 import com.jobradar.ingestion.internal.resolver.WatchlistSeeder;
 import com.jobradar.ingestion.PostingPublisher;
 import com.jobradar.ingestion.internal.enrich.DescriptionEnricher;
+import com.jobradar.ingestion.internal.enrich.ManualIntake;
 import com.jobradar.ingestion.internal.source.HttpFetcher;
 import java.time.Clock;
 import java.util.List;
@@ -43,5 +44,11 @@ class SchedulingConfiguration {
     DescriptionEnricher descriptionEnricher(
             JdbcTemplate jdbc, HttpFetcher http, PostingPublisher publisher, Clock clock) {
         return new DescriptionEnricher(jdbc, http, publisher, clock);
+    }
+
+    /** Queues postings the user added or pasted text into from the dashboard. */
+    @Bean
+    ManualIntake manualIntake(JdbcTemplate jdbc, PostingPublisher publisher, Clock clock) {
+        return new ManualIntake(jdbc, publisher, clock);
     }
 }

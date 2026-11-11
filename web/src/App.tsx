@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import {
   ApplicationRow,
   MatchRow,
@@ -21,10 +21,12 @@ import {
   type BaseCv,
   savePreferences,
   signIn,
+  addPosting,
+  pasteDescription,
 } from "./api";
 import { DEFAULT_EXCLUDES, JOB_TYPES, ROLE_PRESETS, presetIdsFromRoles } from "./presets";
 
-type Tab = "matches" | "applications" | "settings";
+type Tab = "matches" | "add" | "applications" | "settings";
 
 /** "2h ago", "3d ago": freshness is the main thing a job seeker scans for. */
 function ago(iso: string): string {
@@ -90,13 +92,14 @@ export function App() {
       </header>
       <main>
         {tab === "matches" && <Matches rows={matches} onOpen={setOpenId} />}
+        {tab === "add" && <AddPosting onAdded={(id) => { load(); setTab("matches"); setOpenId(id); }} />}
         {tab === "applications" && <Applications rows={applications} />}
         {tab === "settings" && <Settings prefs={prefs} onSaved={load} />}
       </main>
       <nav className="tabs" aria-label="Sections">
-        {(["matches", "applications", "settings"] as Tab[]).map((t) => (
+        {(["matches", "add", "applications", "settings"] as Tab[]).map((t) => (
           <button key={t} className={tab === t ? "on" : ""} aria-current={tab === t} onClick={() => setTab(t)}>
-            {t === "matches" ? "Matches" : t === "applications" ? "Applied" : "Settings"}
+            {t === "matches" ? "Matches" : t === "add" ? "Add" : t === "applications" ? "Applied" : "Settings"}
           </button>
         ))}
       </nav>
@@ -192,6 +195,78 @@ function Matches({ rows, onOpen }: { rows: MatchRow[]; onOpen: (id: number) => v
   );
 }
 
+// ------------------------------------------------------------------------------ add / paste
+/** Add a posting seen in an app or on a phone: paste its link, its text, or both. */
+function AddPosting({ onAdded }: { onAdded: (id: number) => void }) {
+  const [url, setUrl] = useState("");
+  const [title, setTitle] = useState("");
+  const [company, setCompany] = useState("");
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const { id } = await addPosting({ url, title, company, text });
+      onAdded(id);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <form className="add" onSubmit={submit}>
+      <h2>Add a posting</h2>
+      <p className="muted small">Seen one in the Indeed or Bayt app? Paste its link, or copy the whole post text. It is scored against both your CVs within a minute.</p>
+      <label>Link <input type="url" inputMode="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://" /></label>
+      <label>Posting text <textarea rows={8} value={text} onChange={(e) => setText(e.target.value)} /></label>
+      <label>Title (optional) <input value={title} onChange={(e) => setTitle(e.target.value)} /></label>
+      <label>Company (optional) <input value={company} onChange={(e) => setCompany(e.target.value)} /></label>
+      {error && <p className="error" role="alert">{error}</p>}
+      <button className="primary" disabled={busy || (!url.trim() && text.trim().length < 40)}>{busy ? "Adding…" : "Add and score"}</button>
+    </form>
+  );
+}
+
+/** One-tap fix for a low-confidence posting: paste the real text and it is scored again. */
+function PasteDescription({ id, onDone }: { id: number; onDone: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  if (!open) return <button onClick={() => setOpen(true)}>Paste full description</button>;
+  return (
+    <div className="paste">
+      <label>Full posting text <textarea rows={8} value={text} onChange={(e) => setText(e.target.value)} /></label>
+      {error && <p className="error" role="alert">{error}</p>}
+      <button
+        className="primary"
+        disabled={busy || text.trim().length < 40}
+        onClick={async () => {
+          setBusy(true);
+          try {
+            await pasteDescription(id, text);
+            setOpen(false);
+            onDone();
+          } catch (err) {
+            setError((err as Error).message);
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        {busy ? "Saving…" : "Save and score again"}
+      </button>
+    </div>
+  );
+}
+
 function PostingSheet({ id, onClose }: { id: number; onClose: () => void }) {
   const [posting, setPosting] = useState<PostingDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -225,9 +300,10 @@ function PostingSheet({ id, onClose }: { id: number; onClose: () => void }) {
             {posting.thin && (
               <p className="muted small" role="note">
                 Low-confidence score: only a short description is stored
-                {posting.enrichStatus === "blocked" ? " (the full page is on a site that does not allow automated reading)" : ""}. Open the posting to read the full text.
+                {posting.enrichStatus === "blocked" ? " (the full page is on a site that does not allow automated reading)" : ""}. Open the posting, copy the text, and paste it here.
               </p>
             )}
+            {posting.thin && <PasteDescription id={id} onDone={() => setNote("Saved. The score updates in about a minute.")} />}
 
             <div className="actions">
               {posting.cv && <a className="button primary" href={posting.cv.pdfUrl} target="_blank" rel="noreferrer">Open tailored CV</a>}
@@ -349,7 +425,7 @@ function PreferenceForm({ initial, submitLabel, onSubmit }: { initial: Preferenc
 
   const toggle = <T,>(list: T[], item: T) => (list.includes(item) ? list.filter((x) => x !== item) : [...list, item]);
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
     const chosen = ROLE_PRESETS.filter((p) => presets.includes(p.id));
     const keywords = [...new Set([...chosen.flatMap((p) => p.keywords), ...splitList(extraKeywords)])];

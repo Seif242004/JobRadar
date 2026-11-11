@@ -91,3 +91,8 @@ details { margin-top: 16px; } summary { min-height: 44px; display: flex; align-i
 @media (min-width: 900px) { .tabs { max-width: 720px; left: 50%; transform: translateX(-50%); border-radius: 14px 14px 0 0; border: 1px solid var(--line); }
   .sheet-backdrop { align-items: center; } .sheet { border-radius: 20px; } }
 @media (prefers-reduced-motion: no-preference) { button, .button { transition: background-color .15s, color .15s; } }
+
+/* add posting + paste description */
+.add, .paste { display: grid; gap: 10px; max-width: 640px; }
+.add label, .paste label { display: grid; gap: 4px; }
+.add textarea, .paste textarea, .add input { width: 100%; font: inherit; }
