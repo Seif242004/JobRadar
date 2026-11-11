@@ -1,18 +1,20 @@
 # web
 
-Local, read-only dashboard (summary, matches, applications). Single user, no login, no writes.
-Decision recorded in SPEC.md (M4): local only, no load balancer, no invite flow.
+Mobile-first dashboard: onboarding (roles, level, where, job type), matches as cards with the
+fit score and freshness, a posting sheet with the tailored CV, its ATS report and fixes, applications,
+and Settings (search preferences and the CV summary lines you confirm). Single user.
+Layout notes and what was borrowed from other products: [docs/PRODUCT_RESEARCH.md](../docs/PRODUCT_RESEARCH.md).
 
 ## Run
 
-1. Start the database (`docker compose up -d`), or tunnel to RDS yourself. RDS is not publicly
-   accessible and there is no bastion, so a tunnel is your own setup.
-2. Start the api bound to 127.0.0.1 with the dashboard profile:
-   `./mvnw -pl api spring-boot:run -Dspring-boot.run.profiles=local-dashboard`
+1. Start the database and LocalStack (`docker compose up -d`).
+2. Start the api with the dashboard profile:
+   `SPRING_PROFILES_ACTIVE=dashboard ./mvnw -pl api spring-boot:run`
 3. `cd web && npm ci && npm run dev`, then open http://127.0.0.1:5173
 
-The `/api/dashboard/*` endpoints exist only under the `local-dashboard` profile; the deployed api
-does not expose them.
+## On a phone
 
-On Windows, `start-jobradar.bat` runs the api with the `dashboard` profile: the same endpoints as `local-dashboard`,
-but the matching and notifier listeners stay on, and the api is bound to 127.0.0.1 through `SERVER_ADDRESS`.
+Set `JOBRADAR_DASHBOARD_TOKEN` (16+ characters) and `JOBRADAR_PUBLIC_URL` (the https address of your
+tunnel) in `.env`. Every dashboard call then needs the token: open `https://<your-url>/?token=...`
+once on the phone (or enter the key on the sign-in screen) and it is remembered as a cookie. CV links
+in notifications are signed and expire after seven days. The api refuses to start with a public URL and no token.

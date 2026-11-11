@@ -1,82 +1,430 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ApplicationRow,
   MatchRow,
+  Preferences,
+  PostingDetail,
   Summary,
+  SummaryRow,
+  Unauthorized,
+  confirmSummary,
   fetchApplications,
   fetchMatches,
+  fetchPosting,
+  fetchPreferences,
+  fetchSummaries,
   fetchSummary,
+  rebuildCv,
+  savePreferences,
+  signIn,
 } from "./api";
+import { DEFAULT_EXCLUDES, JOB_TYPES, ROLE_PRESETS, presetIdsFromRoles } from "./presets";
 
-type State = { summary: Summary | null; matches: MatchRow[]; applications: ApplicationRow[] };
+type Tab = "matches" | "applications" | "settings";
+
+/** "2h ago", "3d ago": freshness is the main thing a job seeker scans for. */
+function ago(iso: string): string {
+  const minutes = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 60 * 48) return `${Math.round(minutes / 60)}h ago`;
+  return `${Math.round(minutes / 1440)}d ago`;
+}
+
+const splitList = (text: string) =>
+  text
+    .split(/[,\n]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 
 export function App() {
-  const [state, setState] = useState<State | null>(null);
+  const [auth, setAuth] = useState<"checking" | "needed" | "ok">("checking");
+  const [summary, setSummary] = useState<Summary | null>(null);
+  const [prefs, setPrefs] = useState<Preferences | null>(null);
+  const [matches, setMatches] = useState<MatchRow[]>([]);
+  const [applications, setApplications] = useState<ApplicationRow[]>([]);
+  const [tab, setTab] = useState<Tab>("matches");
   const [error, setError] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<number | null>(null);
 
-  useEffect(() => {
-    // Load all three read-only views together.
-    Promise.all([fetchSummary(), fetchMatches(), fetchApplications()])
-      .then(([summary, matches, applications]) => setState({ summary, matches, applications }))
-      .catch((e: Error) => setError(e.message));
+  const load = useCallback(async () => {
+    try {
+      const [s, p, m, a] = await Promise.all([fetchSummary(), fetchPreferences(), fetchMatches(), fetchApplications()]);
+      setSummary(s);
+      setPrefs(p);
+      setMatches(m);
+      setApplications(a);
+      setAuth("ok");
+      setError(null);
+    } catch (e) {
+      if (e instanceof Unauthorized) setAuth("needed");
+      else setError((e as Error).message);
+    }
   }, []);
 
-  if (error) return <main><p className="error">Could not load the dashboard: {error}. Is the api running with the local-dashboard profile?</p></main>;
-  if (!state) return <main><p>Loading…</p></main>;
-  if (!state.summary) return <main><p>No user yet. Import a profile seed first.</p></main>;
+  useEffect(() => {
+    load();
+    const timer = setInterval(load, 5 * 60 * 1000); // fresh postings arrive all day
+    return () => clearInterval(timer);
+  }, [load]);
 
-  const s = state.summary;
-  const stats: [string, number][] = [
-    ["Postings", s.postings],
-    ["Eligible matches", s.eligibleMatches],
-    ["Hot/warm with CV", s.hotOrWarmWithCv],
-    ["Applications", s.applications],
-    ["Replies", s.replies],
-    ["Follow-ups due", s.followUpsDue],
-  ];
+  if (auth === "checking" && !error) return <main className="center"><p className="muted">Loading…</p></main>;
+  if (auth === "needed") return <SignIn onDone={load} />;
+  if (error) return <main className="center"><p className="error">Could not load: {error}</p><button onClick={load}>Try again</button></main>;
+  if (!summary) return <main className="center"><p>No profile yet. Import your profile seed first.</p></main>;
+  if (!prefs?.onboarded) return <Onboarding initial={prefs} onDone={load} />;
 
   return (
-    <main>
-      <h1>JobRadar <small>{s.email}</small></h1>
-      <section className="stats">
-        {stats.map(([label, value]) => (
-          <div key={label} className="stat"><b>{value}</b><span>{label}</span></div>
+    <div className="app">
+      <header className="top">
+        <h1>JobRadar</h1>
+        <span className="muted">{summary.eligibleMatches} matches · {summary.applications} applied</span>
+      </header>
+      <main>
+        {tab === "matches" && <Matches rows={matches} onOpen={setOpenId} />}
+        {tab === "applications" && <Applications rows={applications} />}
+        {tab === "settings" && <Settings prefs={prefs} onSaved={load} />}
+      </main>
+      <nav className="tabs" aria-label="Sections">
+        {(["matches", "applications", "settings"] as Tab[]).map((t) => (
+          <button key={t} className={tab === t ? "on" : ""} aria-current={tab === t} onClick={() => setTab(t)}>
+            {t === "matches" ? "Matches" : t === "applications" ? "Applied" : "Settings"}
+          </button>
         ))}
-      </section>
+      </nav>
+      {openId !== null && <PostingSheet id={openId} onClose={() => setOpenId(null)} />}
+    </div>
+  );
+}
 
-      <h2>Matches</h2>
-      {state.matches.length === 0 ? <p>No eligible matches yet.</p> : (
-        <table>
-          <thead><tr><th>Title</th><th>Company</th><th>Location</th><th>Band</th><th>Fit</th><th>CV</th><th>Apply</th></tr></thead>
-          <tbody>
-            {state.matches.map((m) => (
-              <tr key={m.postingId} title={m.reasons ?? ""}>
-                <td>{m.title}</td>
-                <td>{m.company ?? "—"}</td>
-                <td>{m.location ?? "—"}</td>
-                <td>{m.band}</td>
-                <td>{m.fit ?? "—"}</td>
-                <td>{m.cvReady ? "ready" : "—"}</td>
-                <td>{m.applyTarget && /^https?:\/\//.test(m.applyTarget)
-                  ? <a href={m.applyTarget} target="_blank" rel="noreferrer noopener">open</a>
-                  : (m.applyTarget ?? "—")}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+// ------------------------------------------------------------------------------ sign-in
 
-      <h2>Applications</h2>
-      {state.applications.length === 0 ? <p>No applications yet.</p> : (
-        <table>
-          <thead><tr>{Object.keys(state.applications[0]).map((k) => <th key={k}>{k}</th>)}</tr></thead>
-          <tbody>
-            {state.applications.map((a, i) => (
-              <tr key={i}>{Object.values(a).map((v, j) => <td key={j}>{v == null ? "—" : String(v)}</td>)}</tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+function SignIn({ onDone }: { onDone: () => void }) {
+  const [token, setToken] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  return (
+    <main className="center">
+      <form
+        className="card narrow"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          try {
+            await signIn(token.trim());
+            onDone();
+          } catch {
+            setError("That access key did not work.");
+          }
+        }}
+      >
+        <h1>JobRadar</h1>
+        <label htmlFor="token">Access key</label>
+        <input id="token" type="password" autoComplete="current-password" value={token} onChange={(e) => setToken(e.target.value)} />
+        {error && <p className="error" role="alert">{error}</p>}
+        <button className="primary" type="submit" disabled={token.trim().length < 8}>Open dashboard</button>
+      </form>
     </main>
+  );
+}
+
+// ------------------------------------------------------------------------------ matches
+
+function Matches({ rows, onOpen }: { rows: MatchRow[]; onOpen: (id: number) => void }) {
+  const [filter, setFilter] = useState<"all" | "hot" | "cv">("all");
+  const shown = rows.filter((m) => (filter === "hot" ? m.band === "hot" : filter === "cv" ? m.cvReady : true));
+  return (
+    <section>
+      <div className="chips" role="group" aria-label="Filter">
+        {([["all", "All"], ["hot", "Hot"], ["cv", "CV ready"]] as const).map(([id, label]) => (
+          <button key={id} className={`chip ${filter === id ? "on" : ""}`} aria-pressed={filter === id} onClick={() => setFilter(id)}>
+            {label}
+          </button>
+        ))}
+      </div>
+      {shown.length === 0 ? (
+        <p className="empty">
+          {rows.length === 0
+            ? "No matches yet. New postings are checked every 15 minutes; widen your preferences in Settings if this stays empty."
+            : "Nothing in this filter."}
+        </p>
+      ) : (
+        <ul className="list">
+          {shown.map((m) => (
+            <li key={m.postingId}>
+              <button className="card job" onClick={() => onOpen(m.postingId)}>
+                <span className="row">
+                  <b dir="auto" className="title">{m.title}</b>
+                  {m.fit !== null && <span className={`fit ${m.fit >= 80 ? "hi" : m.fit >= 60 ? "mid" : ""}`}>{Math.round(m.fit)}</span>}
+                </span>
+                <span dir="auto" className="muted">{m.company ?? "Unknown company"} · {m.location ?? "Location not listed"}</span>
+                <span className="row small">
+                  <span className={`tag ${m.band}`}>{m.band}</span>
+                  {m.cvReady && <span className="tag cv">CV ready</span>}
+                  <span className="muted">{ago(m.firstSeenAt)}</span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function PostingSheet({ id, onClose }: { id: number; onClose: () => void }) {
+  const [posting, setPosting] = useState<PostingDetail | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPosting(null);
+    fetchPosting(id).then(setPosting).catch((e: Error) => setError(e.message));
+  }, [id]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const apply = posting?.applyTarget && /^https?:\/\//.test(posting.applyTarget) ? posting.applyTarget : null;
+  const report = posting?.cv?.atsReport ?? null;
+
+  return (
+    <div className="sheet-backdrop" onClick={onClose}>
+      <section className="sheet" role="dialog" aria-modal="true" aria-label="Posting" onClick={(e) => e.stopPropagation()}>
+        <button className="close" onClick={onClose} aria-label="Close">×</button>
+        {error && <p className="error">{error}</p>}
+        {!posting && !error && <p className="muted">Loading…</p>}
+        {posting && (
+          <>
+            <h2 dir="auto">{posting.title}</h2>
+            <p dir="auto" className="muted">{posting.company ?? "Unknown company"} · {posting.location ?? "Location not listed"}</p>
+            {posting.reasons && <p className="why">{posting.reasons}</p>}
+
+            <div className="actions">
+              {posting.cv && <a className="button primary" href={posting.cv.pdfUrl} target="_blank" rel="noreferrer">Open tailored CV</a>}
+              {apply && <a className="button" href={apply} target="_blank" rel="noreferrer noopener">Open posting</a>}
+              {!apply && posting.applyTarget && <span className="muted">Apply by e-mail: {posting.applyTarget}</span>}
+            </div>
+            <p className="muted small">You submit applications yourself; JobRadar never sends one without your approval.</p>
+
+            {posting.cv ? (
+              <div className="ats">
+                <h3>ATS check <span className={`fit ${posting.cv.atsScore >= 70 ? "hi" : posting.cv.atsScore >= 50 ? "mid" : ""}`}>{Math.round(posting.cv.atsScore)}%</span></h3>
+                {posting.cv.summary && <blockquote dir="auto">{posting.cv.summary}</blockquote>}
+                {report ? (
+                  <>
+                    <ul className="checks">
+                      {report.checks.map((c) => (
+                        <li key={c.name} className={c.ok ? "ok" : "bad"}>
+                          <span aria-hidden="true">{c.ok ? "✓" : "✗"}</span> <b>{c.name}</b> <span className="muted"> {c.detail}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    {report.missing.length > 0 && (
+                      <p className="small"><b>Posting keywords not on this CV:</b> {report.missing.slice(0, 12).join(", ")}</p>
+                    )}
+                    {report.fixes.length > 0 && (
+                      <ul className="fixes">{report.fixes.map((f, i) => <li key={i}>{f}</li>)}</ul>
+                    )}
+                  </>
+                ) : (
+                  <p className="muted small">This CV was made before the ATS check existed. Rebuild it to get a report.</p>
+                )}
+                <button
+                  onClick={async () => {
+                    try {
+                      await rebuildCv(posting.postingId);
+                      setNote("Rebuilding. Check again in a minute.");
+                    } catch (e) {
+                      setNote((e as Error).message);
+                    }
+                  }}
+                >
+                  Rebuild CV
+                </button>
+                {note && <p className="muted small" role="status">{note}</p>}
+              </div>
+            ) : (
+              <p className="muted">No tailored CV yet. One is made for postings that fit well.</p>
+            )}
+
+            {posting.description && <details><summary>Job description</summary><p dir="auto" className="desc">{posting.description.slice(0, 4000)}</p></details>}
+          </>
+        )}
+      </section>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------------------ applications
+
+function Applications({ rows }: { rows: ApplicationRow[] }) {
+  if (rows.length === 0) return <p className="empty">No applications yet. When you apply, it shows up here with its follow-up date.</p>;
+  return (
+    <ul className="list">
+      {rows.map((a, i) => (
+        <li key={i} className="card">
+          <b dir="auto">{String(a.title ?? a.postingTitle ?? `Application ${i + 1}`)}</b>
+          <span className="muted">{String(a.company ?? a.companyName ?? "")}</span>
+          <span className="tag">{String(a.status ?? "")}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// ------------------------------------------------------------------------------ preferences
+
+function PreferenceForm({ initial, submitLabel, onSubmit }: { initial: Preferences | null; submitLabel: string; onSubmit: (p: Preferences) => Promise<void> }) {
+  const start = initial ?? {
+    roles: [], cities: ["Cairo"], remote: true, jobTypes: ["internship", "full-time"], entryLevelOnly: true,
+    maxYearsExperience: 2, titleKeywords: [], excludeKeywords: DEFAULT_EXCLUDES, onboarded: false,
+  };
+  const [presets, setPresets] = useState<string[]>(presetIdsFromRoles(start.roles));
+  const [extraKeywords, setExtraKeywords] = useState(() => {
+    const fromPresets = new Set(ROLE_PRESETS.filter((p) => presetIdsFromRoles(start.roles).includes(p.id)).flatMap((p) => p.keywords));
+    return start.titleKeywords.filter((k) => !fromPresets.has(k)).join(", ");
+  });
+  const [cities, setCities] = useState(start.cities.join(", "));
+  const [remote, setRemote] = useState(start.remote);
+  const [jobTypes, setJobTypes] = useState(start.jobTypes);
+  const [entry, setEntry] = useState(start.entryLevelOnly);
+  const [years, setYears] = useState(start.maxYearsExperience);
+  const [excludes, setExcludes] = useState(start.excludeKeywords.join(", "));
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const toggle = <T,>(list: T[], item: T) => (list.includes(item) ? list.filter((x) => x !== item) : [...list, item]);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const chosen = ROLE_PRESETS.filter((p) => presets.includes(p.id));
+    const keywords = [...new Set([...chosen.flatMap((p) => p.keywords), ...splitList(extraKeywords)])];
+    setBusy(true);
+    setMessage(null);
+    try {
+      await onSubmit({
+        roles: chosen.map((p) => p.label),
+        cities: splitList(cities),
+        remote,
+        jobTypes,
+        entryLevelOnly: entry,
+        maxYearsExperience: years,
+        titleKeywords: keywords,
+        excludeKeywords: splitList(excludes),
+        onboarded: true,
+      });
+      setMessage("Saved. Matches are being re-checked against your new filters.");
+    } catch (err) {
+      setMessage((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <form className="form" onSubmit={submit}>
+      <fieldset>
+        <legend>What roles are you looking for?</legend>
+        <div className="chips">
+          {ROLE_PRESETS.map((p) => (
+            <button type="button" key={p.id} className={`chip ${presets.includes(p.id) ? "on" : ""}`} aria-pressed={presets.includes(p.id)} onClick={() => setPresets(toggle(presets, p.id))}>
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <label htmlFor="extra">Other title words (comma separated)</label>
+        <input id="extra" value={extraKeywords} onChange={(e) => setExtraKeywords(e.target.value)} placeholder="e.g. embedded, robotics" />
+      </fieldset>
+
+      <fieldset>
+        <legend>Experience level</legend>
+        <label className="switch">
+          <input type="checkbox" checked={entry} onChange={(e) => setEntry(e.target.checked)} />
+          <span>Student / entry level only (hides senior, lead, manager and mid-level roles)</span>
+        </label>
+        {entry && (
+          <>
+            <label htmlFor="years">Hide postings asking for more than <b>{years}</b> {years === 1 ? "year" : "years"} of experience</label>
+            <input id="years" type="range" min={0} max={5} value={years} onChange={(e) => setYears(Number(e.target.value))} />
+          </>
+        )}
+      </fieldset>
+
+      <fieldset>
+        <legend>Where</legend>
+        <label htmlFor="cities">Cities (comma separated)</label>
+        <input id="cities" value={cities} onChange={(e) => setCities(e.target.value)} />
+        <label className="switch">
+          <input type="checkbox" checked={remote} onChange={(e) => setRemote(e.target.checked)} />
+          <span>Include remote roles open to Egypt</span>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Job type</legend>
+        <div className="chips">
+          {JOB_TYPES.map((t) => (
+            <button type="button" key={t.id} className={`chip ${jobTypes.includes(t.id) ? "on" : ""}`} aria-pressed={jobTypes.includes(t.id)} onClick={() => setJobTypes(toggle(jobTypes, t.id))}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Never show titles with</legend>
+        <input aria-label="Excluded words" value={excludes} onChange={(e) => setExcludes(e.target.value)} />
+      </fieldset>
+
+      <button className="primary" type="submit" disabled={busy || (presets.length === 0 && splitList(extraKeywords).length === 0) || jobTypes.length === 0}>
+        {busy ? "Saving…" : submitLabel}
+      </button>
+      {message && <p className="muted" role="status">{message}</p>}
+    </form>
+  );
+}
+
+function Onboarding({ initial, onDone }: { initial: Preferences | null; onDone: () => void }) {
+  return (
+    <main className="onboard">
+      <h1>Set up your search</h1>
+      <p className="muted">Tell JobRadar what you want so it can hide everything else. You can change this any time in Settings.</p>
+      <PreferenceForm initial={initial} submitLabel="Start matching" onSubmit={async (p) => { await savePreferences(p); onDone(); }} />
+    </main>
+  );
+}
+
+function Settings({ prefs, onSaved }: { prefs: Preferences; onSaved: () => void }) {
+  const [summaries, setSummaries] = useState<SummaryRow[]>([]);
+  useEffect(() => { fetchSummaries().then(setSummaries).catch(() => setSummaries([])); }, []);
+  return (
+    <section>
+      <h2>Search preferences</h2>
+      <PreferenceForm initial={prefs} submitLabel="Save preferences" onSubmit={async (p) => { await savePreferences(p); onSaved(); }} />
+
+      <h2>CV summary lines</h2>
+      <p className="muted small">
+        One of these is printed at the top of each tailored CV, chosen by the posting's keywords. They are written only from
+        what your CV already says. A line is used only after you confirm it is true for you.
+      </p>
+      <ul className="list">
+        {summaries.map((s) => (
+          <li key={s.id} className="card">
+            <span className="row"><b>{s.label}</b><span className={`tag ${s.confirmed ? "cv" : ""}`}>{s.confirmed ? "confirmed" : "needs your check"}</span></span>
+            <span dir="auto">{s.text}</span>
+            <button
+              onClick={async () => {
+                await confirmSummary(s.id, !s.confirmed);
+                setSummaries(await fetchSummaries());
+              }}
+            >
+              {s.confirmed ? "Unconfirm" : "Confirm: this is true"}
+            </button>
+          </li>
+        ))}
+        {summaries.length === 0 && <li className="empty">No summary lines in your profile seed yet.</li>}
+      </ul>
+    </section>
   );
 }
