@@ -60,6 +60,18 @@ public class NotificationRepository {
                 Timestamp.from(oldest), Timestamp.from(newest));
     }
 
+    /**
+     * Eligible matches with a fit score of at least {@code minFit} that nobody was told about yet,
+     * of any age, best first per user. Fills the gap the age-based alerts leave: postings older
+     * than 24 hours, or matches that appeared after the user changed preferences.
+     */
+    public List<AlertPosting> findPendingTop(double minFit) {
+        return jdbc.query(
+                ALERT_COLUMNS + " AND m.fit_score >= ? ORDER BY m.user_id, m.priority DESC NULLS LAST, m.fit_score DESC",
+                MAPPER,
+                minFit);
+    }
+
     /** Postings whose deadline falls in ({@code now}, {@code until}], soonest first. */
     public List<AlertPosting> findPendingByDeadline(Instant now, Instant until) {
         return jdbc.query(
