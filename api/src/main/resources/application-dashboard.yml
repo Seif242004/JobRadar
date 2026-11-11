@@ -1,0 +1,6 @@
+# The api serves the built dashboard (web/dist) itself, so one address (and one tunnel) carries
+# both the page and its data. The directory comes from the start script.
+spring:
+  web:
+    resources:
+      static-locations: "file:${JOBRADAR_WEB_DIR:./web/dist/},classpath:/static/"

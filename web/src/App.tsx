@@ -62,7 +62,12 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    load();
+    // The "JobRadar is online" push opens /?token=...: sign in with it once, then hide it from the address bar.
+    const token = new URLSearchParams(window.location.search).get("token");
+    const start = token
+      ? signIn(token).catch(() => undefined).finally(() => window.history.replaceState(null, "", window.location.pathname))
+      : Promise.resolve();
+    start.then(load);
     const timer = setInterval(load, 5 * 60 * 1000); // fresh postings arrive all day
     return () => clearInterval(timer);
   }, [load]);

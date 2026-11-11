@@ -28,3 +28,6 @@ dist/
 seed/*
 !seed/profile.example.json
 logs/
+
+# Downloaded helper binaries (cloudflared)
+tools/

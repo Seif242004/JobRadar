@@ -37,7 +37,8 @@ import tools.jackson.databind.json.JsonMapper;
             "jobradar.notifier.listener.enabled=false",
             "jobradar.dashboard.access-token=test-access-token-1234",
             "jobradar.dashboard.link-secret=test-link-secret-12345678",
-            "jobradar.public-url=https://jobs.example.test"
+            "jobradar.public-url=https://jobs.example.test",
+            "JOBRADAR_WEB_DIR=src/test/resources/web-test/"
         })
 @ActiveProfiles("dashboard")
 class DashboardAccessTests extends PostgresIntegrationTest {
@@ -131,5 +132,14 @@ class DashboardAccessTests extends PostgresIntegrationTest {
                 .header("Authorization", "Bearer test-access-token-1234"));
         assertThat(confirm.statusCode()).isEqualTo(204);
         assertThat(jdbc.queryForObject("SELECT verify FROM cv_summary WHERE id = ?", Boolean.class, summary)).isFalse();
+    }
+
+    @Test
+    void theBuiltDashboardPageIsServedWithoutAKeyWhileTheDataStaysLocked() throws Exception {
+        HttpResponse<String> page = send("/", b -> b.GET());
+
+        assertThat(page.statusCode()).isEqualTo(200);
+        assertThat(page.body()).contains("JobRadar test page");
+        assertThat(send("/api/dashboard/matches", b -> b.GET()).statusCode()).isEqualTo(401);
     }
 }

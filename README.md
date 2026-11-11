@@ -35,7 +35,7 @@ These rules are enforced in code and reviewed on every change to ingestion or ap
 | `ingestion-worker/` | Deployable: ingestion |
 | `tailoring-worker/` | Deployable: tailoring |
 | `infra/` | Terraform: VPC, RDS PostgreSQL, S3, ECR, GitHub OIDC deploy role, budget alarm |
-| `web/` | Local read-only React dashboard (M4) |
+| `web/` | Mobile-first React dashboard: onboarding, matches, CV and ATS view, settings |
 | `scripts/` | `gmail_authorize.py`: one-time Gmail consent (scope `gmail.send` only) that prints the refresh-token secret to store |
 | `localstack/` | Init script that creates the local SQS queues and S3 bucket |
 
@@ -75,6 +75,13 @@ Keep the PC on: the sources poll every 15 minutes and Gmail alerts every 5.
      website show **I applied** instead and open the posting; you apply on the site yourself.
    - **New matches** digests of the day's other good postings, with links.
    Nothing is ever submitted without your tap.
+
+**On your phone (free, no account):** `start-jobradar.bat` opens a Cloudflare quick tunnel to the dashboard and
+sends a "JobRadar is online" push with a link to the same ntfy topic. Tap it: the page opens signed in (the access key
+is `JOBRADAR_DASHBOARD_TOKEN` in `.env`, created on the first start) and tailored CVs open as PDFs. The address changes
+at every start, so use the newest push. It only works while this PC is on and JobRadar is running; set
+`JOBRADAR_TUNNEL=off` in `.env` to turn it off. Quick tunnels are free and need no sign-up, but Cloudflare gives no
+uptime guarantee for them.
 
 **Where to see things:** the dashboard shows the summary, your best matches with their fit score and reasons, and
 your applications. Tailored CVs are stored as PDFs in the local bucket `jobradar-local` (under `cv/<user id>/<posting id>/`);
