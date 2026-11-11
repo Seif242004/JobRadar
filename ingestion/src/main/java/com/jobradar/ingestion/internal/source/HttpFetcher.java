@@ -16,4 +16,9 @@ public interface HttpFetcher {
      * @throws SourceFetchException when no answer arrived (DNS, TLS, timeout)
      */
     FetchResponse get(URI uri);
+
+    /** Same, with extra request headers (for example an API key). Fetchers that ignore headers keep the default. */
+    default FetchResponse get(URI uri, java.util.Map<String, String> headers) {
+        return get(uri);
+    }
 }

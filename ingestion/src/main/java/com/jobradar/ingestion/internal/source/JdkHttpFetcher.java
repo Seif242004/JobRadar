@@ -22,12 +22,17 @@ class JdkHttpFetcher implements HttpFetcher {
 
     @Override
     public FetchResponse get(URI uri) {
-        HttpRequest request = HttpRequest.newBuilder(uri)
+        return get(uri, java.util.Map.of());
+    }
+
+    @Override
+    public FetchResponse get(URI uri, java.util.Map<String, String> headers) {
+        HttpRequest.Builder builder = HttpRequest.newBuilder(uri)
                 .timeout(Duration.ofSeconds(30))
                 .header("User-Agent", USER_AGENT)
-                .header("Accept", "application/json, text/html;q=0.9, */*;q=0.5")
-                .GET()
-                .build();
+                .header("Accept", "application/json, text/html;q=0.9, */*;q=0.5");
+        headers.forEach(builder::header);
+        HttpRequest request = builder.GET().build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             return new FetchResponse(response.statusCode(), response.body(), retryAfter(response));

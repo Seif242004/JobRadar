@@ -24,6 +24,9 @@ jobradar:
       label: ${JOBRADAR_GMAIL_ALERT_LABEL:JobRadar}
       client-id: ${JOBRADAR_GOOGLE_CLIENT_ID:}
       client-secret: ${JOBRADAR_GOOGLE_CLIENT_SECRET:}
+    himalayas:
+      # Free API key from himalayas.app/signup/developer; empty means the source does nothing.
+      api-key: ${JOBRADAR_HIMALAYAS_API_KEY:}
     workable:
       # One search request per location and run.
       locations: ${JOBRADAR_WORKABLE_LOCATIONS:Egypt}
