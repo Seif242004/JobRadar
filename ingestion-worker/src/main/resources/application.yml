@@ -13,6 +13,13 @@ jobradar:
     # Set only for LocalStack (http://localhost:4566); empty means the real AWS endpoints.
     endpoint: ${JOBRADAR_AWS_ENDPOINT:}
   ingestion:
+    scheduling:
+      # Runs the connectors and the careers resolver in this process (SPEC.md D6: ATS sources
+      # every 15 min; Remotive at most 4 calls a day). Set to false to run no source at all.
+      enabled: ${JOBRADAR_SCHEDULING_ENABLED:true}
+    workable:
+      # One search request per location and run.
+      locations: ${JOBRADAR_WORKABLE_LOCATIONS:Egypt}
     queues:
       hot-url: ${JOBRADAR_SQS_HOT_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-hot}
       backlog-url: ${JOBRADAR_SQS_BACKLOG_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-backlog}

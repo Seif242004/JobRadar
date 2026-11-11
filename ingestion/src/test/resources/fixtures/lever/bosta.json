@@ -1,0 +1,110 @@
+[
+ {
+  "additionalPlain": "Thank you for considering Bosta as your next career step. We value every application we receive, and our selection process is designed to ensure the best fit for both our team and our candidates. We appreciate your patience throughout the process\n",
+  "additional": "<div>\n<div>Thank you for considering Bosta as your next career step. We value every application we receive, and our selection process is designed to ensure the best fit for both our team and our candidates. We appreciate your patience throughout the process</div>\n</div>",
+  "categories": {
+   "commitment": "Full-time",
+   "department": "Data & Performance",
+   "location": "Cairo",
+   "team": "Data",
+   "allLocations": [
+    "Cairo"
+   ]
+  },
+  "createdAt": 1779712377363,
+  "descriptionPlain": "About Bosta: \n\nLaunched in 2017, Bosta is an overnight delivery provider for E-commerce companies in Egypt. Leveraging technology to empower businesses is what we do best. Our goal is to disrupt the logistics industry by bringing technology and experience all together to provide a one-stop-shop for delivery solutions. \n \nWe rely on advanced technology to deliver orders to our customers in a fast way. Businesses can track and connect with couriers and follow up on their orders - all in one system.\n\n\nAbout the role: \n\nWe’re rebuilding Bosta’s data platform end-to-end: from MongoDB at the source, through a governed semantic layer that LLM-native tools (NL-to-SQL agents, AI analysts, embedded copilots) can sit on top of safely and cheaply. You will help own that rebuild.This is a hands-on role. You’ll set patterns, write the foundational code, and ship across the stack — from CDC and ingestion through dbt, the semantic layer, and the interfaces that BI tools and AI agents consume.\n",
+  "description": "<div>\n<div><strong>About Bosta:&nbsp;<br><br></strong></div>\n<div>Launched in 2017, Bosta is an overnight delivery provider for E-commerce companies in Egypt. Leveraging technology to empower businesses is what we do best. Our goal is to disrupt the logistics industry by bringing technology and experience all together to provide a one-stop-shop for delivery solutions.&nbsp;</div>\n<div>&nbsp;</div>\n<div>We rely on advanced technology to deliver orders to our customers in a fast way. Businesses can track and connect with couriers and follow up on their orders - all in one system.</div>\n</div><div><br></div><div>About the role:&nbsp;</div>\n<div><br>We’re rebuilding Bosta’s data platform end-to-end: from MongoDB at the source, through a governed semantic layer that LLM-native tools (NL-to-SQL agents, AI analysts, embedded copilots) can sit on top of safely and cheaply. You will help own that rebuild.This is a hands-on role. You’ll set patterns, write the foundational code, and ship across the stack — from CDC and ingestion through dbt, the semantic layer, and the interfaces that BI tools and AI agents consume.</div>",
+  "id": "002239d4-d595-468f-8a2b-de9b6f3ff549",
+  "lists": [
+   {
+    "text": "Job Responsibilities ",
+    "content": "\n<li>End-to-end pipeline work: MongoDB CDC → ingestion → lakehouse → warehouse → dbt → semantic layer → BI/AI consumers</li>\n<li>Co-ownership of architecture decisions with the Data Engineering Lead</li>\n<li>CDC from production MongoDB without degrading operational DB performance; ingestion patterns that make adding a new source a config change, not a project</li>\n<li>Orchestration that’s observable end-to-end (Airflow, Dagster, or Prefect)</li>\n<li>The dbt project: structure, conventions, tests, contracts, exposures, CI</li>\n<li>The semantic / metrics layer (dbt Semantic Layer, Cube, or equivalent) — one canonical definition per business metric</li>\n<li>LLM-readiness: column-level documentation, PII tagging, query cost guardrails, materialized metric tables, and evals on AI-generated SQL</li>\n<li>Migration of existing logic out of the Tableau and Metabase sprawl into modeled, governed sources</li>\n"
+   },
+   {
+    "text": "Job Qualifications",
+    "content": "\n<li>4+ years across data engineering and/or analytics engineering — you’ve spent meaningful time on both sides</li>\n<li>Comfort spanning the stack: comfortable shipping a Debezium connector one week and a dbt mart the next</li>\n<li>Deep dbt and SQL — you’ve owned a non-trivial project, not just contributed to one</li>\n<li>Production CDC experience (Debezium, Kafka Connect, Airbyte, or hand-rolled) against operational databases — bonus if that database was MongoDB</li>\n<li>A cloud warehouse you know deeply (Redshift, Snowflake, BigQuery, or Databricks)</li>\n<li>Strong Python; comfortable in Linux, infra-as-code, and CI/CD</li>\n<li>Working understanding of how LLM tooling (RAG, NL-to-SQL, embedded agents) consumes a data platform — and what breaks when the platform isn’t ready</li>\n<li>Strong opinions on modeling, lightly held; bias toward observability</li>\n\n<div><strong>Bonus:</strong></div>\n\n<li>MongoDB schema evolution at scale</li>\n<li>Production semantic-layer rollouts (dbt Semantic Layer, Cube, LookML, MetricFlow)</li>\n<li>Lakehouse formats (Iceberg, Delta, Hudi) or streaming experience (Kafka, Flink, Kinesis)</li>\n<li>Data catalog / lineage tooling (DataHub, Atlan, Collibra)</li>\n<li>Logistics, marketplaces, or other operationally heavy domains</li>\n<li>Evals on AI-generated SQL or analytical reasoning</li>\n"
+   }
+  ],
+  "text": "Senior Data Engineer",
+  "country": "EG",
+  "workplaceType": "hybrid",
+  "opening": "<div>\n<div><strong>About Bosta:&nbsp;<br><br></strong></div>\n<div>Launched in 2017, Bosta is an overnight delivery provider for E-commerce companies in Egypt. Leveraging technology to empower businesses is what we do best. Our goal is to disrupt the logistics industry by bringing technology and experience all together to provide a one-stop-shop for delivery solutions.&nbsp;</div>\n<div>&nbsp;</div>\n<div>We rely on advanced technology to deliver orders to our customers in a fast way. Businesses can track and connect with couriers and follow up on their orders - all in one system.</div>\n</div>",
+  "openingPlain": "About Bosta: \n\nLaunched in 2017, Bosta is an overnight delivery provider for E-commerce companies in Egypt. Leveraging technology to empower businesses is what we do best. Our goal is to disrupt the logistics industry by bringing technology and experience all together to provide a one-stop-shop for delivery solutions. \n \nWe rely on advanced technology to deliver orders to our customers in a fast way. Businesses can track and connect with couriers and follow up on their orders - all in one system.\n",
+  "descriptionBody": "<div>About the role:&nbsp;</div>\n<div><br>We&rsquo;re rebuilding Bosta&rsquo;s data platform end-to-end: from MongoDB at the source, through a governed semantic layer that LLM-native tools (NL-to-SQL agents, AI analysts, embedded copilots) can sit on top of safely and cheaply. You will help own that rebuild.This is a hands-on role. You&rsquo;ll set patterns, write the foundational code, and ship across the stack &mdash; from CDC and ingestion through dbt, the semantic layer, and the interfaces that BI tools and AI agents consume.</div>",
+  "descriptionBodyPlain": "About the role: \n\nWe’re rebuilding Bosta’s data platform end-to-end: from MongoDB at the source, through a governed semantic layer that LLM-native tools (NL-to-SQL agents, AI analysts, embedded copilots) can sit on top of safely and cheaply. You will help own that rebuild.This is a hands-on role. You’ll set patterns, write the foundational code, and ship across the stack — from CDC and ingestion through dbt, the semantic layer, and the interfaces that BI tools and AI agents consume.\n",
+  "hostedUrl": "https://jobs.lever.co/Bosta/002239d4-d595-468f-8a2b-de9b6f3ff549",
+  "applyUrl": "https://jobs.lever.co/Bosta/002239d4-d595-468f-8a2b-de9b6f3ff549/apply"
+ },
+ {
+  "additional": "",
+  "additionalPlain": "",
+  "categories": {
+   "commitment": "Full-time",
+   "department": "Finance",
+   "location": "Shabrament",
+   "team": "Accounting",
+   "allLocations": [
+    "Shabrament"
+   ]
+  },
+  "createdAt": 1791197154581,
+  "descriptionPlain": "About Bosta\nLaunched in 2017, Bosta is an overnight delivery provider for E-commerce companies in Egypt and KSA. Leveraging technology to empower businesses is what we do best. Our goal is to disrupt the logistics industry by bringing technology and experience all together to provide a one-stop-shop for delivery solutions.  We rely on advanced technology to deliver orders to our customers in a fast way. Businesses can track and connect with couriers and follow up on their orders - all in one system.\n \nAbout the Job:\n \nThe Spare Parts Inventory Specialist is responsible for the proper control and management of Spare Parts inventory and for providing continuous support to Fleet operations. The role establishes clear ownership of Spare Parts inventory, improves stock control, accurately tracks consumption, and ensures continuous support for Fleet operations.\n",
+  "description": "<div>\n<div><strong style=\"font-size: 16pt;\">About Bosta</strong></div>\n<div><span style=\"font-size: 11pt;\">Launched in 2017, Bosta is an overnight delivery provider for E-commerce companies in Egypt and KSA. Leveraging technology to empower businesses is what we do best. Our goal is to disrupt the logistics industry by bringing technology and experience all together to provide a one-stop-shop for delivery solutions.&nbsp;</span>&nbsp;<span style=\"font-size: 11pt;\">We rely on advanced technology to deliver orders to our customers in a fast way. Businesses can track and connect with couriers and follow up on their orders - all in one system.</span></div>\n<div>&nbsp;</div>\n<div><strong><span style=\"font-size: 11pt;\">About the Job:</span></strong></div>\n<div>&nbsp;</div>\n<div>\n<div><span style=\"font-size: 16pt;\"><span style=\"font-size: 11.0pt; line-height: 115%; font-family: Calibri, sans-serif;\">The Spare Parts Inventory Specialist is responsible for the proper control and management of Spare Parts inventory and for providing continuous support to Fleet operations. The role establishes clear ownership of Spare Parts inventory, improves stock control, accurately tracks consumption, and ensures continuous support for Fleet operations.</span></span></div>\n</div>\n</div>",
+  "id": "b6a0adef-552e-4185-b437-e96b4183a795",
+  "lists": [
+   {
+    "text": "Job Responsibilities",
+    "content": "<div>\n<ul type=\"disc\" style=\"margin-bottom: 0in; margin-top: 0px;\">\n<li style=\"line-height: normal; margin-top: 0in; margin-right: 0in; margin-bottom: 0in; font-size: 11pt; font-family: Arial, sans-serif;\"><span style=\"font-size: 12.0pt; font-family: 'Times New Roman', serif;\">Act as the dedicated resource responsible for Spare Parts stock and inventory accuracy.</span></li>\n<li style=\"line-height: normal; margin-top: 0in; margin-right: 0in; margin-bottom: 0in; font-size: 11pt; font-family: Arial, sans-serif;\"><span style=\"font-size: 12.0pt; font-family: 'Times New Roman', serif;\">Ensure timely issuing of spare parts and materials to the Fleet team based on approved requests.</span></li>\n<li style=\"line-height: normal; margin-top: 0in; margin-right: 0in; margin-bottom: 0in; font-size: 11pt; font-family: Arial, sans-serif;\"><span style=\"font-size: 12.0pt; font-family: 'Times New Roman', serif;\">Monitor stock movement, track spare parts consumption, and maintain visibility of stock availability.</span></li>\n<li style=\"line-height: normal; margin-top: 0in; margin-right: 0in; margin-bottom: 0in; font-size: 11pt; font-family: Arial, sans-serif;\"><span style=\"font-size: 12.0pt; font-family: 'Times New Roman', serif;\">Ensure all receiving, issuing, and handover transactions are properly recorded.</span></li>\n<li style=\"margin-top: 0in; margin-right: 0in; margin-bottom: 0in; line-height: 115%; font-size: 11pt; font-family: Arial, sans-serif;\"><span style=\"font-size: 12.0pt; line-height: 115%; font-family: 'Times New Roman', serif;\">Ensure proper storage and organization of Spare Parts.</span></li>\n<li style=\"margin-top: 0in; margin-right: 0in; margin-bottom: 0in; line-height: 115%; font-size: 11pt; font-family: Arial, sans-serif;\"><span style=\"font-size: 12.0pt; line-height: 115%; font-family: 'Times New Roman', serif;\">Receive spare parts and oil shipments from suppliers; verify quantities and condition against the purchase order.</span></li>\n\n</ul></div>"
+   },
+   {
+    "text": "Job Requirements",
+    "content": "<div>\n<p style=\"margin: 0in; line-height: 115%; font-size: 11pt; font-family: Arial, sans-serif;\"><strong><span style=\"font-size: 12.0pt; line-height: 115%; font-family: 'Times New Roman', serif;\">Education</span></strong></p>\n<ul style=\"margin-bottom: 0in; margin-top: 0px;\">\n<li style=\"margin: 0in 0in 0in 0px; line-height: 115%; font-size: 11pt; font-family: Arial, sans-serif;\"><span style=\"font-size: 12.0pt; line-height: 115%; font-family: 'Times New Roman', serif;\">Bachelor's degree required; Supply Chain, Commerce, Business Administration, or Engineering preferred.</span></li>\n\n<p style=\"margin: 0in; line-height: 115%; font-size: 11pt; font-family: Arial, sans-serif;\"><strong><span style=\"font-size: 12.0pt; line-height: 115%; font-family: 'Times New Roman', serif;\">Experience</span></strong></p>\n<ul style=\"margin-bottom: 0in; margin-top: 0px;\">\n<li style=\"margin: 0in 0in 0in 0px; line-height: 115%; font-size: 11pt; font-family: Arial, sans-serif;\"><span style=\"font-size: 12.0pt; line-height: 115%; font-family: 'Times New Roman', serif;\">1–3 years in a warehouse, spare parts, or inventory role — fleet/automotive background preferred; strong fresh graduates considered.</span></li>\n\n</ul></ul></div>"
+   }
+  ],
+  "text": "Spare Parts Inventory Specialist",
+  "workplaceType": "onsite",
+  "opening": "",
+  "openingPlain": "",
+  "descriptionBody": "<div>\n<div><strong style=\"font-size: 16pt;\">About Bosta</strong></div>\n<div><span style=\"font-size: 11pt;\">Launched in 2017, Bosta is an overnight delivery provider for E-commerce companies in Egypt and KSA. Leveraging technology to empower businesses is what we do best. Our goal is to disrupt the logistics industry by bringing technology and experience all together to provide a one-stop-shop for delivery solutions.&nbsp;</span>&nbsp;<span style=\"font-size: 11pt;\">We rely on advanced technology to deliver orders to our customers in a fast way. Businesses can track and connect with couriers and follow up on their orders - all in one system.</span></div>\n<div>&nbsp;</div>\n<div><strong><span style=\"font-size: 11pt;\">About the Job:</span></strong></div>\n<div>&nbsp;</div>\n<div>\n<div><span style=\"font-size: 16pt;\"><span style=\"font-size: 11.0pt; line-height: 115%; font-family: Calibri, sans-serif;\">The Spare Parts Inventory Specialist is responsible for the proper control and management of Spare Parts inventory and for providing continuous support to Fleet operations. The role establishes clear ownership of Spare Parts inventory, improves stock control, accurately tracks consumption, and ensures continuous support for Fleet operations.</span></span></div>\n</div>\n</div>",
+  "descriptionBodyPlain": "About Bosta\nLaunched in 2017, Bosta is an overnight delivery provider for E-commerce companies in Egypt and KSA. Leveraging technology to empower businesses is what we do best. Our goal is to disrupt the logistics industry by bringing technology and experience all together to provide a one-stop-shop for delivery solutions.  We rely on advanced technology to deliver orders to our customers in a fast way. Businesses can track and connect with couriers and follow up on their orders - all in one system.\n \nAbout the Job:\n \nThe Spare Parts Inventory Specialist is responsible for the proper control and management of Spare Parts inventory and for providing continuous support to Fleet operations. The role establishes clear ownership of Spare Parts inventory, improves stock control, accurately tracks consumption, and ensures continuous support for Fleet operations.\n",
+  "country": null,
+  "hostedUrl": "https://jobs.lever.co/Bosta/b6a0adef-552e-4185-b437-e96b4183a795",
+  "applyUrl": "https://jobs.lever.co/Bosta/b6a0adef-552e-4185-b437-e96b4183a795/apply"
+ },
+ {
+  "additional": "",
+  "additionalPlain": "",
+  "categories": {
+   "commitment": "Full-time",
+   "department": "Strategy",
+   "location": "Cairo",
+   "team": "Strategy",
+   "allLocations": [
+    "Cairo"
+   ]
+  },
+  "createdAt": 1794308485412,
+  "descriptionPlain": "About Bosta:\nLaunched in 2017, Bosta is an overnight delivery provider for E-commerce companies in Egypt. Leveraging technology to empower businesses is what we do best. Our goal is to disrupt the logistics industry by bringing technology and experience altogether to provide a one-stop-shop for delivery solutions.\nWe rely on advanced technology to deliver orders to our customers in a fast way. Businesses can track and connect with couriers and follow up on their orders - all in one system.\n \nJob Code: NB-2025STRA-178\n",
+  "description": "<div><strong>About Bosta:</strong></div>\n<div>Launched in 2017, Bosta is an overnight delivery provider for E-commerce companies in Egypt. Leveraging technology to empower businesses is what we do best. Our goal is to disrupt the logistics industry by bringing technology and experience altogether to provide a one-stop-shop for delivery solutions.</div>\n<div>We rely on advanced technology to deliver orders to our customers in a fast way. Businesses can track and connect with couriers and follow up on their orders - all in one system.</div>\n<div>&nbsp;</div>\n<div>Job Code: NB-2025STRA-178</div>",
+  "id": "7f7cf143-2d38-4ef3-8247-902ba4a8328b",
+  "lists": [
+   {
+    "text": "Job Responsibilities",
+    "content": "\n<li>Lead strategic projects aimed at improving scalability, cost efficiency, and operational excellence.</li>\n<li>Analyze large datasets to identify trends, inefficiencies, and areas for improvement.</li>\n<li>Develop business cases and recommendations for senior leadership, backed by strong data insights.</li>\n<li>Drive cross-functional collaboration between Strategy, Operations, Product, and Commercial teams.</li>\n<li>Own and refine KPI tracking to measure performance and support decision-making.</li>\n<li>Conduct market research and competitive analysis to inform Bosta’s growth strategy.</li>\n<li>Mentor and guide junior team members in analytical problem-solving and strategic thinking</li>\n"
+   },
+   {
+    "text": "Job Qualifications",
+    "content": "\n<li>5-6 years of experience in strategy consulting, business analysis, or a similar role within logistics, e-commerce, or tech. (Years of experience flexible based on experience level)</li>\n<li>Strong analytical and problem-solving skills, with the ability to structure complex problems and derive insights.</li>\n<li>Proficiency in Excel/Google Sheets, SQL (preferred), and data visualization tools (Power BI, Tableau, etc.).</li>\n<li>Excellent communication and presentation skills, with experience in preparing reports for senior leadership.</li>\n<li>Ability to lead projects, work cross-functionally, and drive execution in a fast-paced environment.</li>\n<li>Passion for logistics, technology, and scaling businesses.</li>\n"
+   }
+  ],
+  "text": "Strategy Associate",
+  "country": "EG",
+  "workplaceType": "hybrid",
+  "opening": "",
+  "openingPlain": "",
+  "descriptionBody": "<div><strong>About Bosta:</strong></div>\n<div>Launched in 2017, Bosta is an overnight delivery provider for E-commerce companies in Egypt. Leveraging technology to empower businesses is what we do best. Our goal is to disrupt the logistics industry by bringing technology and experience altogether to provide a one-stop-shop for delivery solutions.</div>\n<div>We rely on advanced technology to deliver orders to our customers in a fast way. Businesses can track and connect with couriers and follow up on their orders - all in one system.</div>\n<div>&nbsp;</div>\n<div>Job Code: NB-2025STRA-178</div>",
+  "descriptionBodyPlain": "About Bosta:\nLaunched in 2017, Bosta is an overnight delivery provider for E-commerce companies in Egypt. Leveraging technology to empower businesses is what we do best. Our goal is to disrupt the logistics industry by bringing technology and experience altogether to provide a one-stop-shop for delivery solutions.\nWe rely on advanced technology to deliver orders to our customers in a fast way. Businesses can track and connect with couriers and follow up on their orders - all in one system.\n \nJob Code: NB-2025STRA-178\n",
+  "hostedUrl": "https://jobs.lever.co/Bosta/7f7cf143-2d38-4ef3-8247-902ba4a8328b",
+  "applyUrl": "https://jobs.lever.co/Bosta/7f7cf143-2d38-4ef3-8247-902ba4a8328b/apply"
+ }
+]
