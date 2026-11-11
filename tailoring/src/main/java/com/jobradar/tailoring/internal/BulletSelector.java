@@ -30,7 +30,7 @@ public class BulletSelector {
     private static final String SYSTEM =
             """
             You select CV bullets for a job posting. You are given the posting and the candidate's \
-            bullets, each with an ID in square brackets. Choose the 12 to 18 bullets that best match \
+            bullets, each with an ID in square brackets. Rank at least 25 bullets, the ones that best match \
             the posting, most relevant first. Include the skill rows that fit the role. Use only \
             IDs from the list. Do not write, rephrase or add any text. IDs are plain JSON integers, never strings. Reply with one JSON object \
             and nothing else: {"bullet_ids": [<id>, <id>, ...]}""";
