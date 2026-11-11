@@ -16,3 +16,9 @@ never touch the network.
 The only edit: the `jobs` array (the top-level array for Lever) is cut down to a few entries to
 keep the repository small. Every remaining entry is byte-for-byte what the source returned apart
 from JSON re-indentation. `remotive/remote-jobs.json` is complete.
+
+## Synthetic fixtures (not recordings)
+
+| File | Why it is synthetic |
+| --- | --- |
+| `workable/board-synthetic.json`, `workable/board-empty-synthetic.json` | `GET https://apply.workable.com/api/v1/widget/accounts/{token}?details=true` answered HTTP 429 (Cloudflare 1015, `Retry-After` of hours) from the build environment on 2026-11-10 and 2026-11-11, so no real response could be recorded. These files are hand-written from the field list that public integrations document: `title`, `shortcode`, `shortlink`, `url`, `department`, `city`, `state`, `country`, `telecommuting`, `published_on`, `description`, with one entry per location for a posting open in several countries. **Unverified against the live API.** Replace them with recordings of a real board (for example `moneyfellows`) as soon as the endpoint is reachable. |

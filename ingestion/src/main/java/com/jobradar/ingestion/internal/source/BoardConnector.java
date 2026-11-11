@@ -20,13 +20,18 @@ abstract class BoardConnector implements SourceConnector {
         this.boards = boards;
     }
 
+    /** The {@code company.ats_type} whose boards this connector reads. Defaults to {@link #source()}. */
+    String atsType() {
+        return source();
+    }
+
     /** Reads every posting of one board. */
     abstract List<RawPosting> fetchBoard(Board board);
 
     @Override
     public final List<RawPosting> fetch() {
         List<RawPosting> postings = new ArrayList<>();
-        for (Board board : boards.boards(source())) {
+        for (Board board : boards.boards(atsType())) {
             try {
                 postings.addAll(fetchBoard(board));
             } catch (SourceRateLimitedException e) {
