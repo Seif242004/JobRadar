@@ -10,6 +10,7 @@ Get-CimInstance Win32_Process | Where-Object {
     $line = $_.CommandLine
     $line -and (
         (($_.Name -in "java.exe", "node.exe", "cmd.exe") -and ($line -match $inRepo)) -or
+        (($_.Name -eq "cloudflared.exe") -and ($line -match $inRepo)) -or
         (($_.Name -eq "java.exe") -and ($line -match "com\.jobradar\.\w+Application"))
     ) -and ($_.ProcessId -ne $PID)
 } | ForEach-Object {

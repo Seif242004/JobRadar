@@ -55,6 +55,23 @@ final class AlertFormatter {
         return text.toString().strip();
     }
 
+    /** Twice-daily push of the best matches that no other alert covered; fit is shown per line. */
+    static String topPicks(List<AlertPosting> postings) {
+        StringBuilder text = new StringBuilder("⭐ Top picks for you (" + postings.size() + ")\n");
+        int index = 1;
+        for (AlertPosting posting : postings) {
+            text.append('\n').append(index++).append(". ").append(headline(posting));
+            if (posting.fitScore() != null) {
+                text.append(" · fit ").append(Math.round(posting.fitScore()));
+            }
+            if (isUrl(posting.applyTarget())) {
+                text.append('\n').append(posting.applyTarget());
+            }
+            text.append('\n');
+        }
+        return text.toString().strip();
+    }
+
     /** "Backend Intern · Instabug · Cairo, Egypt" with missing parts left out. */
     static String headline(AlertPosting posting) {
         StringBuilder line = new StringBuilder(posting.title());

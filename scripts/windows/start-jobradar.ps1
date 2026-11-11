@@ -60,6 +60,55 @@ if (-not (Test-Path "api\target\classes")) {
     if ($LASTEXITCODE -ne 0) { throw "Build failed." }
 }
 
+# ---- phone access: dashboard build, access key, free Cloudflare quick tunnel ------------------------
+# The api serves the dashboard itself, and a quick tunnel (no account, no card, no cost) gives it a
+# public https address. The address changes whenever the tunnel restarts, so it is sent to your phone
+# through ntfy at every start. Set JOBRADAR_TUNNEL=off in .env to skip all of this.
+$tools = Join-Path $root "tools"
+New-Item -ItemType Directory -Force $tools | Out-Null
+$webDir = Join-Path $root "web"
+if ($env:JOBRADAR_TUNNEL -ne "off") {
+    if (-not $env:JOBRADAR_DASHBOARD_TOKEN) {
+        $bytes = New-Object byte[] 24; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+        $env:JOBRADAR_DASHBOARD_TOKEN = ([BitConverter]::ToString($bytes) -replace "-", "").ToLower()
+        Add-Content $envFile ("`nJOBRADAR_DASHBOARD_TOKEN=" + $env:JOBRADAR_DASHBOARD_TOKEN)
+        Say "Created an access key for the dashboard (stored in .env)."
+    }
+    $dist = Join-Path $webDir "dist\index.html"
+    $stale = (-not (Test-Path $dist)) -or ((Get-ChildItem (Join-Path $webDir "src"), (Join-Path $webDir "index.html") -Recurse -File | Where-Object { $_.LastWriteTime -gt (Get-Item $dist).LastWriteTime }).Count -gt 0)
+    if ($stale) {
+        Say "Building the dashboard..."
+        Push-Location $webDir
+        if (-not (Test-Path "node_modules")) { npm install --no-audit --no-fund | Out-Null }
+        npm run build | Out-Null
+        Pop-Location
+    }
+    $env:JOBRADAR_WEB_DIR = (Join-Path $webDir "dist") + "\"
+
+    $cloudflared = Join-Path $tools "cloudflared.exe"
+    if (-not (Test-Path $cloudflared)) {
+        Say "Downloading cloudflared (free)..."
+        Invoke-WebRequest "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe" -OutFile $cloudflared -UseBasicParsing
+    }
+    $tunnelLog = Join-Path $logs "tunnel.err.log"
+    $tunnelPid = Join-Path $logs "tunnel.pid"
+    $alive = (Test-Path $tunnelPid) -and (Get-Process -Id ([int](Get-Content $tunnelPid)) -ErrorAction SilentlyContinue)
+    if (-not $alive) {
+        Say "Opening the tunnel..."
+        Remove-Item $tunnelLog -ErrorAction SilentlyContinue
+        $t = Start-Process -FilePath $cloudflared -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://127.0.0.1:18080" `
+            -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $logs "tunnel.log") -RedirectStandardError $tunnelLog
+        Set-Content $tunnelPid $t.Id
+    }
+    $publicUrl = $null
+    for ($i = 0; $i -lt 40 -and -not $publicUrl; $i++) {
+        Start-Sleep 2
+        if (Test-Path $tunnelLog) { $m = Select-String -Path $tunnelLog -Pattern "https://[a-z0-9-]+\.trycloudflare\.com" | Select-Object -First 1; if ($m) { $publicUrl = $m.Matches[0].Value } }
+    }
+    if ($publicUrl) { $env:JOBRADAR_PUBLIC_URL = $publicUrl; Say "Phone address: $publicUrl" }
+    else { Say "The tunnel did not give an address; the dashboard stays local. See logs\tunnel.err.log."; Remove-Item Env:JOBRADAR_DASHBOARD_TOKEN -ErrorAction SilentlyContinue }
+}
+
 # ---- the three apps ---------------------------------------------------------------------------
 function Test-Up($port) {
     try { return ((Invoke-RestMethod "http://127.0.0.1:$port/actuator/health" -TimeoutSec 3).status -eq "UP") } catch { return $false }
@@ -84,6 +133,16 @@ Remove-Item Env:PORT -ErrorAction SilentlyContinue
 Say "Waiting for the api..."
 for ($i = 0; $i -lt 90; $i++) { if (Test-Up 18080) { break }; Start-Sleep 3 }
 if (-not (Test-Up 18080)) { throw "The api did not come up. See logs\api.log and logs\api.err.log." }
+
+# ---- tell the phone where the dashboard is -------------------------------------------------------
+if ($env:JOBRADAR_PUBLIC_URL -and $env:JOBRADAR_NTFY_TOPIC) {
+    try {
+        Invoke-RestMethod -Method Post -Uri ("https://ntfy.sh/" + $env:JOBRADAR_NTFY_TOPIC) -TimeoutSec 15 `
+            -Headers @{ Title = "JobRadar is online"; Click = ($env:JOBRADAR_PUBLIC_URL + "/?token=" + $env:JOBRADAR_DASHBOARD_TOKEN); Tags = "satellite" } `
+            -Body "Tap to open your dashboard." | Out-Null
+        Say "Sent the dashboard link to your phone."
+    } catch { Say "Could not reach ntfy to send the link: $($_.Exception.Message)" }
+}
 
 # ---- dashboard --------------------------------------------------------------------------------
 $web = Join-Path $root "web"

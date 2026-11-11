@@ -23,6 +23,11 @@ public final class CvComposer {
      * the order of the master CV; bullets inside an entry keep the selection's relevance order.
      */
     public static CvDocument compose(TailoringData data, List<Long> selectedIds) {
+        return compose(data, selectedIds, null);
+    }
+
+    /** @param summary the chosen summary line, or null for none */
+    public static CvDocument compose(TailoringData data, List<Long> selectedIds, String summary) {
         Map<Long, ProfileBullet> byId =
                 data.bullets().stream().collect(Collectors.toMap(ProfileBullet::id, Function.identity()));
         List<ProfileBullet> selected = selectedIds.stream().map(byId::get).toList();
@@ -53,7 +58,7 @@ public final class CvComposer {
         List<CvDocument.Contact> contacts = fixed.contacts() == null
                 ? List.of()
                 : fixed.contacts().stream().map(c -> new CvDocument.Contact(c.text(), c.url())).toList();
-        return new CvDocument(fixed.name(), fixed.headline(), contacts, sections);
+        return new CvDocument(fixed.name(), fixed.headline(), summary, contacts, sections);
     }
 
     private static void addEntries(
@@ -78,6 +83,9 @@ public final class CvComposer {
     /** All text of the document, one item per line; the input of the ATS keyword score. */
     public static String plainText(CvDocument document) {
         StringBuilder text = new StringBuilder();
+        if (document.summary() != null) {
+            text.append(document.summary()).append('\n');
+        }
         for (Section section : document.sections()) {
             for (Entry entry : section.entries()) {
                 text.append(entry.title()).append('\n');

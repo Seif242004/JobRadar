@@ -177,4 +177,30 @@ class AlertPipelineTests extends PostgresIntegrationTest {
         verify(telegram, never()).sendMessage(anyLong(), any(), any(), any());
         assertThat(jdbc.queryForObject("SELECT count(*) FROM match", Long.class)).isEqualTo(1);
     }
+
+    @Test
+    void topPicksPushTheBestOldMatchesOnceAndMoveOnToTheNextOnes() {
+        // Old postings are Backlog: no alert covers them, so only the top-picks run can announce them.
+        long[] ids = new long[7];
+        for (int i = 0; i < ids.length; i++) {
+            ids[i] = posting("Backend Engineer " + i, "Cairo", Duration.ofDays(3 + i), null);
+            matcher.match(ids[i]);
+            jdbc.update("UPDATE match SET fit_score = ?, priority = ? WHERE posting_id = ?", 90 - i, 90 - i, ids[i]);
+        }
+        long weak = posting("Backend Engineer weak", "Cairo", Duration.ofDays(9), null);
+        matcher.match(weak);
+        jdbc.update("UPDATE match SET fit_score = 40, priority = 40 WHERE posting_id = ?", weak);
+        verify(telegram, never()).sendMessage(anyLong(), any(), any(), any());
+
+        alerts.sendTopPicks();
+        alerts.sendTopPicks();
+        alerts.sendTopPicks();
+
+        ArgumentCaptor<String> text = ArgumentCaptor.forClass(String.class);
+        verify(telegram, times(2)).sendMessage(eq(CHAT_ID), text.capture(), any(), any());
+        // First run: the five best. Second run: the remaining two. Third run: nothing. The weak one never.
+        assertThat(text.getAllValues().get(0)).contains("Top picks for you (5)", "Backend Engineer 0 ", "fit 90").doesNotContain("Backend Engineer 5");
+        assertThat(text.getAllValues().get(1)).contains("Top picks for you (2)", "Backend Engineer 5", "Backend Engineer 6");
+        assertThat(text.getAllValues()).noneMatch(t -> t.contains("weak"));
+    }
 }

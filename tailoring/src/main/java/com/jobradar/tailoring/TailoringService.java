@@ -1,6 +1,12 @@
 package com.jobradar.tailoring;
 
+import com.jobradar.tailoring.internal.AtsChecker;
+import com.jobradar.tailoring.internal.AtsReport;
 import com.jobradar.tailoring.internal.AtsScorer;
+import com.jobradar.tailoring.internal.BulletBalancer;
+import com.jobradar.tailoring.internal.CvSummary;
+import com.jobradar.tailoring.internal.NoInvention;
+import com.jobradar.tailoring.internal.SummaryPicker;
 import com.jobradar.tailoring.internal.BulletSelector;
 import com.jobradar.tailoring.internal.CvComposer;
 import com.jobradar.tailoring.internal.CvStore;
@@ -75,15 +81,45 @@ public class TailoringService {
             }
         }
 
-        // 3. Render; drop the lowest-ranked bullet until the CV is exactly one page.
-        OnePageFitter.Fitted fitted = fitter.fit(data, ranked);
+        // 2b. Summary line: a confirmed variant chosen by keyword overlap, and only if it passes the
+        //     no-invention guard against the user's own CV text.
+        String summary = SummaryPicker.pick(data.summaries(), data.postingTitle(), data.postingDescription())
+                .map(CvSummary::text)
+                .filter(text -> {
+                    var unknown = NoInvention.unknownTerms(text, corpus(data));
+                    if (!unknown.isEmpty()) {
+                        log.warn("Summary skipped for user {}: terms not in the CV: {}", userId, unknown);
+                    }
+                    return unknown.isEmpty();
+                })
+                .orElse(null);
 
-        // 4. Keyword coverage of the posting by the text that actually made it onto the page.
-        double atsScore = AtsScorer.score(data.postingTitle(), data.postingDescription(), CvComposer.plainText(fitted.document()));
+        // 3. Spread the bullets over the relevant entries, then render; drop the lowest-ranked
+        //    bullet until the CV is exactly one page.
+        ranked = BulletBalancer.balance(ranked, selectable);
+
+        OnePageFitter.Fitted fitted = fitter.fit(data, ranked, summary);
+
+        // 4. ATS check on the PDF as a parser reads it: keyword coverage plus structural checks.
+        AtsReport report = AtsChecker.check(data, fitted.document(), fitted.pdf(), data.bullets(), fitted.bulletIds());
+        double atsScore = report.score();
 
         // 5. Store the PDF, then the row that points at it.
         String key = store.put(userId, postingId, fitted.pdf());
-        long cvVersionId = repository.insertCvVersion(userId, postingId, fitted.bulletIds(), key, atsScore);
+        long cvVersionId = repository.insertCvVersion(userId, postingId, fitted.bulletIds(), key, atsScore, summary, report);
         return Optional.of(new CvReady(userId, postingId, cvVersionId, atsScore));
+    }
+
+    /** Every piece of CV text the user has written: the only vocabulary a summary may draw on. */
+    private static String corpus(TailoringData data) {
+        StringBuilder text = new StringBuilder();
+        data.bullets().forEach(bullet -> text.append(bullet.text()).append('\n'));
+        data.entries().forEach(entry -> text.append(entry.title()).append(' ').append(entry.dates()).append(' ').append(entry.context()).append('\n'));
+        var fixed = data.cvStatic();
+        text.append(fixed.name()).append(' ').append(fixed.headline()).append(' ').append(fixed.languages()).append('\n');
+        if (fixed.education() != null) {
+            fixed.education().forEach(e -> text.append(e.title()).append(' ').append(e.dates()).append(' ').append(e.context()).append('\n'));
+        }
+        return text.toString();
     }
 }

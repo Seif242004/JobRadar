@@ -31,9 +31,14 @@ public class OnePageFitter {
      * @throws IllegalStateException when even a single bullet does not fit on one page
      */
     public Fitted fit(TailoringData data, List<Long> rankedIds) {
+        return fit(data, rankedIds, null);
+    }
+
+    /** @param summary the summary line to print under the header, or null */
+    public Fitted fit(TailoringData data, List<Long> rankedIds, String summary) {
         List<Long> ids = new ArrayList<>(rankedIds);
         while (!ids.isEmpty()) {
-            CvDocument document = CvComposer.compose(data, ids);
+            CvDocument document = CvComposer.compose(data, ids, summary);
             byte[] pdf = renderer.render(document);
             if (pageCount(pdf) == 1) {
                 return new Fitted(pdf, document, List.copyOf(ids));

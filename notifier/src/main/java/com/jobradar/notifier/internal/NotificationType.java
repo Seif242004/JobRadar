@@ -6,7 +6,9 @@ import java.util.Locale;
 public enum NotificationType {
     APPLY_NOW,
     WARM_BATCH,
-    DEADLINE_SOON;
+    DEADLINE_SOON,
+    /** Best unnotified matches of any age, twice a day. */
+    TOP_PICK;
 
     public String dbValue() {
         return name().toLowerCase(Locale.ROOT);

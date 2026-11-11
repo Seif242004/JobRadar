@@ -12,7 +12,8 @@ public record TailoringData(
         String postingDescription,
         CvStatic cvStatic,
         List<CvEntry> entries,
-        List<ProfileBullet> bullets) {
+        List<ProfileBullet> bullets,
+        List<CvSummary> summaries) {
 
     /** Bullets that may appear on a CV: everything except unconfirmed ones. */
     public List<ProfileBullet> selectableBullets() {

@@ -10,6 +10,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U jobradar -d jobradar"]
       interval: 5s
@@ -23,6 +24,7 @@ services:
       AWS_DEFAULT_REGION: eu-central-1
     ports:
       - "4566:4566"
+    restart: unless-stopped
     volumes:
       # Scripts in ready.d run once LocalStack is up; this one creates the queues and the bucket.
       - ./localstack/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh:ro

@@ -104,4 +104,55 @@ class EligibilityFilterTests {
                         .eligible())
                 .isTrue();
     }
+
+    private static UserPreferences prefs(List<String> titleKeywords, List<String> excludeKeywords, int maxYears) {
+        return new UserPreferences(
+                1L, 42L, List.of(), List.of("Cairo"), true, List.of("internship", "full-time"),
+                LocalDate.of(2027, 6, 30), true, maxYears, titleKeywords, excludeKeywords);
+    }
+
+    private static PostingView withDescription(String title, String description) {
+        return new PostingView(1L, title, "Cairo", null, description, null, null, NOW);
+    }
+
+    @Test
+    void midLevelTitlesAndExperienceHeavyDescriptionsAreRejectedForEntryLevel() {
+        UserPreferences user = prefs(List.of(), List.of(), 2);
+
+        assertThat(EligibilityFilter.check(withDescription("Software Engineer II", null), user, NOW).eligible()).isFalse();
+        assertThat(EligibilityFilter.check(withDescription("Backend Developer", "Requires 5+ years of experience in Java"), user, NOW)
+                        .reason())
+                .isEqualTo("Asks for 5+ years of experience");
+        // Two years is within the limit, and an internship is never rejected on years.
+        assertThat(EligibilityFilter.check(withDescription("Backend Developer", "1-2 years of experience"), user, NOW).eligible()).isTrue();
+        assertThat(EligibilityFilter.check(withDescription("Backend Intern", "3+ years of experience preferred"), user, NOW).eligible()).isTrue();
+    }
+
+    @Test
+    void yearsAskedUsesTheSmallestFigureAndIgnoresCompanyCopy() {
+        assertThat(EligibilityFilter.yearsAsked("3+ years Java, 1 year of experience with Spring")).isEqualTo(1);
+        assertThat(EligibilityFilter.yearsAsked("We have 10 years in business")).isEqualTo(0);
+        assertThat(EligibilityFilter.yearsAsked(null)).isEqualTo(0);
+    }
+
+    @Test
+    void titleKeywordsAreRequiredAndExcludedWordsRejectOnWholeWords() {
+        UserPreferences user = prefs(List.of("backend", "ai", "game"), List.of("sales"), 2);
+
+        assertThat(EligibilityFilter.check(withDescription("Backend Engineer", null), user, NOW).eligible()).isTrue();
+        assertThat(EligibilityFilter.check(withDescription("AI Engineer Intern", null), user, NOW).eligible()).isTrue();
+        // "ai" must not match inside "maintenance".
+        assertThat(EligibilityFilter.check(withDescription("Maintenance Technician", null), user, NOW).reason())
+                .isEqualTo("Title matches none of your target roles");
+        assertThat(EligibilityFilter.check(withDescription("Backend Sales Engineer", null), user, NOW).reason())
+                .isEqualTo("Title has excluded word \"sales\"");
+    }
+
+    @Test
+    void entryLevelCanBeSwitchedOff() {
+        UserPreferences user = new UserPreferences(
+                1L, 42L, List.of(), List.of("Cairo"), true, List.of("full-time"), null, false, 2, List.of(), List.of());
+
+        assertThat(EligibilityFilter.check(withDescription("Senior Engineer", "8+ years of experience"), user, NOW).eligible()).isTrue();
+    }
 }

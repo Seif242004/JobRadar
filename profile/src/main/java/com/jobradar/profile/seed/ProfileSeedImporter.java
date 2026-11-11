@@ -53,15 +53,19 @@ public class ProfileSeedImporter {
                 seed.email(),
                 seed.dailyApplyCap());
 
-        // 2. Preferences: one row per user, replaced on every run.
+        // 2. Preferences: one row per user. Once the user has saved them in the dashboard (onboarded)
+        //    the seed no longer overwrites the search preferences; the CV header and graduation date still follow the seed.
         ProfileSeed.Preferences prefs = seed.preferences();
         jdbc.update(
                 """
                 INSERT INTO profile (user_id, roles, cities, remote, job_types, graduation_date, cv_static)
                 VALUES (?, ?, ?, ?, ?, ?, ?::jsonb)
                 ON CONFLICT (user_id) DO UPDATE SET
-                    roles = EXCLUDED.roles, cities = EXCLUDED.cities, remote = EXCLUDED.remote,
-                    job_types = EXCLUDED.job_types, graduation_date = EXCLUDED.graduation_date,
+                    roles = CASE WHEN profile.onboarded THEN profile.roles ELSE EXCLUDED.roles END,
+                    cities = CASE WHEN profile.onboarded THEN profile.cities ELSE EXCLUDED.cities END,
+                    remote = CASE WHEN profile.onboarded THEN profile.remote ELSE EXCLUDED.remote END,
+                    job_types = CASE WHEN profile.onboarded THEN profile.job_types ELSE EXCLUDED.job_types END,
+                    graduation_date = EXCLUDED.graduation_date,
                     cv_static = EXCLUDED.cv_static
                 """,
                 userId,
@@ -110,6 +114,20 @@ public class ProfileSeedImporter {
                             entryId, userId, entry.section(), bullet.text());
                 }
             }
+        }
+
+        // 4. Summary variants. A variant the user has confirmed is never rewritten by the seed.
+        int summaryOrder = 0;
+        for (ProfileSeed.Summary summary : seed.summaries() == null ? List.<ProfileSeed.Summary>of() : seed.summaries()) {
+            jdbc.update(
+                    """
+                    INSERT INTO cv_summary (user_id, label, focus, text, sort_order)
+                    VALUES (?, ?, ?::text[], ?, ?)
+                    ON CONFLICT (user_id, label) DO UPDATE SET
+                        focus = EXCLUDED.focus, text = EXCLUDED.text, sort_order = EXCLUDED.sort_order
+                    WHERE cv_summary.verify
+                    """,
+                    userId, summary.label(), textArray(summary.focus()), summary.text(), summaryOrder++);
         }
         return new Result(userId, inserted, present);
     }

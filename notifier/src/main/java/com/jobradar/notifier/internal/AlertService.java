@@ -40,12 +40,22 @@ public class AlertService {
     private final TelegramClient telegram;
     private final CvLinks cvLinks;
     private final Clock clock;
+    private final double topPickMinFit;
+    private final String dashboardUrl;
 
-    AlertService(NotificationRepository notifications, TelegramClient telegram, CvLinks cvLinks, Clock clock) {
+    AlertService(
+            NotificationRepository notifications,
+            TelegramClient telegram,
+            CvLinks cvLinks,
+            Clock clock,
+            @org.springframework.beans.factory.annotation.Value("${jobradar.notifier.top-picks-min-fit:60}") double topPickMinFit,
+            @org.springframework.beans.factory.annotation.Value("${jobradar.public-url:}") String dashboardUrl) {
         this.notifications = notifications;
         this.telegram = telegram;
         this.cvLinks = cvLinks;
         this.clock = clock;
+        this.topPickMinFit = topPickMinFit;
+        this.dashboardUrl = dashboardUrl;
     }
 
     /**
@@ -122,6 +132,30 @@ public class AlertService {
             // remainder does not come back as a second interruption; it stays in the dashboard.
             postings.forEach(posting ->
                     notifications.recordSent(userId, posting.postingId(), NotificationType.WARM_BATCH, now));
+        });
+    }
+
+    /** Most postings in one top-picks message. */
+    static final int TOP_PICKS = 5;
+
+    /**
+     * Twice a day (09:00 and 19:00 Cairo): the best matches that nothing else has pushed, whatever
+     * their age. Without this, a good posting older than a day, or one that only became eligible
+     * after a preference change, would never produce a notification. Only the {@value #TOP_PICKS}
+     * listed postings are marked, so the next run moves on to the next ones.
+     */
+    @Scheduled(cron = "${jobradar.notifier.top-picks-cron:0 0 9,19 * * *}", zone = "Africa/Cairo")
+    public void sendTopPicks() {
+        Instant now = clock.instant();
+        byUser(notifications.findPendingTop(topPickMinFit)).forEach((userId, postings) -> {
+            List<AlertPosting> picks = postings.subList(0, Math.min(postings.size(), TOP_PICKS));
+            boolean link = !dashboardUrl.isBlank();
+            telegram.sendMessage(
+                    picks.get(0).chatId(),
+                    AlertFormatter.topPicks(picks),
+                    link ? "Open dashboard" : null,
+                    link ? dashboardUrl : null);
+            picks.forEach(posting -> notifications.recordSent(userId, posting.postingId(), NotificationType.TOP_PICK, now));
         });
     }
 

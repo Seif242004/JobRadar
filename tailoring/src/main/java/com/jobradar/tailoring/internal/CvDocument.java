@@ -6,7 +6,7 @@ import java.util.List;
  * The CV as the Typst template reads it from {@code cv.json}. Field names are part of the
  * template contract (see {@code typst/cv.typ}).
  */
-public record CvDocument(String name, String headline, List<Contact> contacts, List<Section> sections) {
+public record CvDocument(String name, String headline, String summary, List<Contact> contacts, List<Section> sections) {
 
     public record Contact(String text, String url) {}
 

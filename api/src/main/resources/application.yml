@@ -53,7 +53,7 @@ jobradar:
       enabled: ${JOBRADAR_QUEUE_LISTENER_ENABLED:true}
     cv-bucket: ${JOBRADAR_S3_BUCKET:jobradar-local}
     # How long the CV link in an Apply-now alert stays valid.
-    cv-link-ttl: ${JOBRADAR_CV_LINK_TTL:12h}
+    cv-link-ttl: ${JOBRADAR_CV_LINK_TTL:168h}
     queues:
       cv-ready-url: ${JOBRADAR_SQS_CV_READY_URL:http://sqs.eu-central-1.localhost.localstack.cloud:4566/000000000000/jobradar-cv-ready}
   apply:
@@ -63,6 +63,14 @@ jobradar:
     # OAuth client of the Google Cloud project; users' refresh tokens live in Secrets Manager.
     client-id: ${JOBRADAR_GOOGLE_CLIENT_ID:}
     client-secret: ${JOBRADAR_GOOGLE_CLIENT_SECRET:}
+  # Public https address of the dashboard (a tunnel). When set, CV links in notifications point here and
+  # work on a phone; requires jobradar.dashboard.access-token.
+  public-url: ${JOBRADAR_PUBLIC_URL:}
+  dashboard:
+    # Secret for the dashboard on the internet: bearer token, cookie or ?token= (16+ characters).
+    access-token: ${JOBRADAR_DASHBOARD_TOKEN:}
+    # HMAC secret that signs the CV links in notifications (16+ characters). Defaults to the access token.
+    link-secret: ${JOBRADAR_LINK_SECRET:${JOBRADAR_DASHBOARD_TOKEN:}}
   ntfy:
     # Free push channel (ntfy.sh) used instead of Telegram when the topic is set. Use a long random topic.
     topic: ${JOBRADAR_NTFY_TOPIC:}
