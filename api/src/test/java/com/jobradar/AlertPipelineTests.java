@@ -110,7 +110,7 @@ class AlertPipelineTests extends PostgresIntegrationTest {
     void warmPostingsArriveInOneBatchAndBacklogIsNeverPushed() {
         long warmA = posting("Backend Engineer", "Cairo", Duration.ofHours(3), null);
         long warmB = posting("Data Engineer", "Remote", Duration.ofHours(20), null);
-        long backlog = posting("QA Engineer", "Cairo", Duration.ofHours(30), null);
+        long backlog = posting("QA Engineer", "Cairo", Duration.ofDays(8), null);
         for (long id : new long[] {warmA, warmB, backlog}) {
             matcher.match(id);
         }
@@ -123,7 +123,7 @@ class AlertPipelineTests extends PostgresIntegrationTest {
         ArgumentCaptor<String> text = ArgumentCaptor.forClass(String.class);
         verify(telegram, times(1)).sendMessage(eq(CHAT_ID), text.capture(), isNull(), isNull());
         assertThat(text.getValue())
-                .contains("New matches in the last 24 hours (2)", "Backend Engineer", "Data Engineer")
+                .contains("New matches in the past week (2)", "Backend Engineer", "Data Engineer")
                 .doesNotContain("QA Engineer");
         // Newest first while no fit score exists.
         assertThat(text.getValue().indexOf("Backend Engineer")).isLessThan(text.getValue().indexOf("Data Engineer"));
@@ -180,14 +180,14 @@ class AlertPipelineTests extends PostgresIntegrationTest {
 
     @Test
     void topPicksPushTheBestOldMatchesOnceAndMoveOnToTheNextOnes() {
-        // Old postings are Backlog: no alert covers them, so only the top-picks run can announce them.
+        // Within the 7-day window but not yet announced: the top-picks run pushes the best of them.
         long[] ids = new long[7];
         for (int i = 0; i < ids.length; i++) {
-            ids[i] = posting("Backend Engineer " + i, "Cairo", Duration.ofDays(3 + i), null);
+            ids[i] = posting("Backend Engineer " + i, "Cairo", Duration.ofHours(3 + i), null);
             matcher.match(ids[i]);
             jdbc.update("UPDATE match SET fit_score = ?, priority = ? WHERE posting_id = ?", 90 - i, 90 - i, ids[i]);
         }
-        long weak = posting("Backend Engineer weak", "Cairo", Duration.ofDays(9), null);
+        long weak = posting("Backend Engineer weak", "Cairo", Duration.ofHours(12), null);
         matcher.match(weak);
         jdbc.update("UPDATE match SET fit_score = 40, priority = 40 WHERE posting_id = ?", weak);
         verify(telegram, never()).sendMessage(anyLong(), any(), any(), any());

@@ -23,7 +23,12 @@ public class JsonFetch {
      * @throws SourceFetchException       on any other non-2xx status or a body that is not JSON
      */
     public JsonNode get(String source, URI uri) {
-        FetchResponse response = http.get(uri);
+        return get(source, uri, java.util.Map.of());
+    }
+
+    /** Same, sending extra headers such as an API key. */
+    public JsonNode get(String source, URI uri, java.util.Map<String, String> headers) {
+        FetchResponse response = http.get(uri, headers);
         if (response.status() == 429) {
             throw new SourceRateLimitedException(source, response.retryAfter());
         }

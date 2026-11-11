@@ -161,7 +161,7 @@ class EligibilityFilterTests {
 
     @Test
     void aPostingWithNoEarlyCareerSignalIsRejectedForAnEntryLevelProfile() {
-        PostingView plain = new PostingView(1L, "Software Engineer", "Cairo", null, "Build services.", null, null, NOW);
+        PostingView plain = new PostingView(1L, "Software Engineer", "Cairo", null, "Build services. ".repeat(60), null, null, NOW);
 
         Eligibility result = EligibilityFilter.check(plain, STUDENT, NOW);
 
@@ -194,5 +194,32 @@ class EligibilityFilterTests {
 
         assertThat(result.eligible()).isFalse();
         assertThat(result.reason()).isEqualTo("Not a software or tech role");
+    }
+
+    @Test
+    void postingsOlderThanTheAgeLimitAreRejectedUsingTheirOwnDateFirst() {
+        Instant old = NOW.minus(Duration.ofDays(8));
+        PostingView seenOld = new PostingView(1L, "Backend Intern", "Cairo", null, "Open to fresh graduates.", null, null, old);
+        PostingView postedOld = new PostingView(1L, "Backend Intern", "Cairo", null, "Open to fresh graduates.", null, old, NOW);
+        PostingView postedRecently = new PostingView(1L, "Backend Intern", "Cairo", null, "Open to fresh graduates.", null, NOW.minus(Duration.ofDays(2)), old);
+
+        assertThat(EligibilityFilter.check(seenOld, STUDENT, NOW).reason()).isEqualTo("Older than 7 days");
+        assertThat(EligibilityFilter.check(postedOld, STUDENT, NOW).eligible()).isFalse();
+        assertThat(EligibilityFilter.check(postedRecently, STUDENT, NOW).eligible()).isTrue();
+    }
+
+    @Test
+    void aShortSnippetWithoutALevelIsKeptAndMarkedBecauseItCannotShowTheLevel() {
+        PostingView snippet = new PostingView(1L, "AI Software Engineer", "Cairo", null, "Build AI services.", null, null, NOW);
+
+        Eligibility result = EligibilityFilter.check(snippet, STUDENT, NOW);
+
+        assertThat(result.eligible()).isTrue();
+        assertThat(result.reason()).contains("level not stated");
+    }
+
+    @Test
+    void aMobileInternshipWithMarketingInTheTitleIsStillTech() {
+        assertThat(check("Internship - Marketing & Mobile Flutter Development", "Cairo", null).eligible()).isTrue();
     }
 }

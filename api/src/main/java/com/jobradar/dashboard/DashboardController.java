@@ -47,7 +47,9 @@ class DashboardController {
             String applyChannel,
             String applyTarget,
             Instant firstSeenAt,
-            boolean cvReady) {}
+            boolean cvReady,
+            List<String> levels,
+            boolean thin) {}
 
     record PreferencesView(
             List<String> roles,
@@ -58,6 +60,9 @@ class DashboardController {
             int maxYearsExperience,
             List<String> titleKeywords,
             List<String> excludeKeywords,
+            int maxAgeDays,
+            int pushMinFit,
+            int digestMinFit,
             boolean onboarded) {}
 
     private final JdbcTemplate jdbc;
@@ -84,14 +89,15 @@ class DashboardController {
         int years = Math.max(0, Math.min(body.maxYearsExperience(), 20));
         profiles.savePreferences(id, new ProfileService.EditablePreferences(
                 body.roles(), body.cities(), body.remote(), body.jobTypes(), body.entryLevelOnly(), years,
-                body.titleKeywords(), body.excludeKeywords()));
+                body.titleKeywords(), body.excludeKeywords(), Math.max(0, Math.min(body.maxAgeDays(), 365)),
+                Math.max(0, Math.min(body.pushMinFit(), 100)), Math.max(0, Math.min(body.digestMinFit(), 100))));
         CompletableFuture.runAsync(() -> matcher.rematch(id));
         return view(profiles.findPreferences(id).orElseThrow(), true);
     }
 
     private static PreferencesView view(UserPreferences p, boolean onboarded) {
         return new PreferencesView(p.roles(), p.cities(), p.remote(), p.jobTypes(), p.entryLevelOnly(),
-                p.maxYearsExperience(), p.titleKeywords(), p.excludeKeywords(), onboarded);
+                p.maxYearsExperience(), p.titleKeywords(), p.excludeKeywords(), p.maxAgeDays(), p.pushMinFit(), p.digestMinFit(), onboarded);
     }
 
     private Optional<Long> userId() {
@@ -110,7 +116,7 @@ class DashboardController {
                 count("SELECT count(*) FROM application WHERE user_id = ? AND status = 'applied' AND follow_up_at <= now()", id)));
     }
 
-    /** Eligible matches, best first: by priority once fit scores exist, then newest. */
+    /** Eligible matches, newest first by the posting's own date (first seen when the source gives none). */
     @GetMapping("/matches")
     List<MatchRow> matches(@RequestParam(defaultValue = "50") int limit) {
         int capped = Math.max(1, Math.min(limit, 200));
@@ -118,13 +124,17 @@ class DashboardController {
                 .map(id -> jdbc.query(
                         """
                         SELECT p.id, p.title, c.name AS company, p.location, m.band, m.fit_score, m.reasons,
-                               p.apply_channel, p.apply_target, p.first_seen_at,
+                               p.apply_channel, p.apply_target, COALESCE(p.posted_at, p.first_seen_at) AS first_seen_at, p.description,
+                               char_length(coalesce(p.description, '')) < 600 AS thin,
                                EXISTS (SELECT 1 FROM cv_version v WHERE v.user_id = m.user_id AND v.posting_id = m.posting_id) AS cv_ready
                         FROM match m
                         JOIN posting p ON p.id = m.posting_id
                         LEFT JOIN company c ON c.id = p.company_id
+                        LEFT JOIN profile pr ON pr.user_id = m.user_id
                         WHERE m.user_id = ? AND m.eligible
-                        ORDER BY m.priority DESC NULLS LAST, p.first_seen_at DESC
+                          AND (COALESCE(pr.max_age_days, 7) = 0
+                               OR COALESCE(p.posted_at, p.first_seen_at) >= now() - make_interval(days => COALESCE(pr.max_age_days, 7)))
+                        ORDER BY COALESCE(p.posted_at, p.first_seen_at) DESC, m.fit_score DESC NULLS LAST
                         LIMIT ?
                         """,
                         (rs, n) -> new MatchRow(
@@ -132,7 +142,9 @@ class DashboardController {
                                 rs.getString("band"),
                                 rs.getBigDecimal("fit_score") == null ? null : rs.getBigDecimal("fit_score").doubleValue(),
                                 rs.getString("reasons"), rs.getString("apply_channel"), rs.getString("apply_target"),
-                                rs.getTimestamp("first_seen_at").toInstant(), rs.getBoolean("cv_ready")),
+                                rs.getTimestamp("first_seen_at").toInstant(), rs.getBoolean("cv_ready"),
+                                com.jobradar.matching.PostingLevel.ids(rs.getString("title"), rs.getString("description")),
+                                rs.getBoolean("thin")),
                         id, capped))
                 .orElse(List.of());
     }

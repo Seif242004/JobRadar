@@ -22,6 +22,8 @@ export interface MatchRow {
   applyTarget: string | null;
   firstSeenAt: string;
   cvReady: boolean;
+  levels: string[];
+  thin: boolean;
 }
 
 export interface ApplicationRow {
@@ -35,6 +37,9 @@ export interface Preferences {
   jobTypes: string[];
   entryLevelOnly: boolean;
   maxYearsExperience: number;
+  maxAgeDays: number;
+  pushMinFit: number;
+  digestMinFit: number;
   titleKeywords: string[];
   excludeKeywords: string[];
   onboarded: boolean;
@@ -75,6 +80,8 @@ export interface PostingDetail {
   applyTarget: string | null;
   cv: CvInfo | null;
   baseScores: BaseScore[];
+  thin: boolean;
+  enrichStatus: string | null;
 }
 
 export interface BaseCv { id: number; label: string; filename: string }

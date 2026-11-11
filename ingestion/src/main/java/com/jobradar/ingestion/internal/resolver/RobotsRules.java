@@ -10,13 +10,13 @@ import java.util.regex.Pattern;
  * Follows RFC 9309: the group naming our agent wins over {@code *}, the longest matching rule
  * decides, and Allow wins a tie.
  */
-final class RobotsRules {
+public final class RobotsRules {
 
     private record Rule(boolean allow, String path) {}
 
     private RobotsRules() {}
 
-    static boolean allows(String robotsTxt, String agentToken, String path) {
+    public static boolean allows(String robotsTxt, String agentToken, String path) {
         List<Rule> own = new ArrayList<>();
         List<Rule> wildcard = new ArrayList<>();
         boolean ownGroup = false;

@@ -21,9 +21,11 @@ public class NotificationRepository {
             """
             SELECT m.user_id, u.telegram_chat_id, p.id AS posting_id, p.title, c.name AS company, p.location,
                    p.apply_channel, p.apply_target, p.deadline, m.reasons, m.fit_score,
-                   LEAST(p.posted_at, p.first_seen_at) AS fresh_since
+                   LEAST(p.posted_at, p.first_seen_at) AS fresh_since,
+                   COALESCE(pr.push_min_fit, 75) AS push_min_fit, COALESCE(pr.digest_min_fit, 40) AS digest_min_fit
             FROM match m
             JOIN app_user u ON u.id = m.user_id
+            LEFT JOIN profile pr ON pr.user_id = m.user_id
             JOIN posting p ON p.id = m.posting_id
             LEFT JOIN company c ON c.id = p.company_id
             WHERE m.eligible AND u.telegram_chat_id IS NOT NULL
@@ -53,6 +55,7 @@ public class NotificationRepository {
                 ALERT_COLUMNS
                         + """
                          AND p.deadline IS NULL
+                         AND (m.fit_score IS NULL OR m.fit_score >= COALESCE(pr.digest_min_fit, 40))
                          AND LEAST(p.posted_at, p.first_seen_at) > ? AND LEAST(p.posted_at, p.first_seen_at) <= ?
                         ORDER BY m.user_id, m.priority DESC NULLS LAST, LEAST(p.posted_at, p.first_seen_at) DESC
                         """,
@@ -63,7 +66,7 @@ public class NotificationRepository {
     /**
      * Eligible matches with a fit score of at least {@code minFit} that nobody was told about yet,
      * of any age, best first per user. Fills the gap the age-based alerts leave: postings older
-     * than 24 hours, or matches that appeared after the user changed preferences.
+     * than 7 days, or matches that appeared after the user changed preferences.
      */
     public List<AlertPosting> findPendingTop(double minFit) {
         return jdbc.query(
@@ -126,6 +129,8 @@ public class NotificationRepository {
                 deadline == null ? null : deadline.toInstant(),
                 rs.getString("reasons"),
                 fit == null ? null : fit.doubleValue(),
-                rs.getTimestamp("fresh_since").toInstant());
+                rs.getTimestamp("fresh_since").toInstant(),
+                rs.getDouble("push_min_fit"),
+                rs.getDouble("digest_min_fit"));
     }
 }

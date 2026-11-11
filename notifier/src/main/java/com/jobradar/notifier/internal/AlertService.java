@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service;
  * Alerts by freshness band (docs/PLAN.md, "Freshness first"):
  *
  * <ul>
- *   <li>Hot with fit 85+ and under 1 hour old: pushed when its tailored CV is ready. Hot without a
+ *   <li>New (under 24 hours) with fit at or above the user's push threshold: pushed when its CV is ready. Hot without a
  *       fit score: pushed the moment the match is scored.
- *   <li>Warm (2 to 24 hours old): one batched message every 3 hours, best first.
- *   <li>Backlog (over 24 hours): never pushed.
+ *   <li>Warm (2 hours to 7 days old): one daily digest, best first.
+ *   <li>Backlog (over 7 days): never pushed.
  *   <li>Deadline: pushed once, when the closing date is at most 3 days away.
  * </ul>
  *
@@ -31,9 +31,9 @@ import org.springframework.stereotype.Service;
 public class AlertService {
 
     static final Duration HOT_WINDOW = Duration.ofHours(2);
-    static final Duration WARM_WINDOW = Duration.ofHours(24);
-    static final double APPLY_NOW_MIN_FIT = 85.0;
-    static final Duration APPLY_NOW_MAX_AGE = Duration.ofHours(1);
+    static final Duration WARM_WINDOW = Duration.ofDays(7);
+    /** A posting counts as new for an instant push for this long after it was posted or first seen. */
+    static final Duration APPLY_NOW_MAX_AGE = Duration.ofHours(24);
     static final Duration DEADLINE_WINDOW = Duration.ofDays(3);
 
     private final NotificationRepository notifications;
@@ -79,7 +79,7 @@ public class AlertService {
     }
 
     /**
-     * Apply now (SPEC.md D7): fit at least 85, posting under 1 hour old, and the CV is ready.
+     * Apply now: fit at or above the user's push threshold (default 75), posting under 24 hours old, and the CV is ready.
      * Anything else stays pending and falls through to the warm batch or the dashboard.
      *
      * @return true when a push was sent
@@ -87,7 +87,7 @@ public class AlertService {
     public boolean onCvReady(long userId, long postingId, long cvVersionId, double atsScore) {
         Instant now = clock.instant();
         return notifications.findPending(userId, postingId)
-                .filter(posting -> posting.fitScore() != null && posting.fitScore() >= APPLY_NOW_MIN_FIT)
+                .filter(posting -> posting.fitScore() != null && posting.fitScore() >= posting.pushMinFit())
                 .filter(posting -> Duration.between(posting.freshSince(), now).compareTo(APPLY_NOW_MAX_AGE) < 0)
                 .flatMap(posting -> notifications.findCvKey(userId, cvVersionId).map(key -> {
                     telegram.sendWithButtons(
@@ -119,8 +119,8 @@ public class AlertService {
         return rows;
     }
 
-    /** Warm band: every 3 hours, one message per user with everything aged 2 to 24 hours. */
-    @Scheduled(cron = "${jobradar.notifier.warm-batch-cron:0 0 */3 * * *}", zone = "Africa/Cairo")
+    /** Daily digest (18:00 Cairo): one message per user with everything aged 2 hours to 7 days at or above the digest threshold. */
+    @Scheduled(cron = "${jobradar.notifier.warm-batch-cron:0 0 18 * * *}", zone = "Africa/Cairo")
     public void sendWarmBatches() {
         Instant now = clock.instant();
         // Hot postings that could not be pushed in time (age under 2 hours) are left for the next

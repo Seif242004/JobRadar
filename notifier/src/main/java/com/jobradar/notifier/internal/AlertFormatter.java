@@ -40,7 +40,7 @@ final class AlertFormatter {
 
     /** One message listing the batch, best first, each with its apply link. */
     static String warmBatch(List<AlertPosting> postings) {
-        StringBuilder text = new StringBuilder("New matches in the last 24 hours (" + postings.size() + ")\n");
+        StringBuilder text = new StringBuilder("New matches in the past week (" + postings.size() + ")\n");
         int index = 1;
         for (AlertPosting posting : postings.subList(0, Math.min(postings.size(), MAX_BATCH_ITEMS))) {
             text.append('\n').append(index++).append(". ").append(headline(posting));
